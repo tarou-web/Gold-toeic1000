@@ -310,6 +310,7 @@ body.sv-lock{overflow:hidden}
 .badge{--c1:#ffb21e;--c2:#e07d00;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;position:relative;
   background:radial-gradient(circle at 35% 30%,var(--c1),var(--c2));box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 3px 0 rgba(0,0,0,.08)}
 .badge::before{content:"";position:absolute;inset:7px;border-radius:50%;border:3px solid rgba(255,255,255,.55)}
+.badge .bface{position:relative;width:86%;height:86%}
 .badge b{position:relative;color:#fff;font-family:var(--f);font-weight:900;font-size:1.2rem;text-shadow:0 2px 0 rgba(0,0,0,.2)}
 .badge img{width:100%;height:100%;object-fit:contain;border-radius:50%}
 .badge.has-img{background:none;box-shadow:none}.badge.has-img::before{display:none}
@@ -535,10 +536,21 @@ function credit(id,viaCard){
   if(gotPoint&&BADGES.includes(S.points))setTimeout(()=>celebrateBadge(S.points),goalNow?2600:300);
 }
 function studied(xp){S.xp+=xp}
+const PARROT_FACE=`<svg class="bface" viewBox="0 0 100 100" aria-hidden="true">
+  <circle cx="50" cy="51" r="31" fill="rgba(255,255,255,.2)"/>
+  <g fill="none" stroke="rgba(255,255,255,.62)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M35 29q5 5 10 0M45 29q5 5 10 0M55 29q5 5 10 0" stroke-width="3.6"/>
+    <circle cx="38" cy="49" r="11.5" stroke-width="4"/><circle cx="62" cy="49" r="11.5" stroke-width="4"/>
+  </g>
+  <g fill="rgba(255,255,255,.62)">
+    <circle cx="38" cy="49" r="4.8"/><circle cx="62" cy="49" r="4.8"/>
+    <path d="M41.5 61q8.5-8 17 0q1.3 8.5-5.8 16.2q-2 2-3.1-.6q-1.8-6.5-8.1-10.9z"/>
+  </g>
+</svg>`;
 function badgeHTML(p,small){
   const tier=BADGES.indexOf(p), hue=[45,30,10,340,300,265,220,190,160,130][Math.min(9,Math.floor(tier/3.1))];
   if(BADGE_ART)return `<div class="badge has-img"><img src="badges/badge-${p}.png" alt="${p}ポイントのバッジ"></div>`;
-  return `<div class="badge" style="--c1:hsl(${hue} 95% 62%);--c2:hsl(${hue} 85% 42%)"><b>${p>=1000?(p/1000)+'k':p}</b></div>`;
+  return `<div class="badge" style="--c1:hsl(${hue} 95% 62%);--c2:hsl(${hue} 85% 42%)">${PARROT_FACE}</div>`;
 }
 let toastTimer=null;
 function toast(html){const el=$('toast');el.innerHTML=html;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2400)}
