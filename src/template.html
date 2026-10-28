@@ -316,7 +316,7 @@ body.sv-lock{overflow:hidden}
 
   <div class="controls">
     <label class="ctl">範囲<select id="range"></select></label>
-    <label class="ctl">出題<select id="filter"><option value="all">すべて</option><option value="todo">未習得のみ</option><option value="weak">苦手のみ</option><option value="fix">修正した項目</option></select></label>
+    <label class="ctl">出題<select id="filter"><option value="all">すべて</option><option value="todo">未習得のみ</option><option value="weak">苦手のみ</option><option value="fix">修正した項目</option><option value="add">追加した語だけ</option></select></label>
     <label class="ctl">表面<select id="dir"><option value="je">日本語</option><option value="ej">英語</option></select></label>
     <label class="ctl">順番<select id="order"><option value="seq">番号順</option><option value="shuf">シャッフル</option></select></label>
     <label class="ctl">効果音<select id="sound"><option value="on">オン</option><option value="off">オフ</option></select></label>
@@ -339,7 +339,8 @@ const ICON_OK='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="cur
 const ICON_NG='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>';
 const CHEER=['すばらしい！','その調子！','完璧！','ナイス！','やったね！'];
 
-const rs=$('range'); rs.innerHTML='<option value="0-1000">全部 1–1000</option>'+Array.from({length:10},(_,i)=>`<option value="${i*100}-${i*100+100}">${i*100+1}–${i*100+100}</option>`).join('');
+const rs=$('range'); {const N=DATA.length,sets=[];for(let a=0;a<N;a+=100){const b=Math.min(N,a+100);sets.push(`<option value="${a}-${b}">${a+1}–${b}</option>`)}
+  rs.innerHTML=`<option value="0-${N}">全部 1–${N}</option><option value="0-1000">前回の1000語</option><option value="1000-${N}">追加の${N-1000}語</option>`+sets.join('');}
 const prefs=(()=>{try{return JSON.parse(localStorage.getItem(KEY+'-p')||'{}')}catch(e){return{}}})();
 for(const k of ['range','filter','dir','order','sound','vib']) if(prefs[k]) $(k).value=prefs[k];
 let tab=prefs.tab||'card';
@@ -356,7 +357,7 @@ function status(d){return S.known[d.id]?'ok':(S.miss[d.id]?'bad':'new')}
 function chip(d){const s=status(d);return `<span class="chip ${s}">${s==='ok'?'覚えた':s==='bad'?'苦手 ×'+S.miss[d.id]:'未習得'}</span>`}
 function pool(){
   const [a,b]=$('range').value.split('-').map(Number); const f=$('filter').value;
-  let p=DATA.slice(a,b).filter(d=>f==='all'||(f==='todo'&&!S.known[d.id])||(f==='weak'&&S.miss[d.id])||(f==='fix'&&d.fix));
+  let p=DATA.slice(a,b).filter(d=>f==='all'||(f==='todo'&&!S.known[d.id])||(f==='weak'&&S.miss[d.id])||(f==='fix'&&d.fix)||(f==='add'&&d.add));
   if($('order').value==='shuf'){p=p.slice();for(let i=p.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[p[i],p[j]]=[p[j],p[i]]}}
   return p;
 }
