@@ -93,7 +93,11 @@ async function build() {
   else if (now.getHours() >= 20) { mood = "late"; art = `sad-${SAD.late[slot % SAD.late.length]}`; }
   else { mood = "pending"; art = `sad-${SAD.pending[slot % SAD.pending.length]}`; }
   const msgs = MSG[mood];
-  const msg = msgs[dayNum % msgs.length];
+  let msg = msgs[dayNum % msgs.length];
+  // 今日少しでも進んでいれば、目標までの残りを出す
+  const goal = (data && data.goal) || 10;
+  const doneNow = data && data.todayKey === dkey(now) ? (data.todayDone || 0) : 0;
+  if ((mood === "pending" || mood === "late" || mood === "zero") && doneNow > 0) msg = `あと${Math.max(0, goal - doneNow)}問！（${doneNow}/${goal}）`;
   const lit = mood === "happy";
 
   const img = await loadArt(art);
@@ -140,7 +144,7 @@ async function build() {
     w.addSpacer(2);
     const sr = w.addStack();
     sr.addSpacer();
-    const s = sr.addText(`${data.xp || 0} XP ・ 覚えた ${data.knownCount || 0}/${data.total || 1351}`);
+    const s = sr.addText(`★${data.points || 0} ・ 覚えた ${data.knownCount || 0}/${data.total || 1351}`);
     s.font = Font.boldRoundedSystemFont(11);
     s.textColor = new Color("#ffffff", 0.9);
     shadow(s);

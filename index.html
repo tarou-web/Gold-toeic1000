@@ -195,7 +195,7 @@ input[type=search],select{font:inherit;font-weight:700;font-size:.92rem;color:va
 .more{text-align:center;padding:10px}
 
 /* settings */
-.controls{margin-top:6px;padding-top:18px;border-top:2px solid var(--line);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.controls{margin-top:6px;padding-top:18px;border-top:2px solid var(--line);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
 @media (max-width:560px){.controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
 label.ctl{display:flex;flex-direction:column;gap:4px;font-size:.72rem;color:var(--muted);font-weight:800}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -282,6 +282,47 @@ body.sv-lock{overflow:hidden}
 .sync-msg{min-height:1.2em}
 .sync-link{color:var(--blue-ink);font-weight:800;text-decoration:none}
 .sync-msg.bad{color:var(--red-ink)!important}
+.stat.pts{font:inherit;font-weight:900;background:none;border:0;padding:4px 6px;margin:-4px -6px;border-radius:10px;cursor:pointer;color:var(--gold-d)}
+.stat.pts:active{transform:scale(.94)}
+.goalbox{display:flex;flex-direction:column;gap:6px;border:2px solid var(--line);border-radius:16px;padding:10px 14px}
+.goalrow{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;font-weight:800;font-variant-numeric:tabular-nums}
+.goalrow #goalTxt{color:var(--fg)}
+.goalbox.done{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 12%,transparent)}
+.gtrack{height:12px}
+.gtrack i{background:var(--gold)}
+.goalbox.done .gtrack i{background:var(--gold-d)}
+/* badges screen */
+.bv{position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform .38s cubic-bezier(.3,1.1,.4,1);visibility:hidden}
+.bv.open{transform:none;visibility:visible}
+.bv-hero{background:#6a3fd6;color:#fff;padding-top:env(safe-area-inset-top,0px)}
+.bv-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px 26px}
+.bv-num{font-family:var(--f);font-weight:900;font-size:4.2rem;line-height:1;text-shadow:4px 4px 0 #4a28a8}
+.bv-lbl{font-family:var(--f-jp);font-weight:800;font-size:1.3rem;margin-top:4px}
+.bv-sub{font-size:.85rem;opacity:.9;margin-top:4px}
+.bv-next{flex:0 0 auto}
+.bv-body{display:flex;flex-direction:column;gap:14px;padding-block:20px 48px}
+.bv-body h3{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1.2rem}
+.bv-rule{font-size:.82rem;color:var(--muted);margin:0}
+.bgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 10px}
+.bitem{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.bitem small{font-size:.78rem;font-weight:800;font-variant-numeric:tabular-nums}
+.bitem.locked small{color:var(--muted)}
+.badge{--c1:#ffb21e;--c2:#e07d00;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;position:relative;
+  background:radial-gradient(circle at 35% 30%,var(--c1),var(--c2));box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),0 3px 0 rgba(0,0,0,.08)}
+.badge::before{content:"";position:absolute;inset:7px;border-radius:50%;border:3px solid rgba(255,255,255,.55)}
+.badge b{position:relative;color:#fff;font-family:var(--f);font-weight:900;font-size:1.2rem;text-shadow:0 2px 0 rgba(0,0,0,.2)}
+.badge img{width:100%;height:100%;object-fit:contain;border-radius:50%}
+.badge.has-img{background:none;box-shadow:none}.badge.has-img::before{display:none}
+.bitem.locked .badge{filter:grayscale(1);opacity:.35}
+.bitem.locked .badge b{opacity:.7}
+.bitem.newest .badge{outline:3px solid var(--gold);outline-offset:3px}
+.toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));z-index:80;transform:translate(-50%,-160%);transition:transform .4s cubic-bezier(.3,1.4,.5,1);
+  display:flex;align-items:center;gap:12px;background:var(--surface);border:2px solid var(--gold);border-bottom-width:5px;border-radius:18px;padding:10px 16px;max-width:calc(100% - 32px);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.toast.show{transform:translate(-50%,0)}
+.toast .badge{width:48px;height:48px;flex:0 0 auto}.toast .badge b{font-size:.8rem}
+.toast strong{display:block;font-family:var(--f-jp);font-weight:800;font-size:1rem}
+.toast span{font-size:.8rem;color:var(--muted);font-weight:700}
+@media (prefers-reduced-motion:reduce){.bv{transition:none}.toast{transition:none}}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -314,12 +355,16 @@ body.sv-lock{overflow:hidden}
     <h1>フレーズ<span>1000</span></h1>
     <div class="stats">
       <button class="stat fire" id="fireBtn" aria-label="連続記録を見る"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.4 1.1-4 2.3-5.2.2 1.7 1 2.7 2 3.1C11 8 10.6 5 12 2z"/></svg><span id="streak">0</span></button>
-      <span class="stat xp" title="獲得XP"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg><span id="xp">0</span></span>
+      <button class="stat pts" id="ptsBtn" aria-label="ポイントとバッジを見る"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg><span id="pts">0</span></button>
       <span class="stat know" title="覚えたフレーズ"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.3 14.3-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z"/></svg><span id="known">0</span></span>
     </div>
   </header>
   <div class="track" id="mainbar"><i id="bar"></i></div>
   <div class="tracklabel"><span>全体の進み具合</span><span id="pct">0%</span></div>
+  <div class="goalbox" id="goalbox">
+    <div class="goalrow"><span id="goalTxt">今日の目標</span><span id="goalNum">0 / 10</span></div>
+    <div class="track gtrack"><i id="goalBar"></i></div>
+  </div>
 
   <div class="tabs" role="tablist">
     <button role="tab" id="t-card" aria-selected="true">カード</button>
@@ -355,6 +400,18 @@ body.sv-lock{overflow:hidden}
     </div>
   </div>
 </section>
+  <section class="bv" id="bv" role="dialog" aria-modal="true" aria-labelledby="bvTitle" aria-hidden="true">
+    <div class="bv-hero"><div class="sv-in">
+      <div class="sv-bar"><button class="sv-x" id="bvClose" aria-label="閉じる">✕</button><h2 id="bvTitle">ポイントとバッジ</h2><span></span></div>
+      <div class="bv-top"><div><div class="bv-num" id="bvNum">0</div><div class="bv-lbl">ポイント</div><div class="bv-sub" id="bvSub"></div></div><div class="bv-next" id="bvNext"></div></div>
+    </div></div>
+    <div class="sv-in bv-body">
+      <p class="bv-rule">カードで「覚えた」を押すと1ポイント。同じフレーズは1日1回までです。</p>
+      <h3 id="bvCount">バッジ</h3>
+      <div class="bgrid" id="bgrid"></div>
+    </div>
+  </section>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sheet" id="sheet" role="status" aria-live="polite"><div class="in" id="sheetin"></div></div>
 
   <div class="controls">
@@ -363,6 +420,7 @@ body.sv-lock{overflow:hidden}
     <label class="ctl">表面<select id="dir"><option value="je">日本語</option><option value="ej">英語</option></select></label>
     <label class="ctl">順番<select id="order"><option value="seq">番号順</option><option value="shuf">シャッフル</option></select></label>
     <label class="ctl">効果音<select id="sound"><option value="on">オン</option><option value="off">オフ</option></select></label>
+    <label class="ctl">1日の目標<select id="goal"><option value="5">5問</option><option value="10">10問</option><option value="15">15問</option><option value="20">20問</option><option value="30">30問</option></select></label>
     <label class="ctl">振動<select id="vib"><option value="on">オン</option><option value="off">オフ</option></select></label>
   </div>
 
@@ -385,7 +443,7 @@ const DATA = [{"id":1,"jp":"とにかくやってみよう。","en":"Let's try a
 const KEY='toeic1000-v1';
 let S={known:{},miss:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}catch(e){}
-S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{};
+S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}};
 // fill in days from an existing streak recorded before the calendar existed
 if(S.last&&!Object.keys(S.days).length){const [y,m,d]=S.last.split('-').map(Number);for(let i=0;i<Math.max(1,S.streak);i++){const x=new Date(y,m-1,d-i);S.days[dkey(x)]=1}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){};scheduleSync()}
@@ -395,7 +453,8 @@ var FB_ON=/^https:\/\//.test(FB_URL);
 function newKey(){const a=new Uint8Array(16);crypto.getRandomValues(a);return [...a].map(b=>b.toString(16).padStart(2,'0')).join('')}
 var syncTimer=null,syncBusy=false,syncDirty=false;
 function syncPayload(){
-  return {streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},days:S.days||{},
+  const td=todayState();
+  return {points:S.points||0,goal:S.goal||10,todayKey:td.d,todayDone:Object.keys(td.done).length,todayPts:td.pts,todayDoneMap:td.done,streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},days:S.days||{},
     knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:Date.now(),tz:-new Date().getTimezoneOffset()};
 }
 function scheduleSync(){ if(!FB_ON||!S.syncKey)return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
@@ -431,7 +490,8 @@ function initSync(){
       if(!r.ok||!d){m.textContent='その合言葉の記録が見つかりませんでした。';m.classList.add('bad');armed=null;$('syncLoad').textContent='読み込む';return}
       // the database may return numbered maps as arrays with gaps; turn them back into plain maps
       const obj=x=>{const o={};if(x)for(const k of Object.keys(x))if(x[k]!=null)o[k]=x[k];return o};
-      Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,syncKey:k});
+      Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},syncKey:k});
+      $('goal').value=String(S.goal);
       try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
       $('syncKey').value=k; header(); refresh(false); m.textContent='記録を読み込みました。'; armed=null; $('syncLoad').textContent='読み込む'; syncStatus();
     }catch(e){m.textContent='読み込めませんでした。電波を確認してもう一度試してください。';m.classList.add('bad')}
@@ -453,11 +513,47 @@ let tab=prefs.tab||'card';
 
 function dkey(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function today(){return dkey(new Date())}
-function studied(xp){
+// ---- daily goal, points and badges ----
+const BADGES=[0,10,30,50,100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1500,2000,2500,3000,3500,4000,4500,5000,6000,7000,8000,9000,10000];
+const BADGE_ART=false;   // true once the badge pictures are added (badges/badge-<points>.png)
+function todayState(){const t=today();if(S.td.d!==t)S.td={d:t,pts:{},done:{}};return S.td}
+function doneCount(){return Object.keys(todayState().done).length}
+function checkGoal(){
   const t=today();
-  if(S.last!==t){const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();S.streak=(S.last===ys?S.streak:0)+1;S.last=t}
-  S.days[t]=(S.days[t]||0)+1;
-  S.xp+=xp;
+  if(S.last===t||doneCount()<S.goal)return false;
+  const y=new Date();y.setDate(y.getDate()-1);
+  S.streak=(S.last===dkey(y)?S.streak:0)+1; S.last=t; S.days[t]=1;
+  return true;
+}
+// a phrase "counts" for today's goal when you mark it 覚えた or answer it correctly in the quiz
+function credit(id,viaCard){
+  const td=todayState(); let gotPoint=false;
+  td.done[id]=1;
+  if(viaCard&&!td.pts[id]){td.pts[id]=1;S.points++;gotPoint=true}
+  const goalNow=checkGoal();
+  if(goalNow)celebrateGoal();
+  if(gotPoint&&BADGES.includes(S.points))setTimeout(()=>celebrateBadge(S.points),goalNow?2600:300);
+}
+function studied(xp){S.xp+=xp}
+function badgeHTML(p,small){
+  const tier=BADGES.indexOf(p), hue=[45,30,10,340,300,265,220,190,160,130][Math.min(9,Math.floor(tier/3.1))];
+  if(BADGE_ART)return `<div class="badge has-img"><img src="badges/badge-${p}.png" alt="${p}ポイントのバッジ"></div>`;
+  return `<div class="badge" style="--c1:hsl(${hue} 95% 62%);--c2:hsl(${hue} 85% 42%)"><b>${p>=1000?(p/1000)+'k':p}</b></div>`;
+}
+let toastTimer=null;
+function toast(html){const el=$('toast');el.innerHTML=html;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2400)}
+function celebrateGoal(){toast(`<div class="badge" style="--c1:#ffb21e;--c2:#e07d00"><b>🔥</b></div><div><strong>今日の目標達成！</strong><span>${S.streak}日連続になりました</span></div>`);fanfare()}
+function celebrateBadge(p){toast(`${badgeHTML(p)}<div><strong>バッジ獲得！</strong><span>${p}ポイント達成</span></div>`);fanfare()}
+function openBadges(){renderBadges();const v=$('bv');v.classList.add('open');v.setAttribute('aria-hidden','false');document.body.classList.add('sv-lock');setTimeout(()=>$('bvClose').focus({preventScroll:true}),50)}
+function closeBadges(){const v=$('bv');v.classList.remove('open');v.setAttribute('aria-hidden','true');document.body.classList.remove('sv-lock');$('ptsBtn').focus({preventScroll:true})}
+function renderBadges(){
+  const p=S.points, got=BADGES.filter(b=>b<=p), next=BADGES.find(b=>b>p);
+  $('bvNum').textContent=p;
+  $('bvSub').textContent=next!==undefined?`次のバッジまで あと${next-p}ポイント`:'すべてのバッジを集めました！';
+  $('bvNext').innerHTML=next!==undefined?badgeHTML(next):'';
+  $('bvCount').textContent=`バッジ ${got.length} / ${BADGES.length}`;
+  const newest=got[got.length-1];
+  $('bgrid').innerHTML=BADGES.map(b=>`<div class="bitem ${b<=p?'':'locked'} ${b===newest?'newest':''}">${badgeHTML(b)}<small>${b}ポイント</small></div>`).join('');
 }
 function status(d){return S.known[d.id]?'ok':(S.miss[d.id]?'bad':'new')}
 function chip(d){const s=status(d);return `<span class="chip ${s}">${s==='ok'?'覚えた':s==='bad'?'苦手 ×'+S.miss[d.id]:'未習得'}</span>`}
@@ -482,7 +578,7 @@ function closeStreak(){const v=$('sv');v.classList.remove('open');v.setAttribute
 function renderStreak(){
   const cs=curStreak(), studiedToday=S.last===today();
   $('svNum').textContent=cs;
-  $('svSub').textContent=cs===0?'今日学習して記録をスタートしよう':studiedToday?'今日の学習は完了！明日も続けよう':'今日学習すると記録が続きます';
+  $('svSub').textContent=cs===0?`今日${S.goal}問クリアして記録をスタートしよう`:studiedToday?'今日の目標は達成！明日も続けよう':`今日あと${Math.max(0,S.goal-doneCount())}問で記録が続きます`;
   $('svFlame').setAttribute('class','sv-flame '+(cs?'lit':'cold'));
   $('svMonth').textContent=`${svY}年${svM+1}月`;
   const now=new Date(), first=new Date(svY,svM,1), nd=new Date(svY,svM+1,0).getDate();
@@ -513,7 +609,12 @@ function header(){
   // a streak only counts if the last study day was today or yesterday
   const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();
   $('streak').textContent=curStreak();
-  $('xp').textContent=S.xp; $('known').textContent=k;
+  $('pts').textContent=S.points; $('known').textContent=k;
+  const dc=doneCount(), g=S.goal, ok=S.last===today();
+  $('goalNum').textContent=`${Math.min(dc,g)} / ${g}`;
+  $('goalTxt').textContent=ok?'今日の目標 達成！':'今日の目標';
+  $('goalBar').style.width=Math.min(100,dc/g*100)+'%';
+  $('goalbox').classList.toggle('done',ok);
   $('bar').style.width=Math.max(k?2:0,k/DATA.length*100)+'%';
   $('pct').textContent=`${k} / ${DATA.length}（${Math.round(k/DATA.length*100)}%）`;
 }
@@ -636,7 +737,7 @@ function go(n){const c=Math.max(0,Math.min(P.length-1,ci+n));if(c!==ci){ci=c;fil
 let judging=false;
 function mark(ok){
   const d=P[ci]; if(!d||judging) return;
-  if(ok){S.known[d.id]=1;studied(5)} else {delete S.known[d.id]; S.miss[d.id]=(S.miss[d.id]||0)+1;studied(0)}
+  if(ok){S.known[d.id]=1;studied(5);credit(d.id,true)} else {delete S.known[d.id]; S.miss[d.id]=(S.miss[d.id]||0)+1}
   sfx(ok); buzz(ok); save();header(); $('st').innerHTML=chip(d);
   const sc=$('scene'); judging=true;
   sc.classList.add(ok?'judge-ok':'judge-ng');
@@ -664,7 +765,7 @@ function renderQuiz(){
   if(qi>=QP.length){
     const acc=Math.round(qs.r/Math.max(1,qs.n)*100);
     v.innerHTML=`<div class="done"><h2>レッスン完了！</h2><p style="margin:0;color:var(--muted)">${qs.n}問中 ${qs.r}問 正解</p>
-      <div class="boxes"><div class="box"><b>獲得XP</b><span>+${qs.xp}</span></div><div class="box g"><b>正答率</b><span>${acc}%</span></div></div>
+      <div class="boxes"><div class="box"><b>正解</b><span>${qs.r}問</span></div><div class="box g"><b>正答率</b><span>${acc}%</span></div></div>
       <button class="btn ok" id="again" style="width:100%;max-width:320px">次のレッスンへ</button></div>`;
     fanfare(); $('again').onclick=()=>{startQuiz();renderQuiz()};return}
   const d=QP[qi], je=$('dir').value==='je';
@@ -684,7 +785,7 @@ function renderQuiz(){
 function answer(b,d,je){
   if(answered) return; answered=true;
   const v=$('v-quiz'); const ok=+b.dataset.id===d.id; qs.n++;
-  if(ok){qs.r++;qs.xp+=10;S.known[d.id]=1;studied(10)}else{b.classList.add('wrong');S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id];studied(0)}
+  if(ok){qs.r++;qs.xp+=10;S.known[d.id]=1;studied(10);credit(d.id,false)}else{b.classList.add('wrong');S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}
   v.querySelector(`.opt[data-id="${d.id}"]`).classList.add('right');
   v.querySelectorAll('.opt').forEach(x=>x.disabled=true);
   sfx(ok); buzz(ok); save(); header();
@@ -729,12 +830,16 @@ $('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
 $('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
 for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];refresh(true)};
 for(const x of ['card','quiz','list']) $('t-'+x).onclick=()=>setTab(x);
+$('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
+$('goal').value=String(S.goal);
+$('goal').onchange=()=>{S.goal=+$('goal').value;if(checkGoal())celebrateGoal();save();header()};
 $('fireBtn').onclick=openStreak; $('svClose').onclick=closeStreak;
 $('svPrev').onclick=()=>{if(--svM<0){svM=11;svY--}renderStreak()};
 $('svNext').onclick=()=>{if(++svM>11){svM=0;svY++}renderStreak()};
 $('q').oninput=()=>{LIM=150;renderList()};
 document.addEventListener('keydown',e=>{
   if($('sv').classList.contains('open')){if(e.key==='Escape')closeStreak();return}
+  if($('bv').classList.contains('open')){if(e.key==='Escape')closeBadges();return}
   if(/INPUT|SELECT/.test(e.target.tagName))return;
   if(tab==='quiz'){
     if(!answered&&/^[1-4]$/.test(e.key)){const b=$('v-quiz').querySelectorAll('.opt')[+e.key-1];if(b)b.click()}
