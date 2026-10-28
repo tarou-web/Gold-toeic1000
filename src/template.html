@@ -412,7 +412,11 @@ function header(){
 }
 
 let AC=null;
+// iPhone: speech switches the audio mode and Web Audio plays quieter afterwards.
+// Use the same 'playback' mode for both, and start a fresh sound engine after each speech.
+try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
 function ac(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}}
+function resetAudio(){try{if(AC)AC.close()}catch(e){}AC=null}
 function tone(c,type,freq,start,dur,vol){
   const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=freq;
   g.gain.setValueAtTime(0.0001,start);g.gain.exponentialRampToValueAtTime(vol,start+0.01);
@@ -455,7 +459,7 @@ function buzz(ok){
     const l=$('hapt');try{l.click();if(!ok)setTimeout(()=>l.click(),130)}catch(e){}
   }
 }
-function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.9;u.volume=1;u.onend=u.onerror=resetAudio;speechSynthesis.cancel();resetAudio();speechSynthesis.speak(u)}catch(e){}}
 
 // ---- cards
 let P=[],ci=0,turned=false,flipAnim=null,flipTimer=null;
