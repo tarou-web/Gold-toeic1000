@@ -28,7 +28,12 @@ html=f"""<!doctype html>
 <body>
 {bodypart.replace('__DATA__',d)}
 <script>
-if('serviceWorker' in navigator){{window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{{}}))}}
+if('serviceWorker' in navigator){{
+  const had=!!navigator.serviceWorker.controller; let reloaded=false;
+  // when a newer version takes over, reload once so the update shows immediately
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{{if(had&&!reloaded){{reloaded=true;location.reload()}}}});
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{{updateViaCache:'none'}}).then(r=>r.update()).catch(()=>{{}}));
+}}
 </script>
 </body>
 </html>
