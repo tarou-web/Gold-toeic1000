@@ -432,11 +432,12 @@ function header(){
 }
 
 let AC=null;
-// iPhone: speech switches the audio mode and Web Audio plays quieter afterwards.
-// Use the same 'playback' mode for both, and start a fresh sound engine after each speech.
-try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
+// iPhone: 'playback' mode shows the media indicator in the Dynamic Island, so keep effects as short
+// 'ambient' sounds, and start a fresh sound engine after each speech so the volume doesn't drop.
+function sessionAmbient(){try{if(navigator.audioSession)navigator.audioSession.type='ambient'}catch(e){}}
+sessionAmbient();
 function ac(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}}
-function resetAudio(){try{if(AC)AC.close()}catch(e){}AC=null}
+function resetAudio(){try{if(AC)AC.close()}catch(e){}AC=null;sessionAmbient()}
 function tone(c,type,freq,start,dur,vol){
   const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=freq;
   g.gain.setValueAtTime(0.0001,start);g.gain.exponentialRampToValueAtTime(vol,start+0.01);
