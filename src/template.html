@@ -370,7 +370,7 @@ S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{};
 if(S.last&&!Object.keys(S.days).length){const [y,m,d]=S.last.split('-').map(Number);for(let i=0;i<Math.max(1,S.streak);i++){const x=new Date(y,m-1,d-i);S.days[dkey(x)]=1}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){};scheduleSync()}
 // ---- cloud sync (Firebase Realtime Database, REST) ----
-var FB_URL='__FB_URL__'.replace(/\/+$/,'');
+var FB_URL='https://phrase1000-default-rtdb.asia-southeast1.firebasedatabase.app'.replace(/\/+$/,'');
 var FB_ON=/^https:\/\//.test(FB_URL);
 function newKey(){const a=new Uint8Array(16);crypto.getRandomValues(a);return [...a].map(b=>b.toString(16).padStart(2,'0')).join('')}
 var syncTimer=null,syncBusy=false,syncDirty=false;

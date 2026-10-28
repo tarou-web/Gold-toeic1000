@@ -2,7 +2,7 @@
 // ウィジェットを長押し →「ウィジェットを編集」→ Parameter に、アプリの「あなたの合言葉」を貼り付けてください。
 
 const KEY = (args.widgetParameter || "").trim();
-const DB = "__FB_URL__".replace(/\/+$/, "");
+const DB = "https://phrase1000-default-rtdb.asia-southeast1.firebasedatabase.app".replace(/\/+$/, "");
 const BASE = "https://tarou-web.github.io/Gold-toeic1000/widget/";
 const APP = "https://tarou-web.github.io/Gold-toeic1000/";
 
