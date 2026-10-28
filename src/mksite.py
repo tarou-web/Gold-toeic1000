@@ -40,6 +40,6 @@ if('serviceWorker' in navigator){{
 """
 open('index.html','w',encoding='utf-8').write(html)
 json.dump({"name":"TOEICフレーズ1000","short_name":"フレーズ1000","start_url":"./","scope":"./","display":"standalone",
- "background_color":"#ffffff","theme_color":"#4cc21c","lang":"ja",
+ "background_color":"#ffffff","theme_color":"#4cc21c","lang":"ja","orientation":"portrait",
  "icons":[{"src":"icon-192-parrot.png","sizes":"192x192","type":"image/png"},{"src":"icon-512-parrot.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]},
  open('manifest.webmanifest','w',encoding='utf-8'),ensure_ascii=False,indent=2)
