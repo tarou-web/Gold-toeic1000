@@ -22,8 +22,8 @@ html=f"""<!doctype html>
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#131f24" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon-parrot.png">
+<link rel="icon" href="icon-192-parrot.png">
 {reset}{headpart}</head>
 <body>
 {bodypart.replace('__DATA__',d)}
@@ -36,5 +36,5 @@ if('serviceWorker' in navigator){{window.addEventListener('load',()=>navigator.s
 open('index.html','w',encoding='utf-8').write(html)
 json.dump({"name":"TOEICフレーズ1000","short_name":"フレーズ1000","start_url":"./","scope":"./","display":"standalone",
  "background_color":"#ffffff","theme_color":"#4cc21c","lang":"ja",
- "icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]},
+ "icons":[{"src":"icon-192-parrot.png","sizes":"192x192","type":"image/png"},{"src":"icon-512-parrot.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]},
  open('manifest.webmanifest','w',encoding='utf-8'),ensure_ascii=False,indent=2)

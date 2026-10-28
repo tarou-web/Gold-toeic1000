@@ -9,12 +9,12 @@
   "lang": "ja",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icon-192-parrot.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon-512-parrot.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
