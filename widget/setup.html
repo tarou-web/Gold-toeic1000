@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ウィジェットの設置</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap">
+<style>
+:root{--bg:#fff;--bg2:#f5f7f8;--fg:#3c3c3c;--muted:#7d868f;--line:#e5e5e5;--green:#4cc21c;--green-d:#3a9a12;--f:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN",system-ui,sans-serif;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#131f24;--bg2:#1a2a31;--fg:#eef3f5;--muted:#8fa3ad;--line:#37464f;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f);font-weight:500;line-height:1.6}
+.wrap{max-width:620px;margin:0 auto;padding-block:24px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+h1{margin:0;font-size:1.5rem;font-weight:800}
+ol{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:10px}
+li b{font-weight:800}
+.box{border:2px solid var(--line);border-radius:16px;overflow:hidden}
+pre{margin:0;max-height:180px;overflow:auto;padding:12px;background:var(--bg2);font-size:.7rem;line-height:1.4}
+button{font:inherit;font-weight:800;font-size:1rem;width:100%;padding:14px;border-radius:16px;border:2px solid var(--green-d);border-bottom-width:5px;background:var(--green);color:#fff;cursor:pointer}
+button:active{transform:translateY(3px);border-bottom-width:2px}
+.note{font-size:.85rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>ウィジェットの設置</h1>
+  <ol>
+    <li>App Storeで <b>Scriptable</b>（無料）を入れる</li>
+    <li>下の緑のボタンでコードをコピーする</li>
+    <li>Scriptableを開き、右上の <b>＋</b> で新しいスクリプトを作り、コピーしたコードを貼り付ける。上の名前を <b>フレーズ1000</b> にして「Done」</li>
+    <li>ホーム画面を長押し → 左上の <b>編集</b> → <b>ウィジェットを追加</b> → <b>Scriptable</b> を選んで、小（または中）サイズを追加</li>
+    <li>追加したウィジェットを長押し → <b>ウィジェットを編集</b> → <b>Script</b> で「フレーズ1000」を選ぶ</li>
+    <li>同じ画面の <b>Parameter</b> に、フレーズアプリの一番下にある「あなたの合言葉」を貼り付ける</li>
+  </ol>
+  <button id="copy">コードをコピー</button>
+  <div class="box"><pre id="code">読み込み中…</pre></div>
+  <p class="note">ウィジェットの更新タイミングはiPhoneが決めるため、学習してから数字が変わるまで少し時間がかかることがあります。</p>
+</div>
+<script>
+const pre=document.getElementById('code'),btn=document.getElementById('copy');
+fetch('phrase1000-widget.js',{cache:'no-cache'}).then(r=>r.text()).then(t=>{pre.textContent=t}).catch(()=>{pre.textContent='コードを読み込めませんでした。電波を確認して開き直してください。'});
+btn.onclick=async()=>{
+  try{await navigator.clipboard.writeText(pre.textContent);btn.textContent='コピーしました'}
+  catch(e){const s=getSelection(),r=document.createRange();r.selectNodeContents(pre);s.removeAllRanges();s.addRange(r);btn.textContent='選択しました。コピーしてください'}
+  setTimeout(()=>btn.textContent='コードをコピー',2500);
+};
+</script>
+</body>
+</html>

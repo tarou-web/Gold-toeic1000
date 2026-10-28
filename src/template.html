@@ -253,6 +253,17 @@ body.sv-lock{overflow:hidden}
   .rotate-msg small{font-weight:600;font-size:.85rem;opacity:.85}
   body{overflow:hidden}
 }
+.sync{display:flex;flex-direction:column;gap:8px;border:2px solid var(--line);border-radius:18px;padding:14px}
+.sync h2{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1rem}
+.sync p{margin:0;font-size:.82rem;color:var(--muted);font-weight:600}
+.sync-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+.sync-row input{font:inherit;font-family:ui-monospace,Menlo,monospace;font-size:.8rem;color:var(--fg);background:var(--bg2);border:2px solid var(--line);border-radius:12px;padding:9px 10px;min-width:0;width:100%}
+.sync-row .btn{padding:9px 14px;font-size:.85rem}
+.sync-more summary{cursor:pointer;font-size:.85rem;color:var(--blue-ink);font-weight:800;padding:4px 0}
+.sync-more[open]{display:flex;flex-direction:column;gap:8px}
+.sync-msg{min-height:1.2em}
+.sync-link{color:var(--blue-ink);font-weight:800;text-decoration:none}
+.sync-msg.bad{color:var(--red-ink)!important}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -334,6 +345,19 @@ body.sv-lock{overflow:hidden}
     <label class="ctl">効果音<select id="sound"><option value="on">オン</option><option value="off">オフ</option></select></label>
     <label class="ctl">振動<select id="vib"><option value="on">オン</option><option value="off">オフ</option></select></label>
   </div>
+
+  <section class="sync" aria-labelledby="syncTitle">
+    <h2 id="syncTitle">ウィジェット連携・バックアップ</h2>
+    <p class="sync-st" id="syncSt">準備中…</p>
+    <p><a class="sync-link" href="widget/setup.html">ホーム画面ウィジェットの設置方法 →</a></p>
+    <label class="ctl" for="syncKey">あなたの合言葉（ウィジェットに貼り付けます）</label>
+    <div class="sync-row"><input id="syncKey" readonly><button class="btn blue" id="syncCopy">コピー</button></div>
+    <details class="sync-more"><summary>別の端末や消えた記録を読み込む</summary>
+      <p>以前の合言葉を貼り付けると、その記録をこの端末に読み込みます。今のこの端末の記録は上書きされます。</p>
+      <div class="sync-row"><input id="syncIn" placeholder="合言葉を貼り付け" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn blue" id="syncLoad">読み込む</button></div>
+      <p class="sync-msg" id="syncMsg" role="status"></p>
+    </details>
+  </section>
 </div>
 
 <script>
@@ -344,7 +368,57 @@ try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}c
 S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{};
 // fill in days from an existing streak recorded before the calendar existed
 if(S.last&&!Object.keys(S.days).length){const [y,m,d]=S.last.split('-').map(Number);for(let i=0;i<Math.max(1,S.streak);i++){const x=new Date(y,m-1,d-i);S.days[dkey(x)]=1}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){};scheduleSync()}
+// ---- cloud sync (Firebase Realtime Database, REST) ----
+var FB_URL='__FB_URL__'.replace(/\/+$/,'');
+var FB_ON=/^https:\/\//.test(FB_URL);
+function newKey(){const a=new Uint8Array(16);crypto.getRandomValues(a);return [...a].map(b=>b.toString(16).padStart(2,'0')).join('')}
+var syncTimer=null,syncBusy=false,syncDirty=false;
+function syncPayload(){
+  return {streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},days:S.days||{},
+    knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:Date.now(),tz:-new Date().getTimezoneOffset()};
+}
+function scheduleSync(){ if(!FB_ON||!S.syncKey)return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
+async function pushSync(keepalive){
+  if(!FB_ON||!S.syncKey||!syncDirty||syncBusy)return;
+  syncBusy=true; syncDirty=false;
+  try{
+    const r=await fetch(`${FB_URL}/progress/${S.syncKey}.json`,{method:'PUT',body:JSON.stringify(syncPayload()),keepalive:!!keepalive,headers:{'Content-Type':'application/json'}});
+    if(!r.ok)throw new Error(r.status);
+    S.syncedAt=Date.now(); try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+    syncStatus();
+  }catch(e){syncDirty=true; syncStatus('同期できませんでした。電波のある場所で開くと自動で再送します。')}
+  finally{syncBusy=false}
+}
+function syncStatus(err){
+  const el=$('syncSt'); if(!el)return;
+  if(!FB_ON){el.textContent='クラウド同期はまだ設定されていません。';return}
+  if(err){el.textContent=err;return}
+  el.textContent=S.syncedAt?`最後に同期した時刻：${new Date(S.syncedAt).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}`:'まだ同期していません。学習すると自動で送られます。';
+}
+function initSync(){
+  if(!S.syncKey){S.syncKey=newKey();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+  $('syncKey').value=S.syncKey; syncStatus();
+  $('syncCopy').onclick=async()=>{try{await navigator.clipboard.writeText(S.syncKey);$('syncCopy').textContent='コピーしました'}catch(e){$('syncKey').select();$('syncCopy').textContent='選択しました'}setTimeout(()=>$('syncCopy').textContent='コピー',1800)};
+  let armed=null;
+  $('syncLoad').onclick=async()=>{
+    const k=$('syncIn').value.trim().toLowerCase(), m=$('syncMsg'); m.className='sync-msg';
+    if(!/^[0-9a-f]{32}$/.test(k)){m.textContent='合言葉は32文字の英数字です。コピーし直して貼り付けてください。';m.classList.add('bad');return}
+    if(!FB_ON){m.textContent='クラウド同期がまだ設定されていません。';m.classList.add('bad');return}
+    if(armed!==k){armed=k;$('syncLoad').textContent='上書きする';m.textContent='もう一度押すと、この端末の記録をその合言葉の記録で上書きします。';return}
+    try{
+      const r=await fetch(`${FB_URL}/progress/${k}.json`); const d=await r.json();
+      if(!r.ok||!d){m.textContent='その合言葉の記録が見つかりませんでした。';m.classList.add('bad');armed=null;$('syncLoad').textContent='読み込む';return}
+      // the database may return numbered maps as arrays with gaps; turn them back into plain maps
+      const obj=x=>{const o={};if(x)for(const k of Object.keys(x))if(x[k]!=null)o[k]=x[k];return o};
+      Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,syncKey:k});
+      try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+      $('syncKey').value=k; header(); refresh(false); m.textContent='記録を読み込みました。'; armed=null; $('syncLoad').textContent='読み込む'; syncStatus();
+    }catch(e){m.textContent='読み込めませんでした。電波を確認してもう一度試してください。';m.classList.add('bad')}
+  };
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearTimeout(syncTimer);pushSync(true)}});
+  if(FB_ON&&!S.syncedAt){syncDirty=true;setTimeout(pushSync,1500)}
+}
 const $=id=>document.getElementById(id);
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ICON_OK='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M7 12.5l3.2 3.2L17 9" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -651,7 +725,7 @@ document.addEventListener('keydown',e=>{
   if(e.key===' '||e.key==='Enter'){e.preventDefault();flip()} else if(e.key==='ArrowRight')go(1); else if(e.key==='ArrowLeft')go(-1);
   else if(e.key==='1')mark(false); else if(e.key==='2')mark(true);
 });
-header(); setTab(tab);
+header(); setTab(tab); initSync();
 
 (function(){const s=document.getElementById('splash');if(!s)return;
   const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
