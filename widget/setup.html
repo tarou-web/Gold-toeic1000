@@ -34,11 +34,12 @@ button:active{transform:translateY(3px);border-bottom-width:2px}
   </ol>
   <button id="copy">コードをコピー</button>
   <div class="box"><pre id="code">読み込み中…</pre></div>
+  <p class="note">このコードは一度貼り付ければ、絵や表示が更新されても貼り直す必要はありません。</p>
   <p class="note">ウィジェットの更新タイミングはiPhoneが決めるため、学習してから数字が変わるまで少し時間がかかることがあります。</p>
 </div>
 <script>
 const pre=document.getElementById('code'),btn=document.getElementById('copy');
-fetch('phrase1000-widget.js',{cache:'no-cache'}).then(r=>r.text()).then(t=>{pre.textContent=t}).catch(()=>{pre.textContent='コードを読み込めませんでした。電波を確認して開き直してください。'});
+fetch('loader.js',{cache:'no-cache'}).then(r=>r.text()).then(t=>{pre.textContent=t}).catch(()=>{pre.textContent='コードを読み込めませんでした。電波を確認して開き直してください。'});
 btn.onclick=async()=>{
   try{await navigator.clipboard.writeText(pre.textContent);btn.textContent='コピーしました'}
   catch(e){const s=getSelection(),r=document.createRange();r.selectNodeContents(pre);s.removeAllRanges();s.addRange(r);btn.textContent='選択しました。コピーしてください'}
