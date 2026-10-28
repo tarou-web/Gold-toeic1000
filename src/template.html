@@ -1,0 +1,487 @@
+<title>TOEICフレーズ1000</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito:wght@600;800;900&display=swap">
+<style>
+/* Layout: playful lesson app — stat pills on top, one chunky 3D card or quiz in the middle, settings at the bottom */
+:root{
+  --bg:#ffffff; --bg2:#f7f7f7; --surface:#ffffff; --fg:#3c3c3c; --muted:#8a8a8a; --line:#e5e5e5; --line2:#cfcfcf;
+  --green:#4cc21c; --green-d:#3a9a12; --green-s:#d9f7c4; --green-ink:#2f7d0c;
+  --blue:#2fa8f0; --blue-d:#1d86c4; --blue-s:#dcf1fd; --blue-ink:#1673ad;
+  --red:#f04a4a; --red-d:#c73434; --red-s:#ffe0e0; --red-ink:#d13636;
+  --gold:#ffb21e; --gold-d:#e08f00;
+  --f:"Nunito","M PLUS Rounded 1c","Hiragino Maru Gothic ProN",system-ui,sans-serif;
+  --f-jp:"M PLUS Rounded 1c","Nunito","Hiragino Maru Gothic ProN",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#131f24; --bg2:#1a2a31; --surface:#1d2d35; --fg:#eef3f5; --muted:#8fa3ad; --line:#37464f; --line2:#2a3a42;
+  --green:#58d22a; --green-d:#3e9e16; --green-s:#1f3a1a; --green-ink:#7ee64f;
+  --blue:#3fb6f7; --blue-d:#1f88c6; --blue-s:#16344a; --blue-ink:#7fd0fb;
+  --red:#ff5a5a; --red-d:#c43a3a; --red-s:#3d2023; --red-ink:#ff8181;
+  --gold:#ffc03d; --gold-d:#d99200; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#131f24; --bg2:#1a2a31; --surface:#1d2d35; --fg:#eef3f5; --muted:#8fa3ad; --line:#37464f; --line2:#2a3a42;
+  --green:#58d22a; --green-d:#3e9e16; --green-s:#1f3a1a; --green-ink:#7ee64f;
+  --blue:#3fb6f7; --blue-d:#1f88c6; --blue-s:#16344a; --blue-ink:#7fd0fb;
+  --red:#ff5a5a; --red-d:#c43a3a; --red-s:#3d2023; --red-ink:#ff8181;
+  --gold:#ffc03d; --gold-d:#d99200; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f);font-weight:700;font-size:15px;line-height:1.55}
+.wrap{max-width:640px;margin:0 auto;padding-block:18px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+
+/* header stats */
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h1{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1.3rem;letter-spacing:.01em}
+h1 span{color:var(--green)}
+.stats{display:flex;gap:14px;font-family:var(--f);font-weight:900;font-size:1rem;font-variant-numeric:tabular-nums}
+.stat{display:flex;align-items:center;gap:5px}
+.stat.fire{color:var(--gold-d)} .stat.xp{color:var(--blue)} .stat.know{color:var(--green)}
+.stat svg{width:22px;height:22px}
+.track{height:16px;background:var(--line);border-radius:99px;overflow:hidden;position:relative}
+.track i{display:block;height:100%;width:0;background:var(--green);border-radius:99px;transition:width .5s cubic-bezier(.3,1.3,.5,1);position:relative}
+.track i::after{content:"";position:absolute;left:8px;right:8px;top:3px;height:4px;border-radius:99px;background:rgba(255,255,255,.35)}
+.tracklabel{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-top:-10px}
+
+/* tabs as chunky segmented buttons */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tabs button{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.92rem;padding:10px 6px;border-radius:14px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--muted);cursor:pointer}
+.tabs button[aria-selected=true]{border-color:var(--blue);background:var(--blue-s);color:var(--blue-ink)}
+button:focus-visible,select:focus-visible,input:focus-visible,.scene:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+
+.meta{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.chip.ok{background:var(--green-s);color:var(--green-ink)} .chip.bad{background:var(--red-s);color:var(--red-ink)} .chip.new{background:var(--bg2);color:var(--muted);border:2px solid var(--line)}
+.pill{font:inherit;font-weight:800;font-size:.8rem;padding:6px 14px;border-radius:12px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--blue);cursor:pointer}
+.pill:active{transform:translateY(2px);border-bottom-width:2px}
+
+/* 3D flip card */
+.scene{perspective:1400px;cursor:pointer;border-radius:22px}
+.flip{position:relative;height:min(52vh,320px);min-height:250px;transform-style:preserve-3d}
+.flip.turned{transform:rotateY(180deg)}
+.flip.instant,.flip.instant .face{transition:none}
+/* swap visibility at the half-turn so the reverse side never shows through (Safari ignores backface-visibility on some children) */
+.flip.showback .front,.flip:not(.showback) .back{visibility:hidden}
+.face{position:absolute;inset:0;border-radius:22px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;padding:46px 24px 42px;text-align:center;overflow:hidden}
+.front{transform:translateZ(1px);background:var(--surface);border:2px solid var(--line);border-bottom-width:6px}
+.back{transform:rotateY(180deg) translateZ(1px);background:var(--blue);border:2px solid var(--blue-d);border-bottom-width:6px;color:#fff}
+.back::before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.1);right:-70px;top:-90px}
+.back::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08);left:-50px;bottom:-60px}
+.face .corner{position:absolute;top:14px;left:18px;font-size:.75rem;color:var(--muted);font-weight:800}
+.back .corner{color:rgba(255,255,255,.8)}
+.face .side{position:absolute;top:12px;right:16px;font-size:.7rem;font-weight:900;letter-spacing:.08em;padding:3px 10px;border-radius:99px;background:var(--bg2);color:var(--muted)}
+.back .side{background:rgba(255,255,255,.2);color:#fff}
+.face .tap{position:absolute;bottom:14px;left:0;right:0;font-size:.75rem;color:var(--muted)}
+.back .tap{color:rgba(255,255,255,.75)}
+.txt{position:relative;z-index:1;text-wrap:balance;max-width:100%;overflow-wrap:anywhere}
+.txt.jp{font-family:var(--f-jp);font-weight:800;font-size:clamp(1.3rem,4.6vw,1.75rem);line-height:1.45}
+.txt.en{font-family:var(--f);font-weight:900;font-size:clamp(1.4rem,5vw,2rem);line-height:1.25}
+.fixnote{position:relative;z-index:1;font-size:.72rem;opacity:.8}
+.front .fixnote{color:var(--muted)}
+.say{position:relative;z-index:1;font:inherit;font-weight:800;font-size:.85rem;border:2px solid rgba(255,255,255,.5);border-bottom-width:4px;background:rgba(255,255,255,.18);color:#fff;border-radius:14px;padding:6px 16px;cursor:pointer}
+.say:active{transform:translateY(2px);border-bottom-width:2px}
+.front .say{border-color:var(--line);background:var(--surface);color:var(--blue)}
+
+/* chunky buttons */
+.row{display:grid;grid-template-columns:56px 1fr 1fr 56px;gap:10px}
+.row2{display:grid;grid-template-columns:1fr 1.4fr;gap:10px}
+.btn{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:1rem;letter-spacing:.04em;padding:13px 10px;border-radius:16px;border:2px solid var(--line);border-bottom-width:5px;background:var(--surface);color:var(--muted);cursor:pointer;transition:transform .06s}
+.btn:active:not(:disabled){transform:translateY(3px);border-bottom-width:2px;margin-bottom:3px}
+.btn.ok{background:var(--green);border-color:var(--green-d);color:#fff}
+.btn.bad{background:var(--surface);border-color:var(--red);color:var(--red-ink)}
+.btn.blue{background:var(--surface);border-color:var(--line);color:var(--blue)}
+.btn.red{background:var(--red);border-color:var(--red-d);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.keys{font-size:.72rem;color:var(--muted);text-align:center}
+
+/* quiz */
+.qhead{display:flex;align-items:center;gap:12px}
+.qhead .track{flex:1}
+.qhead .score{font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ask{font-family:var(--f-jp);font-weight:800;font-size:1.25rem;margin:4px 0 0}
+.bubble{position:relative;display:flex;align-items:center;gap:12px}
+.bubble .dot{flex:0 0 auto;width:54px;height:54px;border-radius:16px;background:var(--green-s);display:grid;place-items:center}
+.bubble .dot svg{width:30px;height:30px}
+.bubble .say-box{position:relative;flex:1;min-width:0;border:2px solid var(--line);border-radius:16px;padding:14px 16px}
+.bubble .say-box::before{content:"";position:absolute;left:-9px;top:50%;width:14px;height:14px;background:var(--bg);border-left:2px solid var(--line);border-bottom:2px solid var(--line);transform:translateY(-50%) rotate(45deg)}
+.opts{display:grid;gap:10px}
+.opt{font:inherit;font-weight:800;text-align:left;padding:14px 16px;border-radius:16px;border:2px solid var(--line);border-bottom-width:5px;background:var(--surface);color:var(--fg);cursor:pointer;line-height:1.4;display:flex;gap:12px;align-items:center}
+.opt .k{flex:0 0 auto;width:28px;height:28px;border-radius:9px;border:2px solid var(--line);display:grid;place-items:center;font-size:.8rem;color:var(--muted)}
+.opt.jp{font-family:var(--f-jp)}
+.opt:active{transform:translateY(3px);border-bottom-width:2px;margin-bottom:3px}
+.opt.right{border-color:var(--green);background:var(--green-s);color:var(--green-ink)} .opt.right .k{border-color:var(--green);color:var(--green-ink)}
+.opt.wrong{border-color:var(--red);background:var(--red-s);color:var(--red-ink)} .opt.wrong .k{border-color:var(--red);color:var(--red-ink)}
+.opt[disabled]{cursor:default}
+.feedback{border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;animation:pop .35s cubic-bezier(.3,1.5,.5,1)}
+.feedback.good{background:var(--green-s);color:var(--green-ink)}
+.feedback.miss{background:var(--red-s);color:var(--red-ink)}
+.feedback h3{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1.25rem;display:flex;align-items:center;gap:8px}
+.feedback h3 svg{width:30px;height:30px;flex:0 0 auto}
+.feedback p{margin:0;font-size:.95rem}
+.feedback .row2 .btn.blue{border-color:transparent}
+@keyframes pop{from{transform:translateY(16px);opacity:.3}to{transform:none;opacity:1}}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;padding-block:18px calc(18px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));transform:translateY(110%);transition:transform .32s cubic-bezier(.3,1.25,.5,1);border-top:2px solid transparent}
+.sheet.show{transform:none}
+.sheet.good{background:var(--green-s);border-color:var(--green);color:var(--green-ink)}
+.sheet.miss{background:var(--red-s);border-color:var(--red);color:var(--red-ink)}
+.sheet .in{max-width:640px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+.sheet .msg{flex:1 1 260px;min-width:0;display:flex;align-items:center;gap:14px}
+.sheet .badge{flex:0 0 auto;width:58px;height:58px;border-radius:50%;background:var(--surface);display:grid;place-items:center}
+.sheet .badge svg{width:40px;height:40px}
+.sheet.good .badge{color:var(--green)} .sheet.miss .badge{color:var(--red)}
+.sheet h3{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1.35rem;line-height:1.3}
+.sheet p{margin:2px 0 0;font-weight:800}
+.sheet .acts{flex:1 1 220px;display:grid;grid-template-columns:auto 1fr;gap:10px}
+.sheet .acts .btn.blue{background:transparent;border-color:currentColor;color:inherit}
+body.sheet-open .wrap{padding-bottom:200px}
+.opt.right{animation:hop .4s cubic-bezier(.3,1.6,.5,1)}
+.opt.wrong{animation:shake .4s}
+@keyframes hop{40%{transform:translateY(-6px) scale(1.02)}}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+/* card judgement flash */
+.scene{position:relative}
+.scene.judge-ok .face{border-color:var(--green)!important;background:var(--green-s)!important;color:var(--green-ink)}
+.scene.judge-ng .face{border-color:var(--red)!important;background:var(--red-s)!important;color:var(--red-ink)}
+.scene.judge-ok .face *,.scene.judge-ng .face *{color:inherit!important}
+.scene.judge-ok .back::before,.scene.judge-ok .back::after,.scene.judge-ng .back::before,.scene.judge-ng .back::after{opacity:0}
+.scene.judge-ng{animation:shake .4s}
+.scene.judge-ok{animation:joy .55s cubic-bezier(.3,1.4,.5,1)}
+@keyframes joy{0%{transform:none}25%{transform:translateY(-16px) scale(1.03)}50%{transform:translateY(0) scale(1.03,.97)}70%{transform:translateY(-5px) scale(.99,1.01)}100%{transform:none}}
+.spark{position:absolute;left:50%;top:50%;z-index:6;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:4px;pointer-events:none;animation:burst .7s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes burst{0%{transform:translate(0,0) rotate(0) scale(.4);opacity:1}100%{transform:translate(var(--x),var(--y)) rotate(var(--r)) scale(1);opacity:0}}
+.stamp{position:absolute;left:50%;top:50%;z-index:5;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;display:grid;place-items:center;background:var(--surface);transform:scale(0);opacity:0;pointer-events:none}
+.stamp svg{width:72px;height:72px}
+.scene.judge-ok .stamp{color:var(--green);animation:stamp .45s cubic-bezier(.3,1.7,.5,1) forwards}
+.scene.judge-ng .stamp{color:var(--red);animation:stamp .45s cubic-bezier(.3,1.7,.5,1) forwards}
+@keyframes stamp{to{transform:scale(1);opacity:1}}
+.done{display:flex;flex-direction:column;align-items:center;gap:14px;padding:26px 10px;text-align:center}
+.done h2{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1.6rem;color:var(--gold-d)}
+.done .boxes{display:grid;grid-template-columns:repeat(2,minmax(0,140px));gap:12px}
+.done .box{border-radius:16px;border:2px solid var(--gold);overflow:hidden}
+.done .box.g{border-color:var(--green)}
+.done .box b{display:block;background:var(--gold);color:#fff;font-size:.75rem;padding:4px}
+.done .box.g b{background:var(--green)}
+.done .box span{display:block;padding:10px;font-size:1.4rem;font-weight:900}
+.empty{padding:40px 16px;text-align:center;color:var(--muted);border:2px dashed var(--line);border-radius:18px}
+
+/* list */
+input[type=search],select{font:inherit;font-weight:700;font-size:.92rem;color:var(--fg);background:var(--bg2);border:2px solid var(--line);border-radius:14px;padding:10px 12px;width:100%}
+.list{border:2px solid var(--line);border-radius:18px;overflow:hidden}
+.item{display:grid;grid-template-columns:3em 1fr auto;gap:4px 10px;padding:12px 14px;border-top:2px solid var(--line);align-items:start}
+.item:first-child{border-top:0}
+.item .n{font-size:.75rem;color:var(--muted);padding-top:4px}
+.item .t{min-width:0;display:flex;flex-direction:column;gap:1px}
+.item .e{font-weight:900}
+.item .j{font-family:var(--f-jp);font-weight:500;font-size:.88rem;color:var(--muted)}
+.item .f{font-size:.7rem;color:var(--red-ink)}
+.item button{background:none;border:0;cursor:pointer;padding:2px}
+.more{text-align:center;padding:10px}
+
+/* settings */
+.controls{margin-top:6px;padding-top:18px;border-top:2px solid var(--line);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media (max-width:560px){.controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
+label.ctl{display:flex;flex-direction:column;gap:4px;font-size:.72rem;color:var(--muted);font-weight:800}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>フレーズ<span>1000</span></h1>
+    <div class="stats">
+      <span class="stat fire" title="連続学習日数"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.4 1.1-4 2.3-5.2.2 1.7 1 2.7 2 3.1C11 8 10.6 5 12 2z"/></svg><span id="streak">0</span></span>
+      <span class="stat xp" title="獲得XP"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg><span id="xp">0</span></span>
+      <span class="stat know" title="覚えたフレーズ"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.3 14.3-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z"/></svg><span id="known">0</span></span>
+    </div>
+  </header>
+  <div class="track" id="mainbar"><i id="bar"></i></div>
+  <div class="tracklabel"><span>全体の進み具合</span><span id="pct">0%</span></div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" id="t-card" aria-selected="true">カード</button>
+    <button role="tab" id="t-quiz" aria-selected="false">4択クイズ</button>
+    <button role="tab" id="t-list" aria-selected="false">一覧</button>
+  </div>
+
+  <section id="v-card"></section>
+  <section id="v-quiz" hidden></section>
+  <section id="v-list" hidden>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <input type="search" id="q" placeholder="英語・日本語で検索">
+      <div class="list" id="listbox"></div>
+    </div>
+  </section>
+
+  <label id="hapt" aria-hidden="true" style="position:fixed;top:0;left:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none"><input type="checkbox" switch tabindex="-1"></label>
+  <div class="sheet" id="sheet" role="status" aria-live="polite"><div class="in" id="sheetin"></div></div>
+
+  <div class="controls">
+    <label class="ctl">範囲<select id="range"></select></label>
+    <label class="ctl">出題<select id="filter"><option value="all">すべて</option><option value="todo">未習得のみ</option><option value="weak">苦手のみ</option><option value="fix">修正した項目</option></select></label>
+    <label class="ctl">表面<select id="dir"><option value="je">日本語</option><option value="ej">英語</option></select></label>
+    <label class="ctl">順番<select id="order"><option value="seq">番号順</option><option value="shuf">シャッフル</option></select></label>
+    <label class="ctl">効果音<select id="sound"><option value="on">オン</option><option value="off">オフ</option></select></label>
+    <label class="ctl">振動<select id="vib"><option value="on">オン</option><option value="off">オフ</option></select></label>
+  </div>
+</div>
+
+<script>
+const DATA = __DATA__;
+const KEY='toeic1000-v1';
+let S={known:{},miss:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}catch(e){}
+S.xp=S.xp||0; S.streak=S.streak||0;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ICON_OK='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M7 12.5l3.2 3.2L17 9" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ICON_NG='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>';
+const CHEER=['すばらしい！','その調子！','完璧！','ナイス！','やったね！'];
+
+const rs=$('range'); rs.innerHTML='<option value="0-1000">全部 1–1000</option>'+Array.from({length:10},(_,i)=>`<option value="${i*100}-${i*100+100}">${i*100+1}–${i*100+100}</option>`).join('');
+const prefs=(()=>{try{return JSON.parse(localStorage.getItem(KEY+'-p')||'{}')}catch(e){return{}}})();
+for(const k of ['range','filter','dir','order','sound','vib']) if(prefs[k]) $(k).value=prefs[k];
+let tab=prefs.tab||'card';
+
+function today(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function studied(xp){
+  const t=today();
+  if(S.last!==t){const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();S.streak=(S.last===ys?S.streak:0)+1;S.last=t}
+  S.xp+=xp;
+}
+function status(d){return S.known[d.id]?'ok':(S.miss[d.id]?'bad':'new')}
+function chip(d){const s=status(d);return `<span class="chip ${s}">${s==='ok'?'覚えた':s==='bad'?'苦手 ×'+S.miss[d.id]:'未習得'}</span>`}
+function pool(){
+  const [a,b]=$('range').value.split('-').map(Number); const f=$('filter').value;
+  let p=DATA.slice(a,b).filter(d=>f==='all'||(f==='todo'&&!S.known[d.id])||(f==='weak'&&S.miss[d.id])||(f==='fix'&&d.fix));
+  if($('order').value==='shuf'){p=p.slice();for(let i=p.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[p[i],p[j]]=[p[j],p[i]]}}
+  return p;
+}
+function header(){
+  const k=Object.keys(S.known).length;
+  // a streak only counts if the last study day was today or yesterday
+  const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();
+  $('streak').textContent=(S.last===today()||S.last===ys)?S.streak:0;
+  $('xp').textContent=S.xp; $('known').textContent=k;
+  $('bar').style.width=Math.max(k?2:0,k/DATA.length*100)+'%';
+  $('pct').textContent=`${k} / ${DATA.length}（${Math.round(k/DATA.length*100)}%）`;
+}
+
+let AC=null;
+function ac(){try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}}
+function tone(c,type,freq,start,dur,vol){
+  const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=freq;
+  g.gain.setValueAtTime(0.0001,start);g.gain.exponentialRampToValueAtTime(vol,start+0.01);
+  g.gain.setValueAtTime(vol,start+dur*0.6);g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  o.connect(g).connect(c.destination);o.start(start);o.stop(start+dur+0.02);
+}
+function bell(c,f,start,dur,vol){
+  // bright chime: fundamental + soft octave + a touch of fifth, fast attack, ringing decay
+  [[1,1],[2,.35],[3,.12]].forEach(([m,g0])=>{
+    const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=f*m;
+    g.gain.setValueAtTime(0.0001,start);g.gain.exponentialRampToValueAtTime(vol*g0,start+0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001,start+dur*(m===1?1:.6));
+    o.connect(g).connect(c.destination);o.start(start);o.stop(start+dur+0.05);
+  });
+}
+function bwomp(c,f1,f2,start,dur,vol){
+  // soft low tone that slides down, rounded off with a low-pass filter
+  const o=c.createOscillator(),lp=c.createBiquadFilter(),g=c.createGain();
+  o.type='triangle';o.frequency.setValueAtTime(f1,start);o.frequency.exponentialRampToValueAtTime(f2,start+dur);
+  lp.type='lowpass';lp.frequency.value=900;
+  g.gain.setValueAtTime(0.0001,start);g.gain.exponentialRampToValueAtTime(vol,start+0.02);
+  g.gain.setValueAtTime(vol,start+dur*.55);g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+  o.connect(lp).connect(g).connect(c.destination);o.start(start);o.stop(start+dur+0.05);
+}
+function sfx(ok){
+  if($('sound').value!=='on')return;
+  const c=ac();if(!c)return;const t0=c.currentTime+0.02;
+  if(ok){bell(c,1046.5,t0,0.35,0.28);bell(c,1318.5,t0+0.085,0.35,0.26);bell(c,1568,t0+0.17,0.7,0.3)}
+  else{bwomp(c,330,262,t0,0.2,0.32);bwomp(c,247,175,t0+0.2,0.42,0.32)}
+}
+function fanfare(){
+  if($('sound').value!=='on')return;const c=ac();if(!c)return;const t0=c.currentTime+0.02;
+  [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(c,'triangle',f,t0+i*0.12,i===3?0.6:0.2,0.3));
+}
+function buzz(ok){
+  if($('vib').value!=='on')return;
+  let done=false;
+  try{if(navigator.vibrate)done=navigator.vibrate(ok?[35]:[70,60,70])}catch(e){}
+  if(!done){ // iPhone Safari: toggling a switch control gives a light haptic tick
+    const l=$('hapt');try{l.click();if(!ok)setTimeout(()=>l.click(),130)}catch(e){}
+  }
+}
+function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.9;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+
+// ---- cards
+let P=[],ci=0,turned=false,flipAnim=null,flipTimer=null;
+function faceHTML(d,lang,isBack){
+  const t=lang==='en'?d.en:d.jp;
+  return `<span class="corner">No.${d.id}</span>
+    <span class="side">${lang==='en'?'ENGLISH':'日本語'}</span>
+    <div class="txt ${lang}">${esc(t)}</div>
+    ${lang==='en'?`<button class="say" data-say>🔊 発音を聞く</button>`:''}
+    ${isBack&&d.fix?`<div class="fixnote">元の表記を修正: ${esc(d.fix)}</div>`:''}
+    <span class="tap">${isBack?'タップでもう一度回転':'タップで裏返す'}</span>`;
+}
+function buildCard(){
+  const v=$('v-card');
+  if(!P.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。<br>下の「出題」や「範囲」を変えてみてください。</div>';return}
+  v.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
+   <div class="meta"><span id="pos"></span><span style="display:flex;gap:10px;align-items:center"><span id="st"></span><button class="pill" id="shuf">⇄ シャッフル</button></span></div>
+   <div class="scene" id="scene" tabindex="0" role="button" aria-label="カードを回転させる">
+     <div class="flip" id="flip"><div class="face front" id="front"></div><div class="face back" id="back"></div></div>
+   </div>
+   <div class="row">
+     <button class="btn" id="prev" aria-label="前へ">←</button>
+     <button class="btn bad" id="no">まだ</button>
+     <button class="btn ok" id="yes">覚えた</button>
+     <button class="btn" id="next" aria-label="次へ">→</button>
+   </div>
+   <div class="keys">スペース 回転 ・ ← → 移動 ・ 1 まだ ・ 2 覚えた</div></div>`;
+  $('scene').onclick=e=>{const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
+  $('shuf').onclick=reshuffle;
+  $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1);
+  $('yes').onclick=()=>mark(true); $('no').onclick=()=>mark(false);
+  fillCard();
+}
+function fillCard(){
+  if(ci>=P.length) ci=P.length-1;
+  const d=P[ci], je=$('dir').value==='je';
+  if(flipAnim){flipAnim.cancel();flipAnim=null} clearTimeout(flipTimer);
+  const f=$('flip'); f.classList.add('instant'); f.classList.remove('turned','showback'); turned=false;
+  $('front').innerHTML=faceHTML(d,je?'jp':'en',false);
+  $('back').innerHTML=faceHTML(d,je?'en':'jp',true);
+  void f.offsetWidth; f.classList.remove('instant');
+  $('pos').textContent=`${ci+1} / ${P.length}`;
+  $('st').innerHTML=chip(d);
+  $('prev').disabled=ci===0; $('next').disabled=ci>=P.length-1;
+}
+function reshuffle(){$('order').value='shuf'; savePrefs(); P=pool(); ci=0; fillCard()}
+function flip(){
+  const f=$('flip');
+  // finish any spin in progress so state stays consistent on fast taps
+  if(flipAnim){flipAnim.cancel();flipAnim=null;clearTimeout(flipTimer);f.classList.toggle('showback',turned)}
+  const from=turned?180:0, to=turned?0:180, dir=to>from?1:-1;
+  turned=!turned; f.classList.toggle('turned',turned);
+  const D=640, MID=.4;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!f.animate){f.classList.toggle('showback',turned);return}
+  flipAnim=f.animate([
+    {transform:`rotateY(${from}deg)`,easing:'cubic-bezier(.45,0,.9,.6)'},
+    {transform:`rotateY(${from+90*dir}deg)`,offset:MID,easing:'cubic-bezier(.1,.5,.4,1)'},
+    {transform:`rotateY(${to+10*dir}deg)`,offset:.78,easing:'ease-in-out'},
+    {transform:`rotateY(${to}deg)`}
+  ],{duration:D});
+  // swap faces exactly when the card is edge-on
+  flipTimer=setTimeout(()=>f.classList.toggle('showback',turned),D*MID);
+  flipAnim.onfinish=()=>{flipAnim=null};
+}
+function go(n){const c=Math.max(0,Math.min(P.length-1,ci+n));if(c!==ci){ci=c;fillCard()}}
+let judging=false;
+function mark(ok){
+  const d=P[ci]; if(!d||judging) return;
+  if(ok){S.known[d.id]=1;studied(5)} else {delete S.known[d.id]; S.miss[d.id]=(S.miss[d.id]||0)+1;studied(0)}
+  sfx(ok); buzz(ok); save();header(); $('st').innerHTML=chip(d);
+  const sc=$('scene'); judging=true;
+  sc.classList.add(ok?'judge-ok':'judge-ng');
+  if(ok && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const cols=['var(--green)','var(--gold)','var(--blue)'], w=sc.offsetWidth/2, h=sc.offsetHeight/2;
+    for(let i=0;i<14;i++){
+      const s=document.createElement('span'); s.className='spark';
+      const a=i/14*Math.PI*2+Math.random()*.3, r=1+Math.random()*.25;
+      s.style.cssText=`background:${cols[i%3]};--x:${Math.cos(a)*w*r}px;--y:${Math.sin(a)*h*r}px;--r:${Math.random()*360}deg;${i%2?'border-radius:50%':''}`;
+      sc.appendChild(s); setTimeout(()=>s.remove(),750);
+    }
+  }
+  setTimeout(()=>{
+    sc.classList.remove('judge-ok','judge-ng'); judging=false;
+    if(ci<P.length-1){ci++;fillCard()}
+  },650);
+}
+
+// ---- quiz
+let QP=[],qi=0,qs={r:0,n:0,xp:0},answered=false;
+const LESSON=10;
+function renderQuiz(){
+  const v=$('v-quiz');
+  if(QP.length<1){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
+  if(qi>=QP.length){
+    const acc=Math.round(qs.r/Math.max(1,qs.n)*100);
+    v.innerHTML=`<div class="done"><h2>レッスン完了！</h2><p style="margin:0;color:var(--muted)">${qs.n}問中 ${qs.r}問 正解</p>
+      <div class="boxes"><div class="box"><b>獲得XP</b><span>+${qs.xp}</span></div><div class="box g"><b>正答率</b><span>${acc}%</span></div></div>
+      <button class="btn ok" id="again" style="width:100%;max-width:320px">次のレッスンへ</button></div>`;
+    fanfare(); $('again').onclick=()=>{startQuiz();renderQuiz()};return}
+  const d=QP[qi], je=$('dir').value==='je';
+  const others=DATA.filter(x=>x.id!==d.id);
+  const opts=[d];while(opts.length<4){const o=others[Math.random()*others.length|0];if(!opts.includes(o)&&(je?o.en:o.jp)!==(je?d.en:d.jp))opts.push(o)}
+  opts.sort(()=>Math.random()-.5);
+  answered=false;
+  v.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
+   <div class="qhead"><div class="track"><i style="width:${qi/QP.length*100}%"></i></div><span class="score">${qi+1} / ${QP.length}</span></div>
+   <h2 class="ask">${je?'正しい英語を選んでください':'正しい意味を選んでください'}</h2>
+   <div class="bubble"><div class="dot"><svg viewBox="0 0 24 24"><path fill="var(--green)" d="M4 5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-6l-5 4v-4a2 2 0 0 1-2-2z"/></svg></div>
+     <div class="say-box"><div class="txt ${je?'jp':'en'}" style="font-size:1.25rem">${esc(je?d.jp:d.en)}</div></div></div>
+   <div class="opts">${opts.map((o,i)=>`<button class="opt ${je?'':'jp'}" data-id="${o.id}"><span class="k">${i+1}</span><span>${esc(je?o.en:o.jp)}</span></button>`).join('')}</div>
+   </div>`;
+  v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(b,d,je));
+}
+function answer(b,d,je){
+  if(answered) return; answered=true;
+  const v=$('v-quiz'); const ok=+b.dataset.id===d.id; qs.n++;
+  if(ok){qs.r++;qs.xp+=10;S.known[d.id]=1;studied(10)}else{b.classList.add('wrong');S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id];studied(0)}
+  v.querySelector(`.opt[data-id="${d.id}"]`).classList.add('right');
+  v.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+  sfx(ok); buzz(ok); save(); header();
+  showSheet(ok,ok?CHEER[Math.random()*CHEER.length|0]:'不正解',ok?'':`正解：${esc(je?d.en:d.jp)}`,d);
+}
+function showSheet(ok,title,sub,d){
+  const sh=$('sheet');
+  sh.className='sheet '+(ok?'good':'miss');
+  $('sheetin').innerHTML=`<div class="msg"><div><h3>${title}</h3>${sub?`<p>${sub}</p>`:''}</div></div>
+    <div class="acts"><button class="btn blue" id="qsay">🔊</button><button class="btn ${ok?'ok':'red'}" id="qnext">続ける</button></div>`;
+  void sh.offsetWidth; sh.classList.add('show'); document.body.classList.add('sheet-open');
+  $('qsay').onclick=()=>speak(d.en);
+  const n=$('qnext'); n.onclick=()=>{hideSheet();qi++;renderQuiz()}; n.focus({preventScroll:true});
+}
+function hideSheet(){const sh=$('sheet');sh.classList.remove('show');document.body.classList.remove('sheet-open')}
+function startQuiz(){const p=pool();for(let i=p.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[p[i],p[j]]=[p[j],p[i]]}QP=p.slice(0,LESSON);qi=0;qs={r:0,n:0,xp:0}}
+
+// ---- list
+let LIM=150;
+function renderList(){
+  const q=$('q').value.trim().toLowerCase();
+  const [a,b]=$('range').value.split('-').map(Number);
+  const rows=(q?DATA:DATA.slice(a,b)).filter(d=>!q||d.en.toLowerCase().includes(q)||d.jp.includes(q));
+  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.id}</span><div class="t"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):'<div class="empty" style="border:0">見つかりませんでした。</div>';
+  $('listbox').querySelectorAll('button[data-id]').forEach(b=>b.onclick=()=>{const id=+b.dataset.id;if(S.known[id])delete S.known[id];else S.known[id]=1;save();header();b.innerHTML=chip(DATA[id-1])});
+  const m=$('more'); if(m) m.onclick=()=>{LIM+=300;renderList()};
+}
+
+function setTab(t){
+  tab=t; hideSheet();
+  for(const x of ['card','quiz','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
+  savePrefs(); refresh(false);
+}
+function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({range:$('range').value,filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab}))}catch(e){}}
+function refresh(reset=true){
+  if(reset||!P.length){P=pool();ci=0}
+  if(tab==='card')buildCard();
+  if(tab==='quiz'){if(reset||!QP.length)startQuiz();renderQuiz()}
+  if(tab==='list'){LIM=150;renderList()}
+}
+$('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
+$('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
+for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];refresh(true)};
+for(const x of ['card','quiz','list']) $('t-'+x).onclick=()=>setTab(x);
+$('q').oninput=()=>{LIM=150;renderList()};
+document.addEventListener('keydown',e=>{
+  if(/INPUT|SELECT/.test(e.target.tagName))return;
+  if(tab==='quiz'){
+    if(!answered&&/^[1-4]$/.test(e.key)){const b=$('v-quiz').querySelectorAll('.opt')[+e.key-1];if(b)b.click()}
+    else if(answered&&e.key==='Enter'&&e.target.id!=='qnext'){const n=$('qnext');if(n)n.click()}
+    return;
+  }
+  if(tab!=='card'||!P.length||e.target.tagName==='BUTTON')return;
+  if(e.key===' '||e.key==='Enter'){e.preventDefault();flip()} else if(e.key==='ArrowRight')go(1); else if(e.key==='ArrowLeft')go(-1);
+  else if(e.key==='1')mark(false); else if(e.key==='2')mark(true);
+});
+header(); setTab(tab);
+</script>
