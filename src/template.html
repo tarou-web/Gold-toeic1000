@@ -303,7 +303,8 @@ body.sv-lock{overflow:hidden}
 .bitem.newest .badge{outline:3px solid var(--gold);outline-offset:3px}
 .bitem.newest .badge.has-img{outline:none}
 .bitem.newest .badge.has-img::after{content:"";position:absolute;left:50%;top:var(--cy,50%);width:calc(80% + 12px);aspect-ratio:1;border-radius:50%;
-  transform:translate(-50%,-50%);border:3px solid var(--gold);box-sizing:border-box;pointer-events:none}
+  transform:translate(-50%,-50%);border:3px solid var(--gold);box-sizing:border-box;pointer-events:none;z-index:0}
+.badge.has-img img{position:relative;z-index:1}
 .toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));z-index:80;transform:translate(-50%,-160%);transition:transform .4s cubic-bezier(.3,1.4,.5,1);
   display:flex;align-items:center;gap:12px;background:var(--surface);border:2px solid var(--gold);border-bottom-width:5px;border-radius:18px;padding:10px 16px;max-width:calc(100% - 32px);box-shadow:0 10px 30px rgba(0,0,0,.18)}
 .toast.show{transform:translate(-50%,0)}
