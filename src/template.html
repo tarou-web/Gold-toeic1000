@@ -832,6 +832,25 @@ function sfx(ok){
   if(ok){bell(c,1046.5,t0,0.35,0.28);bell(c,1318.5,t0+0.085,0.35,0.26);bell(c,1568,t0+0.17,0.7,0.3)}
   else{bwomp(c,330,262,t0,0.2,0.32);bwomp(c,247,175,t0+0.2,0.42,0.32)}
 }
+// paper "pera" sound for flipping a card: a crisp tick, then a short swish of filtered noise
+let NOISE=null;
+function pageFlip(){
+  if($('sound').value!=='on')return; const c=ac(); if(!c)return; const t0=c.currentTime+0.005;
+  if(!NOISE){NOISE=c.createBuffer(1,c.sampleRate*0.5,c.sampleRate);const d=NOISE.getChannelData(0);let b=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;b=0.6*b+0.4*w;d[i]=w*0.5+b*0.5}}
+  const part=(start,dur,f0,f1,q,vol,type)=>{
+    const src=c.createBufferSource(); src.buffer=NOISE;
+    const bp=c.createBiquadFilter(); bp.type=type; bp.Q.value=q;
+    bp.frequency.setValueAtTime(f0,start); bp.frequency.exponentialRampToValueAtTime(f1,start+dur);
+    const g=c.createGain(); g.gain.setValueAtTime(0.0001,start);
+    g.gain.exponentialRampToValueAtTime(vol,start+Math.min(0.012,dur*0.2));
+    g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+    src.connect(bp); bp.connect(g); g.connect(c.destination);
+    src.start(start,Math.random()*0.2,dur+0.05);
+  };
+  part(t0,0.035,5200,3800,1.2,0.35,'bandpass');            // "pe" — the paper edge snapping
+  part(t0+0.02,0.2,1600,4200,0.9,0.22,'bandpass');         // "ra" — the sheet swishing over
+  part(t0+0.03,0.14,700,500,0.7,0.08,'lowpass');           // a little body
+}
 function fanfare(){
   if($('sound').value!=='on')return;const c=ac();if(!c)return;const t0=c.currentTime+0.02;
   [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(c,'triangle',f,t0+i*0.12,i===3?0.6:0.2,0.3));
@@ -893,7 +912,7 @@ function fillCard(){
 }
 function reshuffle(){$('order').value='shuf'; savePrefs(); P=pool(); ci=0; fillCard()}
 function flip(){
-  const f=$('flip');
+  const f=$('flip'); pageFlip();
   // finish any spin in progress so state stays consistent on fast taps
   if(flipAnim){flipAnim.cancel();flipAnim=null;clearTimeout(flipTimer);f.classList.toggle('showback',turned)}
   const from=turned?180:0, to=turned?0:180, dir=to>from?1:-1;
