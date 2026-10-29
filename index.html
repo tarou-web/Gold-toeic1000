@@ -349,7 +349,8 @@ body.sv-lock{overflow:hidden}
 .sitem b{font-family:var(--f-jp);font-weight:800;font-size:1rem}
 .sitem .price{display:flex;align-items:center;gap:4px;font-family:var(--f);font-weight:900;color:var(--blue)}
 .sitem .price svg{width:18px;height:18px}
-.sitem .btn{width:100%;padding:10px 8px;font-size:.92rem}
+.sitem .btn{width:100%;padding:10px 6px;font-size:.92rem;white-space:nowrap}
+.sitem .btn:disabled{font-size:.82rem}
 .gzone{position:relative;display:flex;flex-direction:column;gap:18px}
 .gzone .goalbox{margin-right:84px}
 .mascot{position:absolute;right:6px;top:-22px;width:70px;z-index:3;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -673,21 +674,25 @@ function studied(xp){S.xp+=xp}
 const GLASS_SVG=`<svg class="m-glass" viewBox="0 0 221 320" aria-hidden="true"><g transform="translate(0 -16) scale(1 1.2)"><path d="M16 50H174Q180 50 180 56V66Q180 106 140 110H124Q94 106 92 74Q90 68 88 68Q86 68 84 74Q82 106 52 110H44Q16 106 16 66Z" fill="#15161a"/><path d="M22 57H81Q81 100 51 103H45Q22 100 22 66Z" fill="#2b3240"/><path d="M95 57H173V66Q173 100 139 103H126Q97 100 95 72Z" fill="#2b3240"/><path d="M30 61H42L28 88Q24 76 30 61Z M104 61H118L102 90Q98 76 104 61Z" fill="#fff" opacity=".5"/></g></svg>`;
 const ITEMS=[
   {id:'sunglasses',type:'acc',name:'サングラス',price:10},
+  {id:'bone',type:'skin',name:'ガイコツのスキン',price:60,img:'mascot-bone.png',w:1.0769,ml:-0.0754},
   {id:'silver',type:'skin',name:'銀のスキン',price:100,img:'mascot-silver.png'},
   {id:'gold',type:'skin',name:'金のスキン',price:500,img:'mascot-gold.png'}
 ];
-const skinImg=id=>(ITEMS.find(x=>x.id===id&&x.type==='skin')||{}).img||'mascot.png';
+const skinOf=id=>ITEMS.find(x=>x.id===id&&x.type==='skin')||{};
+const skinImg=id=>skinOf(id).img||'mascot.png';
+// some skins are drawn a little wider than the frame; stretch the image box so the body still lines up
+const skinStyle=id=>{const k=skinOf(id);return k.w?`width:${k.w*100}%;max-width:none;margin-left:${k.ml*100}%`:''};
 function earnCoin(id){
   const t=today(); if(S.cpd.d!==t)S.cpd={d:t,ids:{}};
   if(S.cpd.ids[id])return; S.cpd.ids[id]=1; S.coins=(S.coins||0)+1;
   const b=$('bagBtn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
 }
-function fig(skin,acc){return `<img src="${skinImg(skin)}" alt="">${acc==='sunglasses'?GLASS_SVG:''}`}
+function fig(skin,acc){return `<img src="${skinImg(skin)}" style="${skinStyle(skin)}" alt="">${acc==='sunglasses'?GLASS_SVG:''}`}
 function applyWear(){
   const m=$('mascot'); m.className=m.className.replace(/\b(w|s)-\S+/g,'').trim();
   if(S.wear&&S.owned[S.wear])m.classList.add('w-'+S.wear);
   const sk=S.skin&&S.owned[S.skin]?S.skin:'';
-  m.querySelector('img').src=skinImg(sk);
+  const mi=m.querySelector('img'); mi.src=skinImg(sk); mi.style.cssText=skinStyle(sk);
   if(sk)m.classList.add('s-'+sk);
   $('hangerBtn').hidden=!Object.keys(S.owned).length;
 }
@@ -696,7 +701,7 @@ function renderShop(){
   const bag=$('bagBtn').querySelector('svg').outerHTML;
   $('sgrid').innerHTML=ITEMS.map(it=>{const own=S.owned[it.id], can=(S.coins||0)>=it.price;
     const prev=it.type==='skin'?fig(it.id,''):fig('',it.id);
-    return `<div class="sitem ${it.type==='skin'?'sk-'+it.id:''}"><div class="prev">${prev}${it.type==='skin'?'<i class="pk"></i><i class="pk"></i><i class="pk"></i>':''}</div><b>${it.name}</b>
+    return `<div class="sitem ${it.type==='skin'?'sk-'+it.id:''}"><div class="prev">${prev}${(it.id==='silver'||it.id==='gold')?'<i class="pk"></i><i class="pk"></i><i class="pk"></i>':''}</div><b>${it.name}</b>
       <span class="price">${bag}${it.price}</span>
       ${own?`<button class="btn" disabled>購入済み</button>`:`<button class="btn ${can?'ok':''}" data-buy="${it.id}" ${can?'':'disabled'}>${can?'買う':`あと${it.price-(S.coins||0)}ポイント`}</button>`}</div>`}).join('');
   $('sgrid').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{

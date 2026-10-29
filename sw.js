@@ -1,6 +1,6 @@
 // Network first for the app itself so updates show right away; cached copy when offline.
-const CACHE='phrase1000-v38';
-const CORE=['./','index.html','manifest.webmanifest','apple-touch-icon-parrot.png','icon-192-parrot.png','icon-512-parrot.png','mascot.png','mascot-silver.png','mascot-gold.png'];
+const CACHE='phrase1000-v39';
+const CORE=['./','index.html','manifest.webmanifest','apple-touch-icon-parrot.png','icon-192-parrot.png','icon-512-parrot.png','mascot.png','mascot-silver.png','mascot-gold.png','mascot-bone.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{
