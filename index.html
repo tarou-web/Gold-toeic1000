@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,7 +14,9 @@
 <link rel="icon" href="icon-192-parrot.png">
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{overflow-x:clip;overscroll-behavior-x:none}
 body{margin:0;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+*{touch-action:manipulation}
 img{max-width:100%}[hidden]{display:none!important}
 </style>
 <title>TOEICフレーズ1000</title>
@@ -157,6 +159,7 @@ body.sheet-open .wrap{padding-bottom:200px}
 @keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 /* card judgement flash */
 .scene{position:relative}
+#v-card{overflow-x:clip}
 .scene.judge-ok .face{border-color:var(--green)!important;background:var(--green-s)!important;color:var(--green-ink)}
 .scene.judge-ng .face{border-color:var(--red)!important;background:var(--red-s)!important;color:var(--red-ink)}
 .scene.judge-ok .face *,.scene.judge-ng .face *{color:inherit!important}
