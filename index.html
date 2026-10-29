@@ -447,6 +447,11 @@ body.sv-lock{overflow:hidden}
       <div class="sync-row"><input id="syncIn" placeholder="合言葉を貼り付け" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn blue" id="syncLoad">読み込む</button></div>
       <p class="sync-msg" id="syncMsg" role="status"></p>
     </details>
+    <details class="sync-more"><summary>学習記録をリセットする</summary>
+      <p>覚えたフレーズ、苦手、ポイント、バッジ、今日の進み具合を最初の状態に戻します。連続日数とカレンダーはそのまま残ります。</p>
+      <button class="btn bad" id="resetBtn">リセットする</button>
+      <p class="sync-msg" id="resetMsg" role="status"></p>
+    </details>
   </section>
 </div>
 
@@ -456,6 +461,8 @@ const KEY='toeic1000-v1';
 let S={known:{},miss:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}catch(e){}
 S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}};
+function resetProgress(){S.known={};S.miss={};S.points=0;S.xp=0;S.td={d:'',pts:{},done:{}};}
+if(!S.reset1){resetProgress();S.reset1=1;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 // fill in days from an existing streak recorded before the calendar existed
 if(S.last&&!Object.keys(S.days).length){const [y,m,d]=S.last.split('-').map(Number);for(let i=0;i<Math.max(1,S.streak);i++){const x=new Date(y,m-1,d-i);S.days[dkey(x)]=1}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){};scheduleSync()}
@@ -507,6 +514,11 @@ function initSync(){
       try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
       $('syncKey').value=k; header(); refresh(false); m.textContent='記録を読み込みました。'; armed=null; $('syncLoad').textContent='読み込む'; syncStatus();
     }catch(e){m.textContent='読み込めませんでした。電波を確認してもう一度試してください。';m.classList.add('bad')}
+  };
+  let rArmed=false;
+  $('resetBtn').onclick=()=>{
+    if(!rArmed){rArmed=true;$('resetBtn').textContent='もう一度押すとリセット';$('resetMsg').textContent='元に戻せません。よければもう一度押してください。';return}
+    resetProgress();save();header();refresh(true);rArmed=false;$('resetBtn').textContent='リセットする';$('resetMsg').textContent='リセットしました。連続日数はそのままです。';
   };
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearTimeout(syncTimer);pushSync(true)}});
   if(FB_ON&&!S.syncedAt){syncDirty=true;setTimeout(pushSync,1500)}
