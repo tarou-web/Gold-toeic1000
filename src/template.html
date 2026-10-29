@@ -882,8 +882,30 @@ function uiClick(){
   const o=c.createOscillator(), g=c.createGain(); o.type='triangle'; o.frequency.setValueAtTime(1900,t0+0.045); o.frequency.exponentialRampToValueAtTime(1300,t0+0.08);
   g.gain.setValueAtTime(0.06,t0+0.045); g.gain.exponentialRampToValueAtTime(0.0001,t0+0.085); o.connect(g); g.connect(out); o.start(t0+0.045); o.stop(t0+0.1);
 }
-const CLICK_SEL='.tabs button,#bagBtn,#fireBtn,#ptsBtn,.sv-x,#hangerBtn,.wardrobe button[data-skin],.wardrobe button[data-wear]';
-document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest(CLICK_SEL); if(b&&!b.disabled)uiClick()},true);
+function noiseSwish(c,st,dur,f0,f1,q,vol,type){
+  if(!NOISE){NOISE=c.createBuffer(1,c.sampleRate*0.5,c.sampleRate);const d=NOISE.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+  const src=c.createBufferSource(); src.buffer=NOISE;
+  const f=c.createBiquadFilter(); f.type=type||'bandpass'; f.Q.value=q;
+  f.frequency.setValueAtTime(f0,st); f.frequency.exponentialRampToValueAtTime(f1,st+dur);
+  const g=c.createGain(); g.gain.setValueAtTime(0.0001,st); g.gain.exponentialRampToValueAtTime(vol,st+dur*0.35); g.gain.exponentialRampToValueAtTime(0.0001,st+dur);
+  src.connect(f); f.connect(g); g.connect(c.destination); src.start(st,Math.random()*0.2,dur+0.03);
+}
+// clothes: soft fabric "ファサッ" — two cloth swishes
+function sClothes(){if($('sound').value!=='on')return;const c=ac();if(!c)return;const t=c.currentTime+0.005;
+  noiseSwish(c,t,0.2,700,1700,0.7,0.16,'bandpass'); noiseSwish(c,t+0.13,0.16,1200,800,0.8,0.1,'bandpass'); noiseSwish(c,t,0.3,400,300,0.6,0.06,'lowpass')}
+// shop: a little "チャリン" shop bell with a coin glint
+function sShop(){if($('sound').value!=='on')return;const c=ac();if(!c)return;const t=c.currentTime+0.01;
+  bell(c,1568,t,0.35,0.18); bell(c,2093,t+0.07,0.5,0.2); noiseSwish(c,t+0.07,0.05,6000,7000,3,0.05,'bandpass')}
+// streak: fire catching "ボッ"
+function sFire(){if($('sound').value!=='on')return;const c=ac();if(!c)return;const t=c.currentTime+0.005;
+  noiseSwish(c,t,0.32,250,1400,0.8,0.32,'lowpass'); noiseSwish(c,t+0.02,0.25,900,2500,1,0.08,'bandpass');
+  const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.setValueAtTime(90,t);o.frequency.exponentialRampToValueAtTime(160,t+0.15);
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.22,t+0.04);g.gain.exponentialRampToValueAtTime(0.0001,t+0.25);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+0.3)}
+// badges: medal sparkle "キラーン"
+function sBadge(){if($('sound').value!=='on')return;const c=ac();if(!c)return;const t=c.currentTime+0.01;
+  [1318.5,1760,2349.3,2637].forEach((f,i)=>bell(c,f,t+i*0.055,i===3?0.6:0.25,0.12+i*0.02))}
+const SOUNDS=[['#hangerBtn,.wardrobe button[data-skin],.wardrobe button[data-wear]',sClothes],['#bagBtn',sShop],['#fireBtn',sFire],['#ptsBtn',sBadge],['.tabs button,.sv-x',uiClick]];
+document.addEventListener('click',e=>{if(!e.target.closest)return;for(const [sel,fn] of SOUNDS){const b=e.target.closest(sel);if(b){if(!b.disabled)fn();return}}},true);
 function fanfare(){
   if($('sound').value!=='on')return;const c=ac();if(!c)return;const t0=c.currentTime+0.02;
   [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(c,'triangle',f,t0+i*0.12,i===3?0.6:0.2,0.3));
