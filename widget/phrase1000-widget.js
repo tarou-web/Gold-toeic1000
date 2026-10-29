@@ -16,6 +16,8 @@ const SAD = {
   late:    [4, 6, 8],     // 夜8時を過ぎてもまだ
 };
 const HAPPY_COUNT = 12;
+// 背景がオレンジ系で、オレンジの炎と数字が見えにくい絵（炎と数字を白にする）
+const ORANGE_ART = ["happy-5", "happy-6", "happy-7"];
 const CHANGE_EVERY_HOURS = 1;  // 絵とひとことが入れ替わる間隔（時間）
 
 const MSG = {
@@ -101,6 +103,8 @@ async function build() {
   const doneNow = data && data.todayKey === dkey(now) ? (data.todayDone || 0) : 0;
   if ((mood === "pending" || mood === "late" || mood === "zero") && doneNow > 0) msg = `あと${Math.max(0, goal - doneNow)}問！（${doneNow}/${goal}）`;
   const lit = mood === "happy";
+  const onOrange = ORANGE_ART.includes(art);
+  const flameColor = onOrange ? Color.white() : new Color("#ff9600");
 
   const img = await loadArt(art);
   if (img) w.backgroundImage = img; else w.backgroundColor = new Color("#9aa3ad");
@@ -112,8 +116,9 @@ async function build() {
   const fl = SFSymbol.named("flame.fill");
   fl.applyFont(Font.heavySystemFont(28));
   const fi = row.addImage(fl.image);
+  if (onOrange) { fi.shadowColor = new Color("#000000", 0.3); fi.shadowRadius = 4; }
   fi.imageSize = new Size(28, 28);
-  fi.tintColor = lit ? new Color("#ff9600") : new Color("#e6e6ee");
+  fi.tintColor = lit ? flameColor : new Color("#e6e6ee");
   if (!lit) {
     // 今日まだのときは、炎に赤い「!」をつける
     const ex = SFSymbol.named("exclamationmark.circle.fill");
@@ -125,7 +130,7 @@ async function build() {
   row.addSpacer(4);
   const num = row.addText(String(streak));
   num.font = Font.heavyRoundedSystemFont(32);
-  num.textColor = lit ? new Color("#ff9600") : new Color("#f2f2f7");
+  num.textColor = lit ? flameColor : new Color("#f2f2f7");
   num.minimumScaleFactor = 0.6;
   shadow(num);
   row.addSpacer();
