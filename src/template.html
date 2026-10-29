@@ -837,19 +837,23 @@ let NOISE=null;
 function pageFlip(){
   if($('sound').value!=='on')return; const c=ac(); if(!c)return; const t0=c.currentTime+0.005;
   if(!NOISE){NOISE=c.createBuffer(1,c.sampleRate*0.5,c.sampleRate);const d=NOISE.getChannelData(0);let b=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;b=0.6*b+0.4*w;d[i]=w*0.5+b*0.5}}
-  // one soft swish: slow fade-in, filter sweeps up then down, light rustle flutter, long tail
-  const dur=0.42, src=c.createBufferSource(); src.buffer=NOISE;
-  const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=0.8;
-  bp.frequency.setValueAtTime(900,t0); bp.frequency.exponentialRampToValueAtTime(2600,t0+0.16); bp.frequency.exponentialRampToValueAtTime(1500,t0+dur);
-  const hp=c.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=350;
-  const g=c.createGain(); g.gain.setValueAtTime(0.0001,t0);
-  g.gain.exponentialRampToValueAtTime(0.16,t0+0.07);
-  g.gain.setValueAtTime(0.16,t0+0.07);
-  // rustle: small dips while the sheet moves
-  [0.1,0.15,0.2,0.26].forEach((x,i)=>{g.gain.linearRampToValueAtTime(0.09+0.02*i,t0+x);g.gain.linearRampToValueAtTime(0.15-0.02*i,t0+x+0.025)});
-  g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
-  src.connect(hp); hp.connect(bp); bp.connect(g); g.connect(c.destination);
-  src.start(t0,0,dur+0.05);
+  // "ペ" soft bend of the sheet  ->  "ラ" crisp flutter  ->  "ッ" the page landing
+  const burst=(start,dur,type,f0,f1,q,vol,att)=>{
+    const src=c.createBufferSource(); src.buffer=NOISE;
+    const f=c.createBiquadFilter(); f.type=type; f.Q.value=q;
+    f.frequency.setValueAtTime(f0,start); f.frequency.exponentialRampToValueAtTime(f1,start+dur);
+    const g=c.createGain(); g.gain.setValueAtTime(0.0001,start);
+    g.gain.exponentialRampToValueAtTime(vol,start+att); g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
+    src.connect(f); f.connect(g); g.connect(c.destination); src.start(start,Math.random()*0.3,dur+0.03);
+  };
+  burst(t0,0.09,'bandpass',1100,1900,1.1,0.2,0.012);           // ペ: paper bending (mid, rounded)
+  burst(t0,0.08,'lowpass',500,300,0.7,0.12,0.01);              //     a little air push
+  burst(t0+0.05,0.2,'bandpass',2400,3600,1.4,0.09,0.03);       // ラ: the sheet sliding
+  for(let i=0;i<7;i++){                                         //     crackles of the paper fibres
+    const st=t0+0.06+i*0.024+Math.random()*0.012;
+    burst(st,0.018,'bandpass',2800+Math.random()*1800,2600,2.2,0.07+Math.random()*0.05,0.003);
+  }
+  burst(t0+0.27,0.09,'lowpass',1200,500,0.8,0.1,0.006);        // ッ: page lands softly
 }
 function fanfare(){
   if($('sound').value!=='on')return;const c=ac();if(!c)return;const t0=c.currentTime+0.02;
