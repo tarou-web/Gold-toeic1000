@@ -305,6 +305,27 @@ body.sv-lock{overflow:hidden}
 .mfig{position:relative;display:block}
 .m-glass{position:absolute;inset:0;width:100%;height:100%;display:none;pointer-events:none}
 .mascot.w-sunglasses .m-glass{display:block}
+.wardrobe h4+button,.wardrobe button+h4{margin-top:0}
+.wardrobe button+h4{margin-top:6px}
+/* skin sparkles */
+.msparks{position:absolute;inset:-14px -10px -4px;pointer-events:none;display:none;z-index:2}
+.mascot.s-silver .msparks,.mascot.s-gold .msparks{display:block}
+.msparks i,.sitem .pk{position:absolute;width:12px;height:12px;background:var(--pc,#fff);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);filter:drop-shadow(0 0 3px var(--pg,#fff));opacity:0;animation:twk 2.4s ease-in-out infinite}
+.mascot.s-silver,.sitem.sk-silver{--pc:#f4f7fb;--pg:#cfd8e3}
+.mascot.s-gold,.sitem.sk-gold{--pc:#ffe27a;--pg:#ffb300}
+.msparks i:nth-child(1){left:2%;top:10%;animation-delay:0s}
+.msparks i:nth-child(2){left:82%;top:4%;animation-delay:.3s;width:9px;height:9px}
+.msparks i:nth-child(3){left:90%;top:42%;animation-delay:.9s}
+.msparks i:nth-child(4){left:-4%;top:52%;animation-delay:1.3s;width:8px;height:8px}
+.msparks i:nth-child(5){left:40%;top:-2%;animation-delay:1.7s;width:10px;height:10px}
+.msparks i:nth-child(6){left:70%;top:78%;animation-delay:.6s;width:8px;height:8px}
+.msparks i:nth-child(7){left:8%;top:84%;animation-delay:2s;width:9px;height:9px}
+.msparks i:nth-child(8){left:56%;top:30%;animation-delay:1.1s;width:7px;height:7px}
+.sitem .pk:nth-of-type(1){left:-6%;top:8%;animation-delay:0s}
+.sitem .pk:nth-of-type(2){left:88%;top:24%;animation-delay:.8s;width:9px;height:9px}
+.sitem .pk:nth-of-type(3){left:76%;top:80%;animation-delay:1.5s;width:8px;height:8px}
+@keyframes twk{0%,100%{opacity:0;transform:scale(.2) rotate(0)}40%{opacity:1;transform:translateY(-4px) scale(1) rotate(45deg)}70%{opacity:0;transform:translateY(-8px) scale(.4) rotate(90deg)}}
+@media (prefers-reduced-motion: reduce){.msparks i,.sitem .pk{animation:none;opacity:.8}}
 .hanger{position:absolute;right:-4px;top:58px;z-index:5;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:var(--surface);color:var(--fg);display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 .hanger[hidden]{display:none}
 .hanger svg{width:18px;height:18px}
@@ -427,7 +448,7 @@ body.sv-lock{overflow:hidden}
   <div class="track" id="mainbar"><i id="bar"></i></div>
   <div class="tracklabel"><span>全体の進み具合</span><span id="pct">0%</span></div>
   <div class="gzone">
-  <button class="mascot" id="mascot" aria-label="ヨウム"><span class="mfig"><img src="mascot.png" alt=""><svg class="m-glass" viewBox="0 0 221 320" aria-hidden="true"><g transform="translate(0 -16) scale(1 1.2)"><path d="M16 50H174Q180 50 180 56V66Q180 106 140 110H124Q94 106 92 74Q90 68 88 68Q86 68 84 74Q82 106 52 110H44Q16 106 16 66Z" fill="#15161a"/><path d="M22 57H81Q81 100 51 103H45Q22 100 22 66Z" fill="#2b3240"/><path d="M95 57H173V66Q173 100 139 103H126Q97 100 95 72Z" fill="#2b3240"/><path d="M30 61H42L28 88Q24 76 30 61Z M104 61H118L102 90Q98 76 104 61Z" fill="#fff" opacity=".5"/></g></svg></span></button>
+  <button class="mascot" id="mascot" aria-label="ヨウム"><span class="msparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="mfig"><img src="mascot.png" alt=""><svg class="m-glass" viewBox="0 0 221 320" aria-hidden="true"><g transform="translate(0 -16) scale(1 1.2)"><path d="M16 50H174Q180 50 180 56V66Q180 106 140 110H124Q94 106 92 74Q90 68 88 68Q86 68 84 74Q82 106 52 110H44Q16 106 16 66Z" fill="#15161a"/><path d="M22 57H81Q81 100 51 103H45Q22 100 22 66Z" fill="#2b3240"/><path d="M95 57H173V66Q173 100 139 103H126Q97 100 95 72Z" fill="#2b3240"/><path d="M30 61H42L28 88Q24 76 30 61Z M104 61H118L102 90Q98 76 104 61Z" fill="#fff" opacity=".5"/></g></svg></span></button>
   <button class="hanger" id="hangerBtn" aria-label="着せ替え" aria-expanded="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5a2.3 2.3 0 1 1 2.3-2.3c0 1.3-1 1.7-2.3 2.6L3 14.6c-1 .8-.4 2.4.9 2.4h16.2c1.3 0 1.9-1.6.9-2.4L12 8.1"/></svg></button>
   <div class="wardrobe" id="wardrobe" role="dialog" aria-label="着せ替え" hidden></div>
   <div class="mbub" id="mbub" aria-live="polite"></div>
@@ -530,7 +551,7 @@ const DATA = [{"id":1,"jp":"とにかくやってみよう。","en":"Let's try a
 const KEY='toeic1000-v1';
 let S={known:{},miss:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}catch(e){}
-S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}}; S.coins=S.coins||0; S.owned=S.owned||{}; S.wear=S.wear||''; S.cpd=S.cpd||{d:'',ids:{}};
+S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}}; S.coins=S.coins||0; S.owned=S.owned||{}; S.wear=S.wear||''; S.skin=S.skin||''; S.cpd=S.cpd||{d:'',ids:{}};
 // one-time gift: answers made before the shop existed
 if(!S.coinGift1){S.coins+=117;S.coinGift1=1;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function resetProgress(){S.known={};S.miss={};S.points=0;S.xp=0;S.td={d:'',pts:{},done:{}};}
@@ -546,7 +567,7 @@ var syncTimer=null,syncBusy=false,syncDirty=false;
 function syncPayload(){
   const td=todayState();
   return {points:S.points||0,goal:S.goal||10,todayKey:td.d,todayDone:Object.keys(td.done).length,todayPts:td.pts,todayDoneMap:td.done,streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},days:S.days||{},
-    coins:S.coins||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:Date.now(),tz:-new Date().getTimezoneOffset()};
+    coins:S.coins||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:Date.now(),tz:-new Date().getTimezoneOffset()};
 }
 function scheduleSync(){ if(!FB_ON||!S.syncKey)return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
 async function pushSync(keepalive){
@@ -581,7 +602,7 @@ function initSync(){
       if(!r.ok||!d){m.textContent='その合言葉の記録が見つかりませんでした。';m.classList.add('bad');armed=null;$('syncLoad').textContent='読み込む';return}
       // the database may return numbered maps as arrays with gaps; turn them back into plain maps
       const obj=x=>{const o={};if(x)for(const k of Object.keys(x))if(x[k]!=null)o[k]=x[k];return o};
-      Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},coins:d.coins||0,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}},syncKey:k});
+      Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},coins:d.coins||0,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}},syncKey:k});
       $('goal').value=String(S.goal);
       applyWear();
       try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
@@ -650,34 +671,53 @@ function credit(id,viaCard){
 function studied(xp){S.xp+=xp}
 // ---- shopping points, shop and wardrobe
 const GLASS_SVG=`<svg class="m-glass" viewBox="0 0 221 320" aria-hidden="true"><g transform="translate(0 -16) scale(1 1.2)"><path d="M16 50H174Q180 50 180 56V66Q180 106 140 110H124Q94 106 92 74Q90 68 88 68Q86 68 84 74Q82 106 52 110H44Q16 106 16 66Z" fill="#15161a"/><path d="M22 57H81Q81 100 51 103H45Q22 100 22 66Z" fill="#2b3240"/><path d="M95 57H173V66Q173 100 139 103H126Q97 100 95 72Z" fill="#2b3240"/><path d="M30 61H42L28 88Q24 76 30 61Z M104 61H118L102 90Q98 76 104 61Z" fill="#fff" opacity=".5"/></g></svg>`;
-const ITEMS=[{id:'sunglasses',name:'サングラス',price:10}];
+const ITEMS=[
+  {id:'sunglasses',type:'acc',name:'サングラス',price:10},
+  {id:'silver',type:'skin',name:'銀のスキン',price:100,img:'mascot-silver.png'},
+  {id:'gold',type:'skin',name:'金のスキン',price:500,img:'mascot-gold.png'}
+];
+const skinImg=id=>(ITEMS.find(x=>x.id===id&&x.type==='skin')||{}).img||'mascot.png';
 function earnCoin(id){
   const t=today(); if(S.cpd.d!==t)S.cpd={d:t,ids:{}};
   if(S.cpd.ids[id])return; S.cpd.ids[id]=1; S.coins=(S.coins||0)+1;
   const b=$('bagBtn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
 }
+function fig(skin,acc){return `<img src="${skinImg(skin)}" alt="">${acc==='sunglasses'?GLASS_SVG:''}`}
 function applyWear(){
-  const m=$('mascot'); m.className=m.className.replace(/\bw-\S+/g,'').trim(); if(S.wear&&S.owned[S.wear])m.classList.add('w-'+S.wear);
+  const m=$('mascot'); m.className=m.className.replace(/\b(w|s)-\S+/g,'').trim();
+  if(S.wear&&S.owned[S.wear])m.classList.add('w-'+S.wear);
+  const sk=S.skin&&S.owned[S.skin]?S.skin:'';
+  m.querySelector('img').src=skinImg(sk);
+  if(sk)m.classList.add('s-'+sk);
   $('hangerBtn').hidden=!Object.keys(S.owned).length;
 }
 function renderShop(){
   $('shopNum').textContent=S.coins||0;
+  const bag=$('bagBtn').querySelector('svg').outerHTML;
   $('sgrid').innerHTML=ITEMS.map(it=>{const own=S.owned[it.id], can=(S.coins||0)>=it.price;
-    return `<div class="sitem"><div class="prev"><img src="mascot.png" alt="">${GLASS_SVG}</div><b>${it.name}</b>
-      <span class="price">${$('bagBtn').querySelector('svg').outerHTML}${it.price}</span>
+    const prev=it.type==='skin'?fig(it.id,''):fig('',it.id);
+    return `<div class="sitem ${it.type==='skin'?'sk-'+it.id:''}"><div class="prev">${prev}${it.type==='skin'?'<i class="pk"></i><i class="pk"></i><i class="pk"></i>':''}</div><b>${it.name}</b>
+      <span class="price">${bag}${it.price}</span>
       ${own?`<button class="btn" disabled>購入済み</button>`:`<button class="btn ${can?'ok':''}" data-buy="${it.id}" ${can?'':'disabled'}>${can?'買う':`あと${it.price-(S.coins||0)}ポイント`}</button>`}</div>`}).join('');
   $('sgrid').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{
     const it=ITEMS.find(x=>x.id===b.dataset.buy); if(!it||S.owned[it.id]||S.coins<it.price)return;
-    S.coins-=it.price; S.owned[it.id]=1; S.wear=it.id; save(); header(); applyWear(); renderShop(); fanfare&&fanfare();
+    S.coins-=it.price; S.owned[it.id]=1; if(it.type==='skin')S.skin=it.id; else S.wear=it.id;
+    save(); header(); applyWear(); renderShop(); fanfare&&fanfare();
     toast(`${it.name}を買いました！ヨウムの右下のハンガーから着せ替えできます`);
   });
 }
 function openShop(){renderShop();const v=$('shopv');v.classList.add('open');v.setAttribute('aria-hidden','false');document.body.classList.add('sv-lock');setTimeout(()=>$('shopClose').focus({preventScroll:true}),50)}
 function closeShop(){const v=$('shopv');v.classList.remove('open');v.setAttribute('aria-hidden','true');document.body.classList.remove('sv-lock');$('bagBtn').focus({preventScroll:true})}
 function renderWardrobe(){
-  const list=[{id:'',name:'なし'},...ITEMS.filter(it=>S.owned[it.id])];
-  $('wardrobe').innerHTML='<h4>着せ替え</h4>'+list.map(it=>`<button data-wear="${it.id}" aria-pressed="${(S.wear||'')===it.id}"><span class="wthumb"><img src="mascot.png" alt="">${it.id==='sunglasses'?GLASS_SVG:''}</span>${it.name}</button>`).join('');
+  const skins=[{id:'',name:'ふつう'},...ITEMS.filter(it=>it.type==='skin'&&S.owned[it.id])];
+  const accs=[{id:'',name:'なし'},...ITEMS.filter(it=>it.type==='acc'&&S.owned[it.id])];
+  const cur=S.skin&&S.owned[S.skin]?S.skin:'', curA=S.wear&&S.owned[S.wear]?S.wear:'';
+  let h='';
+  if(skins.length>1)h+='<h4>スキン</h4>'+skins.map(it=>`<button data-skin="${it.id}" aria-pressed="${cur===it.id}"><span class="wthumb">${fig(it.id,curA)}</span>${it.name}</button>`).join('');
+  if(accs.length>1)h+='<h4>アクセサリー</h4>'+accs.map(it=>`<button data-wear="${it.id}" aria-pressed="${curA===it.id}"><span class="wthumb">${fig(cur,it.id)}</span>${it.name}</button>`).join('');
+  $('wardrobe').innerHTML=h;
   $('wardrobe').querySelectorAll('[data-wear]').forEach(b=>b.onclick=()=>{S.wear=b.dataset.wear;save();applyWear();renderWardrobe();setTimeout(closeWardrobe,250);mascotSay('tap')});
+  $('wardrobe').querySelectorAll('[data-skin]').forEach(b=>b.onclick=()=>{S.skin=b.dataset.skin;save();applyWear();renderWardrobe();setTimeout(closeWardrobe,250);mascotSay('tap')});
 }
 function openWardrobe(){renderWardrobe();$('wardrobe').hidden=false;$('hangerBtn').setAttribute('aria-expanded','true')}
 function closeWardrobe(){$('wardrobe').hidden=true;$('hangerBtn').setAttribute('aria-expanded','false')}
