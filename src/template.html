@@ -278,6 +278,21 @@ body.sv-lock{overflow:hidden}
 .goalrow{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;font-weight:800;font-variant-numeric:tabular-nums}
 .goalrow #goalTxt{color:var(--fg)}
 .goalbox.done{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 12%,transparent)}
+.gzone{position:relative;display:flex;flex-direction:column;gap:18px}
+.gzone .goalbox{margin-right:84px}
+.mascot{position:absolute;right:6px;top:-22px;width:70px;z-index:3;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mascot img{width:100%;display:block;pointer-events:none;transform-origin:50% 100%}
+.mascot.hop img{animation:mhop .55s cubic-bezier(.3,1.6,.5,1)}
+.mascot.ouch img{animation:mouch .5s}
+@keyframes mhop{0%{transform:none}35%{transform:translateY(-14px) scale(1.04,.97)}70%{transform:translateY(0) scale(1.05,.94)}100%{transform:none}}
+@keyframes mouch{0%,100%{transform:none}20%{transform:rotate(-9deg)}45%{transform:rotate(7deg)}70%{transform:rotate(-4deg)}}
+.mbub{position:absolute;right:84px;top:10px;z-index:4;max-width:calc(100% - 96px);padding:9px 14px;border-radius:16px;background:var(--surface);border:2px solid var(--line);font-family:var(--f-jp);font-weight:800;font-size:.95rem;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:0;transform:translateX(8px) scale(.9);transform-origin:100% 50%;transition:opacity .18s,transform .22s cubic-bezier(.3,1.5,.5,1);pointer-events:none}
+.mbub::after{content:'';position:absolute;right:-9px;top:50%;width:14px;height:14px;background:inherit;border:2px solid var(--line);border-left:0;border-bottom:0;transform:translateY(-50%) rotate(45deg);border-radius:0 3px 0 0}
+.mbub.show{opacity:1;transform:none}
+.mbub.ok{border-color:var(--green);color:var(--green-ink,var(--green))}
+.mbub.ok::after{border-color:var(--green)}
+.mbub.ng{border-color:var(--red);color:var(--red-ink)}
+.mbub.ng::after{border-color:var(--red)}
 .gtrack{height:12px}
 .gtrack i{background:var(--gold)}
 .goalbox.done .gtrack i{background:var(--gold-d)}
@@ -356,6 +371,9 @@ body.sv-lock{overflow:hidden}
   </header>
   <div class="track" id="mainbar"><i id="bar"></i></div>
   <div class="tracklabel"><span>全体の進み具合</span><span id="pct">0%</span></div>
+  <div class="gzone">
+  <button class="mascot" id="mascot" aria-label="ヨウム"><img src="mascot.png" alt=""></button>
+  <div class="mbub" id="mbub" aria-live="polite"></div>
   <div class="goalbox" id="goalbox">
     <div class="goalrow"><span id="goalTxt">今日の目標</span><span id="goalNum">0 / 10</span></div>
     <div class="track gtrack"><i id="goalBar"></i></div>
@@ -365,6 +383,7 @@ body.sv-lock{overflow:hidden}
     <button role="tab" id="t-card" aria-selected="true">カード</button>
     <button role="tab" id="t-quiz" aria-selected="false">4択クイズ</button>
     <button role="tab" id="t-list" aria-selected="false">一覧</button>
+  </div>
   </div>
 
   <section id="v-card"></section>
@@ -511,6 +530,21 @@ const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&qu
 const ICON_OK='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M7 12.5l3.2 3.2L17 9" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const ICON_NG='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>';
 const CHEER=['すばらしい！','その調子！','完璧！','ナイス！','やったね！'];
+// ---- mascot comments
+const SAY={
+  ok:['正解！','いいね！','その調子！','覚えてたね！','さすが！','完璧！','天才かも！','ナイス！','やるじゃん！','どんどんいこう！'],
+  ng:['おしい！','ドンマイ！','次は覚えよう','もう一回見てね','あとで復習しよう','大丈夫、大丈夫','ここで覚えれば勝ち','間違えて覚えよう'],
+  tap:['がんばってるね','今日も一緒にやろう','1枚ずつでいいよ','フレーズは声に出すといいよ','ぼくはヨウムだよ','つついた？']
+};
+let mbT=0,mLast='';
+function mascotSay(kind){
+  const b=$('mbub'),m=$('mascot'); if(!b)return;
+  const list=SAY[kind]; let t; do{t=list[Math.random()*list.length|0]}while(list.length>1&&t===mLast); mLast=t;
+  b.textContent=t; b.className='mbub '+(kind==='ok'?'ok':kind==='ng'?'ng':'');
+  void b.offsetWidth; b.classList.add('show');
+  m.classList.remove('hop','ouch'); void m.offsetWidth; m.classList.add(kind==='ng'?'ouch':'hop');
+  clearTimeout(mbT); mbT=setTimeout(()=>b.classList.remove('show'),1800);
+}
 
 const rs=$('range'); {const N=DATA.length,sets=[];for(let a=0;a<N;a+=100){const b=Math.min(N,a+100);sets.push(`<option value="${a}-${b}">${a+1}–${b}</option>`)}
   rs.innerHTML=`<option value="0-${N}">全部 1–${N}</option><option value="0-1000">前回の1000語</option><option value="1000-${N}">追加の${N-1000}語</option>`+sets.join('');}
@@ -759,7 +793,7 @@ let judging=false;
 function mark(ok){
   const d=P[ci]; if(!d||judging) return;
   if(ok){S.known[d.id]=1;studied(5);credit(d.id,true)} else {delete S.known[d.id]; S.miss[d.id]=(S.miss[d.id]||0)+1}
-  sfx(ok); buzz(ok); save();header(); $('st').innerHTML=chip(d);
+  sfx(ok); buzz(ok); save();header(); $('st').innerHTML=chip(d); mascotSay(ok?'ok':'ng');
   const sc=$('scene'); judging=true;
   sc.classList.add(ok?'judge-ok':'judge-ng');
   if(ok && !matchMedia('(prefers-reduced-motion: reduce)').matches){
@@ -809,7 +843,7 @@ function answer(b,d,je){
   if(ok){qs.r++;qs.xp+=10;S.known[d.id]=1;studied(10);credit(d.id,false)}else{b.classList.add('wrong');S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}
   v.querySelector(`.opt[data-id="${d.id}"]`).classList.add('right');
   v.querySelectorAll('.opt').forEach(x=>x.disabled=true);
-  sfx(ok); buzz(ok); save(); header();
+  sfx(ok); buzz(ok); save(); header(); mascotSay(ok?'ok':'ng');
   showSheet(ok,ok?CHEER[Math.random()*CHEER.length|0]:'不正解',ok?'':`正解：${esc(je?d.en:d.jp)}`,d);
 }
 function showSheet(ok,title,sub,d){
@@ -852,6 +886,7 @@ $('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
 for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];refresh(true)};
 for(const x of ['card','quiz','list']) $('t-'+x).onclick=()=>setTab(x);
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
+$('mascot').onclick=()=>mascotSay('tap');
 $('goal').value=String(S.goal);
 $('goal').onchange=()=>{S.goal=+$('goal').value;if(checkGoal())celebrateGoal();save();header()};
 $('fireBtn').onclick=openStreak; $('svClose').onclick=closeStreak;
