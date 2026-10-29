@@ -869,6 +869,28 @@ header(); setTab(tab); initSync();
 
 (function(){const s=document.getElementById('splash');if(!s)return;
   const rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  setTimeout(()=>{s.classList.add('hide');setTimeout(()=>s.remove(),500)},rm?500:1500);
+  const AWAY=5*60*1000;   // after 5 minutes away, start again from the launch screen
+  let timer=null, leftAt=0;
+  function play(){
+    clearTimeout(timer);
+    s.hidden=false; s.classList.remove('hide');
+    // restart the pop and blink animations
+    s.querySelectorAll('svg,.lids').forEach(el=>{el.style.animation='none';void el.offsetWidth;el.style.animation=''});
+    timer=setTimeout(()=>{s.classList.add('hide');timer=setTimeout(()=>{s.hidden=true},500)},rm?500:1500);
+  }
+  play();
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='hidden'){leftAt=Date.now();return}
+    if(leftAt&&Date.now()-leftAt>=AWAY){
+      // back to a fresh start: close open screens and go to the top of the card view
+      try{if(typeof closeStreak==='function'&&document.getElementById('sv').classList.contains('open'))closeStreak()}catch(e){}
+      try{if(typeof closeBadges==='function'&&document.getElementById('bv').classList.contains('open'))closeBadges()}catch(e){}
+      try{if(typeof hideSheet==='function')hideSheet()}catch(e){}
+      try{if(typeof header==='function')header();if(typeof refresh==='function')refresh(false)}catch(e){}
+      window.scrollTo(0,0);
+      play();
+    }
+    leftAt=0;
+  });
 })();
 </script>
