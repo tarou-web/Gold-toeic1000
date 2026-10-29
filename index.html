@@ -319,6 +319,9 @@ body.sv-lock{overflow:hidden}
 .bitem.locked .badge{filter:grayscale(1);opacity:.35}
 .bitem.locked .badge b{opacity:.7}
 .bitem.newest .badge{outline:3px solid var(--gold);outline-offset:3px}
+.bitem.newest .badge.has-img{outline:none}
+.bitem.newest .badge.has-img::after{content:"";position:absolute;left:50%;top:var(--cy,50%);width:calc(80% + 12px);aspect-ratio:1;border-radius:50%;
+  transform:translate(-50%,-50%);border:3px solid var(--gold);box-sizing:border-box;pointer-events:none}
 .toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));z-index:80;transform:translate(-50%,-160%);transition:transform .4s cubic-bezier(.3,1.4,.5,1);
   display:flex;align-items:center;gap:12px;background:var(--surface);border:2px solid var(--gold);border-bottom-width:5px;border-radius:18px;padding:10px 16px;max-width:calc(100% - 32px);box-shadow:0 10px 30px rgba(0,0,0,.18)}
 .toast.show{transform:translate(-50%,0)}
@@ -518,7 +521,8 @@ function dkey(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function today(){return dkey(new Date())}
 // ---- daily goal, points and badges ----
 const BADGES=[0,10,30,50,100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1500,2000,2500,3000,3500,4000,4500,5000,6000,7000,8000,9000,10000];
-const BADGE_ART=new Set(BADGES);   // every badge now has a picture in badges/badge-<points>.png   // badges that have a picture in badges/badge-<points>.png
+const BADGE_ART=new Set(BADGES);
+const CROWN=new Set([50,200,350,500,800,1500,3000,4500,7000,10000]);   // crowned badges sit a little lower in their picture   // every badge now has a picture in badges/badge-<points>.png   // badges that have a picture in badges/badge-<points>.png
 function todayState(){const t=today();if(S.td.d!==t)S.td={d:t,pts:{},done:{}};return S.td}
 function doneCount(){return Object.keys(todayState().done).length}
 function checkGoal(){
@@ -551,7 +555,7 @@ const PARROT_FACE=`<svg class="bface" viewBox="0 0 100 100" aria-hidden="true">
 </svg>`;
 function badgeHTML(p,small){
   const tier=BADGES.indexOf(p), hue=[45,30,10,340,300,265,220,190,160,130][Math.min(9,Math.floor(tier/3.1))];
-  if(BADGE_ART.has(p))return `<div class="badge has-img"><img src="badges/badge-${p}.png" alt="${p}ポイントのバッジ"></div>`;
+  if(BADGE_ART.has(p))return `<div class="badge has-img" style="--cy:${CROWN.has(p)?54:50}%"><img src="badges/badge-${p}.png" alt="${p}ポイントのバッジ"></div>`;
   return `<div class="badge" style="--c1:hsl(${hue} 95% 62%);--c2:hsl(${hue} 85% 42%)">${PARROT_FACE}</div>`;
 }
 let toastTimer=null;
