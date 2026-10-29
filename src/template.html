@@ -866,6 +866,24 @@ function pageFlip(){
   }
   burst(t0+0.32,0.09,'lowpass',1200,500,0.8,0.1,0.006);        // ッ: page lands softly
 }
+// "カチャッ" click for menu buttons: two tiny clicks (カ + チャ) and a faint tick
+function uiClick(){
+  if($('sound').value!=='on')return; const c=ac(); if(!c)return; const t0=c.currentTime+0.003;
+  if(!NOISE){NOISE=c.createBuffer(1,c.sampleRate*0.5,c.sampleRate);const d=NOISE.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
+  const out=c.createGain(); out.gain.value=0.9; out.connect(c.destination);
+  const clk=(st,dur,freq,q,vol)=>{
+    const src=c.createBufferSource(); src.buffer=NOISE;
+    const f=c.createBiquadFilter(); f.type='bandpass'; f.frequency.value=freq; f.Q.value=q;
+    const g=c.createGain(); g.gain.setValueAtTime(vol,st); g.gain.exponentialRampToValueAtTime(0.0001,st+dur);
+    src.connect(f); f.connect(g); g.connect(out); src.start(st,Math.random()*0.3,dur+0.02);
+  };
+  clk(t0,0.018,3200,2.5,0.5);          // カ
+  clk(t0+0.045,0.03,2200,1.6,0.42);    // チャ
+  const o=c.createOscillator(), g=c.createGain(); o.type='triangle'; o.frequency.setValueAtTime(1900,t0+0.045); o.frequency.exponentialRampToValueAtTime(1300,t0+0.08);
+  g.gain.setValueAtTime(0.06,t0+0.045); g.gain.exponentialRampToValueAtTime(0.0001,t0+0.085); o.connect(g); g.connect(out); o.start(t0+0.045); o.stop(t0+0.1);
+}
+const CLICK_SEL='.tabs button,#bagBtn,#fireBtn,#ptsBtn,.sv-x,#hangerBtn,.wardrobe button[data-skin],.wardrobe button[data-wear]';
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest(CLICK_SEL); if(b&&!b.disabled)uiClick()},true);
 function fanfare(){
   if($('sound').value!=='on')return;const c=ac();if(!c)return;const t0=c.currentTime+0.02;
   [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(c,'triangle',f,t0+i*0.12,i===3?0.6:0.2,0.3));
