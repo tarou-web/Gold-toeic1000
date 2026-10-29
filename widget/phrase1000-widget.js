@@ -116,7 +116,6 @@ async function build() {
   const fl = SFSymbol.named("flame.fill");
   fl.applyFont(Font.heavySystemFont(28));
   const fi = row.addImage(fl.image);
-  if (onOrange) { fi.shadowColor = new Color("#000000", 0.3); fi.shadowRadius = 4; }
   fi.imageSize = new Size(28, 28);
   fi.tintColor = lit ? flameColor : new Color("#e6e6ee");
   if (!lit) {
