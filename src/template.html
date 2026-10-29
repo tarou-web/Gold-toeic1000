@@ -75,6 +75,11 @@ button:focus-visible,select:focus-visible,input:focus-visible,.scene:focus-visib
 .txt{position:relative;z-index:1;text-wrap:balance;max-width:100%;overflow-wrap:anywhere}
 .txt.jp{font-family:var(--f-jp);font-weight:800;font-size:clamp(1.3rem,4.6vw,1.75rem);line-height:1.45}
 .txt.en{font-family:var(--f);font-weight:900;font-size:clamp(1.4rem,5vw,2rem);line-height:1.25}
+.gloss{position:relative;z-index:1;display:flex;flex-direction:column;gap:3px;max-width:100%;padding-top:10px;border-top:2px dashed currentColor;border-top-color:color-mix(in srgb,currentColor 25%,transparent)}
+.gloss div{font-size:.8rem;line-height:1.4;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;opacity:.88}
+.gloss b{font-family:var(--f);font-weight:900}
+.gloss span{font-family:var(--f-jp);font-weight:500}
+.front .gloss{color:var(--muted)}.front .gloss b{color:var(--fg)}
 .fixnote{position:relative;z-index:1;font-size:.72rem;opacity:.8}
 .front .fixnote{color:var(--muted)}
 .say{position:relative;z-index:1;font:inherit;font-weight:800;font-size:.85rem;border:2px solid rgba(255,255,255,.5);border-bottom-width:4px;background:rgba(255,255,255,.18);color:#fff;border-radius:14px;padding:6px 16px;cursor:pointer}
@@ -692,6 +697,7 @@ function faceHTML(d,lang,isBack){
   return `<span class="corner">No.${d.id}</span>
     <span class="side">${lang==='en'?'ENGLISH':'日本語'}</span>
     <div class="txt ${lang}">${esc(t)}</div>
+    ${lang==='jp'&&d.g&&d.g.length?`<div class="gloss">${d.g.map(([w,m])=>`<div><b>${esc(w)}</b><span>${esc(m)}</span></div>`).join('')}</div>`:''}
     ${lang==='en'?`<button class="say" data-say>🔊 発音を聞く</button>`:''}
     ${isBack&&d.fix?`<div class="fixnote">元の表記を修正: ${esc(d.fix)}</div>`:''}
     <span class="tap">${isBack?'タップでもう一度回転':'タップで裏返す'}</span>`;
