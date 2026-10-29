@@ -872,12 +872,12 @@ function pageFlip(){
   burst(t0,0.09,'lowpass',520,300,0.7,0.17,0.012);              //     a little air push
   { // ラ: the soft "サラッ" swish of the sheet passing over
     const t1=t0+0.03, dur=0.4, src=c.createBufferSource(); src.buffer=NOISE;
-    const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=0.8;
-    bp.frequency.setValueAtTime(900,t1); bp.frequency.exponentialRampToValueAtTime(2600,t1+0.16); bp.frequency.exponentialRampToValueAtTime(1500,t1+dur);
-    const hp=c.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=350;
+    const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=1.3;
+    bp.frequency.setValueAtTime(2200,t1); bp.frequency.exponentialRampToValueAtTime(3400,t1+0.14); bp.frequency.exponentialRampToValueAtTime(2400,t1+dur);
+    const hp=c.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=1200;
     const g=c.createGain(); g.gain.setValueAtTime(0.0001,t1);
-    g.gain.exponentialRampToValueAtTime(0.085,t1+0.07); g.gain.setValueAtTime(0.085,t1+0.07);
-    [0.1,0.15,0.2,0.26].forEach((x,i)=>{g.gain.linearRampToValueAtTime(0.05+0.01*i,t1+x);g.gain.linearRampToValueAtTime(0.08-0.01*i,t1+x+0.025)});
+    g.gain.exponentialRampToValueAtTime(0.06,t1+0.05); g.gain.setValueAtTime(0.06,t1+0.05);
+    [0.08,0.12,0.15,0.19,0.24].forEach((x,i)=>{const j=Math.random()*0.012;g.gain.linearRampToValueAtTime(0.025+Math.random()*0.015,t1+x+j);g.gain.linearRampToValueAtTime(0.055-0.007*i,t1+x+j+0.018)});   // dry, uneven rub like paper
     g.gain.exponentialRampToValueAtTime(0.0001,t1+dur);
     src.connect(hp); hp.connect(bp); bp.connect(g); g.connect(c.destination); src.start(t1,0,dur+0.05);
   }
