@@ -16,7 +16,7 @@ const SAD = {
   late:    [4, 6, 8],     // 夜8時を過ぎてもまだ
 };
 const HAPPY_COUNT = 12;
-const CHANGE_EVERY_DAYS = 2;  // 絵が入れ替わる間隔
+const CHANGE_EVERY_HOURS = 1;  // 絵とひとことが入れ替わる間隔（時間）
 
 const MSG = {
   zero:    ["また始めよう", "今日から再スタート！", "フレーズが待ってるよ"],
@@ -62,7 +62,9 @@ function shadow(t) {
 async function build() {
   const w = new ListWidget();
   w.url = APP;
-  w.refreshAfterDate = new Date(Date.now() + 30 * 60 * 1000);
+  // 次の「ちょうど◯時」に更新する
+  const nextHour = new Date(); nextHour.setMinutes(0, 5, 0); nextHour.setHours(nextHour.getHours() + 1);
+  w.refreshAfterDate = nextHour;
   w.setPadding(14, 10, 10, 10);
 
   if (!KEY) {
@@ -83,8 +85,8 @@ async function build() {
   const streak = alive ? (data.streak || 0) : 0;
   const doneToday = last === dkey(now);
 
-  const dayNum = Math.floor((now.getTime() - now.getTimezoneOffset() * 60000) / 86400000);
-  const slot = Math.floor(dayNum / CHANGE_EVERY_DAYS);
+  const hourNum = Math.floor((now.getTime() - now.getTimezoneOffset() * 60000) / 3600000);
+  const slot = Math.floor(hourNum / CHANGE_EVERY_HOURS);
 
   let mood, art;
   if (!data) { mood = "error"; art = `sad-${SAD.pending[slot % SAD.pending.length]}`; }
@@ -93,7 +95,7 @@ async function build() {
   else if (now.getHours() >= 20) { mood = "late"; art = `sad-${SAD.late[slot % SAD.late.length]}`; }
   else { mood = "pending"; art = `sad-${SAD.pending[slot % SAD.pending.length]}`; }
   const msgs = MSG[mood];
-  let msg = msgs[dayNum % msgs.length];
+  let msg = msgs[slot % msgs.length];
   // 今日少しでも進んでいれば、目標までの残りを出す
   const goal = (data && data.goal) || 10;
   const doneNow = data && data.todayKey === dkey(now) ? (data.todayDone || 0) : 0;
