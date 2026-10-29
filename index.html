@@ -859,19 +859,19 @@ let NOISE=null;
 function pageFlip(){
   if($('sound').value!=='on')return; const c=ac(); if(!c)return; const t0=c.currentTime+0.005;
   if(!NOISE){NOISE=c.createBuffer(1,c.sampleRate*0.5,c.sampleRate);const d=NOISE.getChannelData(0);let b=0;for(let i=0;i<d.length;i++){const w=Math.random()*2-1;b=0.6*b+0.4*w;d[i]=w*0.5+b*0.5}}
-  const part=(start,dur,f0,f1,q,vol,type)=>{
-    const src=c.createBufferSource(); src.buffer=NOISE;
-    const bp=c.createBiquadFilter(); bp.type=type; bp.Q.value=q;
-    bp.frequency.setValueAtTime(f0,start); bp.frequency.exponentialRampToValueAtTime(f1,start+dur);
-    const g=c.createGain(); g.gain.setValueAtTime(0.0001,start);
-    g.gain.exponentialRampToValueAtTime(vol,start+Math.min(0.012,dur*0.2));
-    g.gain.exponentialRampToValueAtTime(0.0001,start+dur);
-    src.connect(bp); bp.connect(g); g.connect(c.destination);
-    src.start(start,Math.random()*0.2,dur+0.05);
-  };
-  part(t0,0.035,5200,3800,1.2,0.35,'bandpass');            // "pe" — the paper edge snapping
-  part(t0+0.02,0.2,1600,4200,0.9,0.22,'bandpass');         // "ra" — the sheet swishing over
-  part(t0+0.03,0.14,700,500,0.7,0.08,'lowpass');           // a little body
+  // one soft swish: slow fade-in, filter sweeps up then down, light rustle flutter, long tail
+  const dur=0.42, src=c.createBufferSource(); src.buffer=NOISE;
+  const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=0.8;
+  bp.frequency.setValueAtTime(900,t0); bp.frequency.exponentialRampToValueAtTime(2600,t0+0.16); bp.frequency.exponentialRampToValueAtTime(1500,t0+dur);
+  const hp=c.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=350;
+  const g=c.createGain(); g.gain.setValueAtTime(0.0001,t0);
+  g.gain.exponentialRampToValueAtTime(0.16,t0+0.07);
+  g.gain.setValueAtTime(0.16,t0+0.07);
+  // rustle: small dips while the sheet moves
+  [0.1,0.15,0.2,0.26].forEach((x,i)=>{g.gain.linearRampToValueAtTime(0.09+0.02*i,t0+x);g.gain.linearRampToValueAtTime(0.15-0.02*i,t0+x+0.025)});
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  src.connect(hp); hp.connect(bp); bp.connect(g); g.connect(c.destination);
+  src.start(t0,0,dur+0.05);
 }
 function fanfare(){
   if($('sound').value!=='on')return;const c=ac();if(!c)return;const t0=c.currentTime+0.02;
