@@ -33,7 +33,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f);font-weight:700;f
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 h1{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1.3rem;letter-spacing:.01em}
 h1 span{color:var(--green)}
-.stats{display:flex;gap:14px;font-family:var(--f);font-weight:900;font-size:1rem;font-variant-numeric:tabular-nums}
+.stats{display:flex;gap:12px;font-family:var(--f);font-weight:900;font-size:1rem;font-variant-numeric:tabular-nums}
 .stat{display:flex;align-items:center;gap:5px}
 .stat.fire{color:var(--gold-d)} .stat.xp{color:var(--blue)} .stat.know{color:var(--green)}
 .stat svg{width:22px;height:22px}
@@ -278,12 +278,44 @@ body.sv-lock{overflow:hidden}
 .goalrow{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;font-weight:800;font-variant-numeric:tabular-nums}
 .goalrow #goalTxt{color:var(--fg)}
 .goalbox.done{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 12%,transparent)}
+.stat.bag{font:inherit;font-weight:900;background:none;border:0;padding:4px 6px;margin:-4px -6px;border-radius:10px;cursor:pointer;color:var(--blue)}
+.stat.bag:active{transform:scale(.94)}
+.stat.bag.bump svg{animation:bagbump .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes bagbump{40%{transform:scale(1.35) rotate(-8deg)}}
+.mfig{position:relative;display:block}
+.m-glass{position:absolute;inset:0;width:100%;height:100%;display:none;pointer-events:none}
+.mascot.w-sunglasses .m-glass{display:block}
+.hanger{position:absolute;right:-4px;top:58px;z-index:5;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:var(--surface);color:var(--fg);display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.hanger[hidden]{display:none}
+.hanger svg{width:18px;height:18px}
+.hanger:active{transform:scale(.92)}
+.wardrobe{position:absolute;right:0;top:94px;z-index:7;min-width:180px;padding:10px;border-radius:16px;background:var(--surface);border:2px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:6px}
+.wardrobe[hidden]{display:none}
+.wardrobe h4{margin:2px 4px 4px;font-family:var(--f-jp);font-weight:800;font-size:.9rem;color:var(--muted)}
+.wardrobe button{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.92rem;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;border:2px solid var(--line);background:none;color:var(--fg);cursor:pointer;text-align:left}
+.wardrobe button[aria-pressed=true]{border-color:var(--blue);background:var(--blue-s);color:var(--blue-ink)}
+.wthumb{position:relative;width:30px;flex:0 0 30px}
+.wthumb img{width:100%;display:block}
+.wthumb .m-glass{display:block}
+.shop .bv-hero{background:#1c8fd6}
+.shop .bv-num{text-shadow:4px 4px 0 #136aa3}
+.shop-bag svg{width:96px;height:96px;display:block}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.sitem{border:2px solid var(--line);border-bottom-width:4px;border-radius:18px;padding:14px 12px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.sitem .prev{position:relative;width:74px}
+.sitem .prev img{width:100%;display:block}
+.sitem .prev .m-glass{display:block}
+.sitem b{font-family:var(--f-jp);font-weight:800;font-size:1rem}
+.sitem .price{display:flex;align-items:center;gap:4px;font-family:var(--f);font-weight:900;color:var(--blue)}
+.sitem .price svg{width:18px;height:18px}
+.sitem .btn{width:100%;padding:10px 8px;font-size:.92rem}
 .gzone{position:relative;display:flex;flex-direction:column;gap:18px}
 .gzone .goalbox{margin-right:84px}
 .mascot{position:absolute;right:6px;top:-22px;width:70px;z-index:3;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.mascot img{width:100%;display:block;pointer-events:none;transform-origin:50% 100%}
-.mascot.hop img{animation:mhop .55s cubic-bezier(.3,1.6,.5,1)}
-.mascot.ouch img{animation:mouch .5s}
+.mascot img{width:100%;display:block;pointer-events:none}
+.mascot .mfig{transform-origin:50% 100%}
+.mascot.hop .mfig{animation:mhop .55s cubic-bezier(.3,1.6,.5,1)}
+.mascot.ouch .mfig{animation:mouch .5s}
 @keyframes mhop{0%{transform:none}35%{transform:translateY(-14px) scale(1.04,.97)}70%{transform:translateY(0) scale(1.05,.94)}100%{transform:none}}
 @keyframes mouch{0%,100%{transform:none}20%{transform:rotate(-9deg)}45%{transform:rotate(7deg)}70%{transform:rotate(-4deg)}}
 .mbub{position:absolute;right:84px;top:10px;z-index:4;max-width:calc(100% - 96px);padding:9px 14px;border-radius:16px;background:var(--surface);border:2px solid var(--line);font-family:var(--f-jp);font-weight:800;font-size:.95rem;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 14px rgba(0,0,0,.25);opacity:0;transform:translateX(8px) scale(.9);transform-origin:100% 50%;transition:opacity .18s,transform .22s cubic-bezier(.3,1.5,.5,1);pointer-events:none}
@@ -364,6 +396,7 @@ body.sv-lock{overflow:hidden}
   <header>
     <h1>フレーズ<span>1000</span></h1>
     <div class="stats">
+      <button class="stat bag" id="bagBtn" aria-label="ショップを開く"><svg viewBox="0 0 24 24"><path d="M8 8.5V6.8a4 4 0 0 1 8 0v1.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path fill="currentColor" d="M5.3 8h13.4c.6 0 1 .4 1.1 1l.9 10.8A2 2 0 0 1 18.7 22H5.3a2 2 0 0 1-2-2.2L4.2 9c.1-.6.5-1 1.1-1z"/><circle cx="9" cy="11.5" r="1.1" fill="#fff" opacity=".85"/><circle cx="15" cy="11.5" r="1.1" fill="#fff" opacity=".85"/></svg><span id="coins">0</span></button>
       <button class="stat fire" id="fireBtn" aria-label="連続記録を見る"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.4 1.1-4 2.3-5.2.2 1.7 1 2.7 2 3.1C11 8 10.6 5 12 2z"/></svg><span id="streak">0</span></button>
       <button class="stat pts" id="ptsBtn" aria-label="ポイントとバッジを見る"><img id="curBadge" src="badges/badge-0.png" alt=""></button>
       <span class="stat know" title="覚えたフレーズ"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.3 14.3-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z"/></svg><span id="known">0</span></span>
@@ -372,7 +405,9 @@ body.sv-lock{overflow:hidden}
   <div class="track" id="mainbar"><i id="bar"></i></div>
   <div class="tracklabel"><span>全体の進み具合</span><span id="pct">0%</span></div>
   <div class="gzone">
-  <button class="mascot" id="mascot" aria-label="ヨウム"><img src="mascot.png" alt=""></button>
+  <button class="mascot" id="mascot" aria-label="ヨウム"><span class="mfig"><img src="mascot.png" alt=""><svg class="m-glass" viewBox="0 0 221 320" aria-hidden="true"><g transform="translate(0 -16) scale(1 1.2)"><path d="M16 50H174Q180 50 180 56V66Q180 106 140 110H124Q94 106 92 74Q90 68 88 68Q86 68 84 74Q82 106 52 110H44Q16 106 16 66Z" fill="#15161a"/><path d="M22 57H81Q81 100 51 103H45Q22 100 22 66Z" fill="#2b3240"/><path d="M95 57H173V66Q173 100 139 103H126Q97 100 95 72Z" fill="#2b3240"/><path d="M30 61H42L28 88Q24 76 30 61Z M104 61H118L102 90Q98 76 104 61Z" fill="#fff" opacity=".5"/></g></svg></span></button>
+  <button class="hanger" id="hangerBtn" aria-label="着せ替え" aria-expanded="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5a2.3 2.3 0 1 1 2.3-2.3c0 1.3-1 1.7-2.3 2.6L3 14.6c-1 .8-.4 2.4.9 2.4h16.2c1.3 0 1.9-1.6.9-2.4L12 8.1"/></svg></button>
+  <div class="wardrobe" id="wardrobe" role="dialog" aria-label="着せ替え" hidden></div>
   <div class="mbub" id="mbub" aria-live="polite"></div>
   <div class="goalbox" id="goalbox">
     <div class="goalrow"><span id="goalTxt">今日の目標</span><span id="goalNum">0 / 10</span></div>
@@ -425,6 +460,17 @@ body.sv-lock{overflow:hidden}
       <div class="bgrid" id="bgrid"></div>
     </div>
   </section>
+  <section class="bv shop" id="shopv" role="dialog" aria-modal="true" aria-labelledby="shopTitle" aria-hidden="true">
+    <div class="bv-hero"><div class="sv-in">
+      <div class="sv-bar"><button class="sv-x" id="shopClose" aria-label="閉じる">✕</button><h2 id="shopTitle">ショップ</h2><span></span></div>
+      <div class="bv-top"><div><div class="bv-num" id="shopNum">0</div><div class="bv-lbl">ショッピングポイント</div></div><div class="shop-bag"><svg viewBox="0 0 24 24"><path d="M8 8.5V6.8a4 4 0 0 1 8 0v1.7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path fill="#fff" d="M5.3 8h13.4c.6 0 1 .4 1.1 1l.9 10.8A2 2 0 0 1 18.7 22H5.3a2 2 0 0 1-2-2.2L4.2 9c.1-.6.5-1 1.1-1z"/><circle cx="9" cy="11.5" r="1.1" fill="#1c8fd6"/><circle cx="15" cy="11.5" r="1.1" fill="#1c8fd6"/></svg></div></div>
+    </div></div>
+    <div class="sv-in bv-body">
+      <p class="bv-rule">問題に正解すると1ポイント（カードの「覚えた」も正解に数えます）。同じフレーズでもらえるのは1日1回までです。</p>
+      <h3>ヨウムの着せ替え</h3>
+      <div class="sgrid" id="sgrid"></div>
+    </div>
+  </section>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sheet" id="sheet" role="status" aria-live="polite"><div class="in" id="sheetin"></div></div>
 
@@ -462,7 +508,7 @@ const DATA = __DATA__;
 const KEY='toeic1000-v1';
 let S={known:{},miss:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}catch(e){}
-S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}};
+S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}}; S.coins=S.coins||0; S.owned=S.owned||{}; S.wear=S.wear||''; S.cpd=S.cpd||{d:'',ids:{}};
 function resetProgress(){S.known={};S.miss={};S.points=0;S.xp=0;S.td={d:'',pts:{},done:{}};}
 if(!S.reset1){resetProgress();S.reset1=1;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 // fill in days from an existing streak recorded before the calendar existed
@@ -476,7 +522,7 @@ var syncTimer=null,syncBusy=false,syncDirty=false;
 function syncPayload(){
   const td=todayState();
   return {points:S.points||0,goal:S.goal||10,todayKey:td.d,todayDone:Object.keys(td.done).length,todayPts:td.pts,todayDoneMap:td.done,streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},days:S.days||{},
-    knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:Date.now(),tz:-new Date().getTimezoneOffset()};
+    coins:S.coins||0,owned:S.owned||{},wear:S.wear||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:Date.now(),tz:-new Date().getTimezoneOffset()};
 }
 function scheduleSync(){ if(!FB_ON||!S.syncKey)return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
 async function pushSync(keepalive){
@@ -511,8 +557,9 @@ function initSync(){
       if(!r.ok||!d){m.textContent='その合言葉の記録が見つかりませんでした。';m.classList.add('bad');armed=null;$('syncLoad').textContent='読み込む';return}
       // the database may return numbered maps as arrays with gaps; turn them back into plain maps
       const obj=x=>{const o={};if(x)for(const k of Object.keys(x))if(x[k]!=null)o[k]=x[k];return o};
-      Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},syncKey:k});
+      Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},coins:d.coins||0,owned:obj(d.owned),wear:d.wear||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}},syncKey:k});
       $('goal').value=String(S.goal);
+      applyWear();
       try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
       $('syncKey').value=k; header(); refresh(false); m.textContent='記録を読み込みました。'; armed=null; $('syncLoad').textContent='読み込む'; syncStatus();
     }catch(e){m.textContent='読み込めませんでした。電波を確認してもう一度試してください。';m.classList.add('bad')}
@@ -577,6 +624,39 @@ function credit(id,viaCard){
   if(gotPoint&&BADGES.includes(S.points))setTimeout(()=>celebrateBadge(S.points),goalNow?2600:300);
 }
 function studied(xp){S.xp+=xp}
+// ---- shopping points, shop and wardrobe
+const GLASS_SVG=`<svg class="m-glass" viewBox="0 0 221 320" aria-hidden="true"><g transform="translate(0 -16) scale(1 1.2)"><path d="M16 50H174Q180 50 180 56V66Q180 106 140 110H124Q94 106 92 74Q90 68 88 68Q86 68 84 74Q82 106 52 110H44Q16 106 16 66Z" fill="#15161a"/><path d="M22 57H81Q81 100 51 103H45Q22 100 22 66Z" fill="#2b3240"/><path d="M95 57H173V66Q173 100 139 103H126Q97 100 95 72Z" fill="#2b3240"/><path d="M30 61H42L28 88Q24 76 30 61Z M104 61H118L102 90Q98 76 104 61Z" fill="#fff" opacity=".5"/></g></svg>`;
+const ITEMS=[{id:'sunglasses',name:'サングラス',price:10}];
+function earnCoin(id){
+  const t=today(); if(S.cpd.d!==t)S.cpd={d:t,ids:{}};
+  if(S.cpd.ids[id])return; S.cpd.ids[id]=1; S.coins=(S.coins||0)+1;
+  const b=$('bagBtn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
+}
+function applyWear(){
+  const m=$('mascot'); m.className=m.className.replace(/\bw-\S+/g,'').trim(); if(S.wear&&S.owned[S.wear])m.classList.add('w-'+S.wear);
+  $('hangerBtn').hidden=!Object.keys(S.owned).length;
+}
+function renderShop(){
+  $('shopNum').textContent=S.coins||0;
+  $('sgrid').innerHTML=ITEMS.map(it=>{const own=S.owned[it.id], can=(S.coins||0)>=it.price;
+    return `<div class="sitem"><div class="prev"><img src="mascot.png" alt="">${GLASS_SVG}</div><b>${it.name}</b>
+      <span class="price">${$('bagBtn').querySelector('svg').outerHTML}${it.price}</span>
+      ${own?`<button class="btn" disabled>購入済み</button>`:`<button class="btn ${can?'ok':''}" data-buy="${it.id}" ${can?'':'disabled'}>${can?'買う':`あと${it.price-(S.coins||0)}ポイント`}</button>`}</div>`}).join('');
+  $('sgrid').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{
+    const it=ITEMS.find(x=>x.id===b.dataset.buy); if(!it||S.owned[it.id]||S.coins<it.price)return;
+    S.coins-=it.price; S.owned[it.id]=1; S.wear=it.id; save(); header(); applyWear(); renderShop(); fanfare&&fanfare();
+    toast(`${it.name}を買いました！ヨウムの右下のハンガーから着せ替えできます`);
+  });
+}
+function openShop(){renderShop();const v=$('shopv');v.classList.add('open');v.setAttribute('aria-hidden','false');document.body.classList.add('sv-lock');setTimeout(()=>$('shopClose').focus({preventScroll:true}),50)}
+function closeShop(){const v=$('shopv');v.classList.remove('open');v.setAttribute('aria-hidden','true');document.body.classList.remove('sv-lock');$('bagBtn').focus({preventScroll:true})}
+function renderWardrobe(){
+  const list=[{id:'',name:'なし'},...ITEMS.filter(it=>S.owned[it.id])];
+  $('wardrobe').innerHTML='<h4>着せ替え</h4>'+list.map(it=>`<button data-wear="${it.id}" aria-pressed="${(S.wear||'')===it.id}"><span class="wthumb"><img src="mascot.png" alt="">${it.id==='sunglasses'?GLASS_SVG:''}</span>${it.name}</button>`).join('');
+  $('wardrobe').querySelectorAll('[data-wear]').forEach(b=>b.onclick=()=>{S.wear=b.dataset.wear;save();applyWear();renderWardrobe();setTimeout(closeWardrobe,250);mascotSay('tap')});
+}
+function openWardrobe(){renderWardrobe();$('wardrobe').hidden=false;$('hangerBtn').setAttribute('aria-expanded','true')}
+function closeWardrobe(){$('wardrobe').hidden=true;$('hangerBtn').setAttribute('aria-expanded','false')}
 const PARROT_FACE=`<svg class="bface" viewBox="0 0 100 100" aria-hidden="true">
   <circle cx="50" cy="51" r="31" fill="rgba(255,255,255,.2)"/>
   <g fill="none" stroke="rgba(255,255,255,.62)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -663,7 +743,7 @@ function header(){
   const y=new Date();y.setDate(y.getDate()-1);const ys=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();
   $('streak').textContent=curStreak();
   {const cur=BADGES.filter(b=>b<=S.points).pop()||0;const im=$('curBadge');const src=`badges/badge-${cur}.png`;if(im.getAttribute('src')!==src)im.setAttribute('src',src);im.alt=`${cur}ポイントのバッジ（いま${S.points}ポイント）`;$('ptsBtn').title=`${S.points}ポイント`}
-  $('known').textContent=k;
+  $('known').textContent=k; $('coins').textContent=S.coins||0;
   const dc=doneCount(), g=S.goal, ok=S.last===today();
   $('goalNum').textContent=`${Math.min(dc,g)} / ${g}`;
   $('goalTxt').textContent=ok?'今日の目標 達成！':'今日の目標';
@@ -792,7 +872,7 @@ function go(n){const c=Math.max(0,Math.min(P.length-1,ci+n));if(c!==ci){ci=c;fil
 let judging=false;
 function mark(ok){
   const d=P[ci]; if(!d||judging) return;
-  if(ok){S.known[d.id]=1;studied(5);credit(d.id,true)} else {delete S.known[d.id]; S.miss[d.id]=(S.miss[d.id]||0)+1}
+  if(ok){S.known[d.id]=1;studied(5);credit(d.id,true);earnCoin(d.id)} else {delete S.known[d.id]; S.miss[d.id]=(S.miss[d.id]||0)+1}
   sfx(ok); buzz(ok); save();header(); $('st').innerHTML=chip(d); mascotSay(ok?'ok':'ng');
   const sc=$('scene'); judging=true;
   sc.classList.add(ok?'judge-ok':'judge-ng');
@@ -840,7 +920,7 @@ function renderQuiz(){
 function answer(b,d,je){
   if(answered) return; answered=true;
   const v=$('v-quiz'); const ok=+b.dataset.id===d.id; qs.n++;
-  if(ok){qs.r++;qs.xp+=10;S.known[d.id]=1;studied(10);credit(d.id,false)}else{b.classList.add('wrong');S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}
+  if(ok){qs.r++;qs.xp+=10;S.known[d.id]=1;studied(10);credit(d.id,false);earnCoin(d.id)}else{b.classList.add('wrong');S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}
   v.querySelector(`.opt[data-id="${d.id}"]`).classList.add('right');
   v.querySelectorAll('.opt').forEach(x=>x.disabled=true);
   sfx(ok); buzz(ok); save(); header(); mascotSay(ok?'ok':'ng');
@@ -885,6 +965,12 @@ $('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
 $('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
 for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];refresh(true)};
 for(const x of ['card','quiz','list']) $('t-'+x).onclick=()=>setTab(x);
+$('bagBtn').onclick=openShop; $('shopClose').onclick=closeShop;
+$('hangerBtn').onclick=e=>{e.stopPropagation();$('wardrobe').hidden?openWardrobe():closeWardrobe()};
+$('wardrobe').onclick=e=>e.stopPropagation();
+document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
+applyWear();
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
 $('mascot').onclick=()=>mascotSay('tap');
 $('goal').value=String(S.goal);
