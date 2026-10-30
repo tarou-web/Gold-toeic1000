@@ -686,13 +686,14 @@ const ITEMS=[
   {id:'santa',type:'acc',slot:'head',name:'サンタの帽子',short:'サンタ帽',price:30},
   {id:'pumpkin',type:'acc',slot:'head',name:'カボチャの被り物',short:'カボチャ',price:40},
   {id:'bone',type:'skin',name:'ガイコツのスキン',short:'ガイコツ',price:60,img:'mascot-bone.png',w:1.0769,ml:-0.0754},
+  {id:'robot',type:'skin',name:'ロボットのスキン',short:'ロボット',price:70,img:'mascot-robot.png',mt:-0.1412},
   {id:'silver',type:'skin',name:'銀のスキン',short:'銀',price:100,img:'mascot-silver.png'},
   {id:'gold',type:'skin',name:'金のスキン',short:'金',price:500,img:'mascot-gold.png'}
 ];
 const skinOf=id=>ITEMS.find(x=>x.id===id&&x.type==='skin')||{};
 const skinImg=id=>skinOf(id).img||'mascot.png';
 // some skins are drawn a little wider than the frame; stretch the image box so the body still lines up
-const skinStyle=id=>{const k=skinOf(id);return k.w?`width:${k.w*100}%;max-width:none;margin-left:${k.ml*100}%`:''};
+const skinStyle=id=>{const k=skinOf(id);return (k.w?`width:${k.w*100}%;max-width:none;margin-left:${k.ml*100}%;`:'')+(k.mt?`margin-top:${k.mt*100}%;`:'')};
 function earnCoin(id){
   const t=today(); if(S.cpd.d!==t)S.cpd={d:t,ids:{}};
   if(S.cpd.ids[id])return; S.cpd.ids[id]=1; S.coins=(S.coins||0)+1;
