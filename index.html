@@ -303,7 +303,7 @@ body.sv-lock{overflow:hidden}
 .stat.bag.bump svg{animation:bagbump .5s cubic-bezier(.3,1.6,.5,1)}
 @keyframes bagbump{40%{transform:scale(1.35) rotate(-8deg)}}
 .mfig{position:relative;display:block}
-.m-glass{position:absolute;inset:0;width:100%;height:100%;display:none;pointer-events:none}
+.m-glass,.m-acc{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;overflow:visible}
 .mascot.w-sunglasses .m-glass{display:block}
 .wardrobe h4+button,.wardrobe button+h4{margin-top:0}
 .wardrobe button+h4{margin-top:6px}
@@ -336,6 +336,11 @@ body.sv-lock{overflow:hidden}
 .wardrobe button{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.92rem;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;border:2px solid var(--line);background:none;color:var(--fg);cursor:pointer;text-align:left}
 .wardrobe button[aria-pressed=true]{border-color:var(--blue);background:var(--blue-s);color:var(--blue-ink)}
 .wthumb{position:relative;width:30px;flex:0 0 30px}
+body.has-hat .tracklabel{padding-right:80px}
+.wardrobe{max-width:calc(100vw - 32px)}
+.wgrid{display:grid;grid-template-columns:repeat(4,60px);gap:6px}
+.wardrobe .wgrid button{flex-direction:column;gap:4px;padding:8px 2px 6px;font-size:.66rem;text-align:center;justify-content:flex-end;white-space:nowrap;letter-spacing:-.02em}
+.wardrobe .wgrid .wthumb{width:30px;flex:none;margin-top:8px}
 .wthumb img{width:100%;display:block}
 .wthumb .m-glass{display:block}
 .shop .bv-hero{background:#1c8fd6}
@@ -449,7 +454,7 @@ body.sv-lock{overflow:hidden}
   <div class="track" id="mainbar"><i id="bar"></i></div>
   <div class="tracklabel"><span>全体の進み具合</span><span id="pct">0%</span></div>
   <div class="gzone">
-  <button class="mascot" id="mascot" aria-label="ヨウム"><span class="msparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="mfig"><img src="mascot.png" alt=""><svg class="m-glass" viewBox="0 0 221 320" aria-hidden="true"><g transform="translate(0 -16) scale(1 1.2)"><path d="M16 50H174Q180 50 180 56V66Q180 106 140 110H124Q94 106 92 74Q90 68 88 68Q86 68 84 74Q82 106 52 110H44Q16 106 16 66Z" fill="#15161a"/><path d="M22 57H81Q81 100 51 103H45Q22 100 22 66Z" fill="#2b3240"/><path d="M95 57H173V66Q173 100 139 103H126Q97 100 95 72Z" fill="#2b3240"/><path d="M30 61H42L28 88Q24 76 30 61Z M104 61H118L102 90Q98 76 104 61Z" fill="#fff" opacity=".5"/></g></svg></span></button>
+  <button class="mascot" id="mascot" aria-label="ヨウム"><span class="msparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="mfig"><img src="mascot.png" alt=""></span></button>
   <button class="hanger" id="hangerBtn" aria-label="着せ替え" aria-expanded="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5a2.3 2.3 0 1 1 2.3-2.3c0 1.3-1 1.7-2.3 2.6L3 14.6c-1 .8-.4 2.4.9 2.4h16.2c1.3 0 1.9-1.6.9-2.4L12 8.1"/></svg></button>
   <div class="wardrobe" id="wardrobe" role="dialog" aria-label="着せ替え" hidden></div>
   <div class="mbub" id="mbub" aria-live="polite"></div>
@@ -552,7 +557,7 @@ const DATA = [{"id":1,"jp":"とにかくやってみよう。","en":"Let's try a
 const KEY='toeic1000-v1';
 let S={known:{},miss:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}catch(e){}
-S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}}; S.coins=S.coins||0; S.owned=S.owned||{}; S.wear=S.wear||''; S.skin=S.skin||''; S.cpd=S.cpd||{d:'',ids:{}};
+S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}}; S.coins=S.coins||0; S.owned=S.owned||{}; S.wear=S.wear||''; S.skin=S.skin||''; S.hat=S.hat||''; S.cpd=S.cpd||{d:'',ids:{}};
 // one-time gift: answers made before the shop existed
 if(!S.coinGift1){S.coins+=117;S.coinGift1=1;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function resetProgress(){S.known={};S.miss={};S.points=0;S.xp=0;S.td={d:'',pts:{},done:{}};}
@@ -568,7 +573,7 @@ var syncTimer=null,syncBusy=false,syncDirty=false;
 function syncPayload(){
   const td=todayState();
   return {points:S.points||0,goal:S.goal||10,todayKey:td.d,todayDone:Object.keys(td.done).length,todayPts:td.pts,todayDoneMap:td.done,streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},days:S.days||{},
-    coins:S.coins||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:Date.now(),tz:-new Date().getTimezoneOffset()};
+    coins:S.coins||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',hat:S.hat||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:Date.now(),tz:-new Date().getTimezoneOffset()};
 }
 function scheduleSync(){ if(!FB_ON||!S.syncKey)return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
 async function pushSync(keepalive){
@@ -603,7 +608,7 @@ function initSync(){
       if(!r.ok||!d){m.textContent='その合言葉の記録が見つかりませんでした。';m.classList.add('bad');armed=null;$('syncLoad').textContent='読み込む';return}
       // the database may return numbered maps as arrays with gaps; turn them back into plain maps
       const obj=x=>{const o={};if(x)for(const k of Object.keys(x))if(x[k]!=null)o[k]=x[k];return o};
-      Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},coins:d.coins||0,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}},syncKey:k});
+      Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},coins:d.coins||0,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',hat:d.hat||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}},syncKey:k});
       $('goal').value=String(S.goal);
       applyWear();
       try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
@@ -673,10 +678,11 @@ function studied(xp){S.xp+=xp}
 // ---- shopping points, shop and wardrobe
 const GLASS_SVG=`<svg class="m-glass" viewBox="0 0 221 320" aria-hidden="true"><g transform="translate(0 -16) scale(1 1.2)"><path d="M16 50H174Q180 50 180 56V66Q180 106 140 110H124Q94 106 92 74Q90 68 88 68Q86 68 84 74Q82 106 52 110H44Q16 106 16 66Z" fill="#15161a"/><path d="M22 57H81Q81 100 51 103H45Q22 100 22 66Z" fill="#2b3240"/><path d="M95 57H173V66Q173 100 139 103H126Q97 100 95 72Z" fill="#2b3240"/><path d="M30 61H42L28 88Q24 76 30 61Z M104 61H118L102 90Q98 76 104 61Z" fill="#fff" opacity=".5"/></g></svg>`;
 const ITEMS=[
-  {id:'sunglasses',type:'acc',name:'サングラス',price:10},
-  {id:'bone',type:'skin',name:'ガイコツのスキン',price:60,img:'mascot-bone.png',w:1.0769,ml:-0.0754},
-  {id:'silver',type:'skin',name:'銀のスキン',price:100,img:'mascot-silver.png'},
-  {id:'gold',type:'skin',name:'金のスキン',price:500,img:'mascot-gold.png'}
+  {id:'sunglasses',type:'acc',slot:'face',name:'サングラス',price:10},
+  {id:'crown',type:'acc',slot:'head',name:'王冠',price:30},
+  {id:'bone',type:'skin',name:'ガイコツのスキン',short:'ガイコツ',price:60,img:'mascot-bone.png',w:1.0769,ml:-0.0754},
+  {id:'silver',type:'skin',name:'銀のスキン',short:'銀',price:100,img:'mascot-silver.png'},
+  {id:'gold',type:'skin',name:'金のスキン',short:'金',price:500,img:'mascot-gold.png'}
 ];
 const skinOf=id=>ITEMS.find(x=>x.id===id&&x.type==='skin')||{};
 const skinImg=id=>skinOf(id).img||'mascot.png';
@@ -687,26 +693,30 @@ function earnCoin(id){
   if(S.cpd.ids[id])return; S.cpd.ids[id]=1; S.coins=(S.coins||0)+1;
   const b=$('bagBtn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
 }
-function fig(skin,acc){return `<img src="${skinImg(skin)}" style="${skinStyle(skin)}" alt="">${acc==='sunglasses'?GLASS_SVG:''}`}
+const CROWN_SVG=`<svg class="m-acc" viewBox="0 0 221 320" aria-hidden="true"><g transform="rotate(-9 97 10)"><path d="M52 17L47 -22L72 -3L97 -34L122 -3L147 -22L142 17Z" fill="#FFC83D"/><path d="M122 -3L147 -22L142 17L119 17Z" fill="#F0A91C"/><rect x="49" y="4" width="96" height="15" rx="6" fill="#F2A818"/><circle cx="47" cy="-24" r="6.5" fill="#FFDA5E"/><circle cx="97" cy="-37" r="7.5" fill="#FFDA5E"/><circle cx="147" cy="-24" r="6.5" fill="#F7C33A"/><circle cx="97" cy="11.5" r="5.5" fill="#E8414F"/><circle cx="72" cy="11.5" r="3.8" fill="#3FA9F5"/><circle cx="122" cy="11.5" r="3.8" fill="#3FA9F5"/><path d="M57 12L54 -12L62 -6L64 12Z" fill="#fff" opacity=".45"/><circle cx="95" cy="9.5" r="1.6" fill="#fff" opacity=".8"/></g></svg>`;
+const ACC_SVG={sunglasses:GLASS_SVG,crown:CROWN_SVG};
+const itemOf=id=>ITEMS.find(x=>x.id===id)||{};
+function fig(skin,face,hat){return `<img src="${skinImg(skin)}" style="${skinStyle(skin)}" alt="">${face?ACC_SVG[face]||'':''}${hat?ACC_SVG[hat]||'':''}`}
+const cur=()=>({skin:S.skin&&S.owned[S.skin]?S.skin:'',face:S.wear&&S.owned[S.wear]?S.wear:'',hat:S.hat&&S.owned[S.hat]?S.hat:''});
 function applyWear(){
   const m=$('mascot'); m.className=m.className.replace(/\b(w|s)-\S+/g,'').trim();
-  if(S.wear&&S.owned[S.wear])m.classList.add('w-'+S.wear);
-  const sk=S.skin&&S.owned[S.skin]?S.skin:'';
-  const mi=m.querySelector('img'); mi.src=skinImg(sk); mi.style.cssText=skinStyle(sk);
+  const c=cur(); const sk=c.skin;
+  m.querySelector('.mfig').innerHTML=fig(sk,c.face,c.hat);
   if(sk)m.classList.add('s-'+sk);
+  document.body.classList.toggle('has-hat',!!c.hat);
   $('hangerBtn').hidden=!Object.keys(S.owned).length;
 }
 function renderShop(){
   $('shopNum').textContent=S.coins||0;
   const bag=$('bagBtn').querySelector('svg').outerHTML;
   $('sgrid').innerHTML=ITEMS.map(it=>{const own=S.owned[it.id], can=(S.coins||0)>=it.price;
-    const prev=it.type==='skin'?fig(it.id,''):fig('',it.id);
+    const prev=it.type==='skin'?fig(it.id,'',''):it.slot==='head'?fig('','',it.id):fig('',it.id,'');
     return `<div class="sitem ${it.type==='skin'?'sk-'+it.id:''}"><div class="prev">${prev}${(it.id==='silver'||it.id==='gold')?'<i class="pk"></i><i class="pk"></i><i class="pk"></i>':''}</div><b>${it.name}</b>
       <span class="price">${bag}${it.price}</span>
       ${own?`<button class="btn" disabled>購入済み</button>`:`<button class="btn ${can?'ok':''}" data-buy="${it.id}" ${can?'':'disabled'}>${can?'買う':`あと${it.price-(S.coins||0)}ポイント`}</button>`}</div>`}).join('');
   $('sgrid').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{
     const it=ITEMS.find(x=>x.id===b.dataset.buy); if(!it||S.owned[it.id]||S.coins<it.price)return;
-    S.coins-=it.price; S.owned[it.id]=1; if(it.type==='skin')S.skin=it.id; else S.wear=it.id;
+    S.coins-=it.price; S.owned[it.id]=1; if(it.type==='skin')S.skin=it.id; else if(it.slot==='head')S.hat=it.id; else S.wear=it.id;
     save(); header(); applyWear(); renderShop(); fanfare&&fanfare();
     toast(`${it.name}を買いました！ヨウムの右下のハンガーから着せ替えできます`);
   });
@@ -714,15 +724,13 @@ function renderShop(){
 function openShop(){renderShop();const v=$('shopv');v.classList.add('open');v.setAttribute('aria-hidden','false');document.body.classList.add('sv-lock');setTimeout(()=>$('shopClose').focus({preventScroll:true}),50)}
 function closeShop(){const v=$('shopv');v.classList.remove('open');v.setAttribute('aria-hidden','true');document.body.classList.remove('sv-lock');$('bagBtn').focus({preventScroll:true})}
 function renderWardrobe(){
-  const skins=[{id:'',name:'ふつう'},...ITEMS.filter(it=>it.type==='skin'&&S.owned[it.id])];
-  const accs=[{id:'',name:'なし'},...ITEMS.filter(it=>it.type==='acc'&&S.owned[it.id])];
-  const cur=S.skin&&S.owned[S.skin]?S.skin:'', curA=S.wear&&S.owned[S.wear]?S.wear:'';
-  let h='';
-  if(skins.length>1)h+='<h4>スキン</h4>'+skins.map(it=>`<button data-skin="${it.id}" aria-pressed="${cur===it.id}"><span class="wthumb">${fig(it.id,curA)}</span>${it.name}</button>`).join('');
-  if(accs.length>1)h+='<h4>アクセサリー</h4>'+accs.map(it=>`<button data-wear="${it.id}" aria-pressed="${curA===it.id}"><span class="wthumb">${fig(cur,it.id)}</span>${it.name}</button>`).join('');
-  $('wardrobe').innerHTML=h;
-  $('wardrobe').querySelectorAll('[data-wear]').forEach(b=>b.onclick=()=>{S.wear=b.dataset.wear;save();applyWear();renderWardrobe();setTimeout(closeWardrobe,250);mascotSay('tap')});
-  $('wardrobe').querySelectorAll('[data-skin]').forEach(b=>b.onclick=()=>{S.skin=b.dataset.skin;save();applyWear();renderWardrobe();setTimeout(closeWardrobe,250);mascotSay('tap')});
+  const c=cur(), own=it=>S.owned[it.id];
+  const groups=[
+    ['スキン','skin',[{id:'',name:'ふつう'},...ITEMS.filter(it=>it.type==='skin'&&own(it))],id=>fig(id,c.face,c.hat),c.skin],
+    ['顔','face',[{id:'',name:'なし'},...ITEMS.filter(it=>it.slot==='face'&&own(it))],id=>fig(c.skin,id,c.hat),c.face],
+    ['頭','hat',[{id:'',name:'なし'},...ITEMS.filter(it=>it.slot==='head'&&own(it))],id=>fig(c.skin,c.face,id),c.hat]];
+  $('wardrobe').innerHTML=groups.filter(g=>g[2].length>1).map(([title,key,list,pv,sel])=>`<h4>${title}</h4><div class="wgrid">`+list.map(it=>`<button data-${key==='skin'?'skin':'wear'}="${it.id}" data-slot="${key}" aria-pressed="${sel===it.id}"><span class="wthumb">${pv(it.id)}</span>${it.short||it.name}</button>`).join('')+'</div>').join('');
+  $('wardrobe').querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{const v=b.dataset.skin??b.dataset.wear;const k=b.dataset.slot;if(k==='skin')S.skin=v;else if(k==='face')S.wear=v;else S.hat=v;save();applyWear();renderWardrobe();setTimeout(closeWardrobe,250);mascotSay('tap')});
 }
 function openWardrobe(){renderWardrobe();$('wardrobe').hidden=false;$('hangerBtn').setAttribute('aria-expanded','true')}
 function closeWardrobe(){$('wardrobe').hidden=true;$('hangerBtn').setAttribute('aria-expanded','false')}
