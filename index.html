@@ -683,6 +683,8 @@ const GLASS_SVG=`<svg class="m-glass" viewBox="0 0 221 320" aria-hidden="true"><
 const ITEMS=[
   {id:'sunglasses',type:'acc',slot:'face',name:'サングラス',price:10},
   {id:'crown',type:'acc',slot:'head',name:'王冠',price:30},
+  {id:'santa',type:'acc',slot:'head',name:'サンタの帽子',short:'サンタ帽',price:30},
+  {id:'pumpkin',type:'acc',slot:'head',name:'カボチャの被り物',short:'カボチャ',price:40},
   {id:'bone',type:'skin',name:'ガイコツのスキン',short:'ガイコツ',price:60,img:'mascot-bone.png',w:1.0769,ml:-0.0754},
   {id:'silver',type:'skin',name:'銀のスキン',short:'銀',price:100,img:'mascot-silver.png'},
   {id:'gold',type:'skin',name:'金のスキン',short:'金',price:500,img:'mascot-gold.png'}
@@ -697,7 +699,9 @@ function earnCoin(id){
   const b=$('bagBtn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
 }
 const CROWN_SVG=`<svg class="m-acc" viewBox="0 0 221 320" aria-hidden="true"><g transform="rotate(-9 97 10)"><path d="M52 17L47 -22L72 -3L97 -34L122 -3L147 -22L142 17Z" fill="#FFC83D"/><path d="M122 -3L147 -22L142 17L119 17Z" fill="#F0A91C"/><rect x="49" y="4" width="96" height="15" rx="6" fill="#F2A818"/><circle cx="47" cy="-24" r="6.5" fill="#FFDA5E"/><circle cx="97" cy="-37" r="7.5" fill="#FFDA5E"/><circle cx="147" cy="-24" r="6.5" fill="#F7C33A"/><circle cx="97" cy="11.5" r="5.5" fill="#E8414F"/><circle cx="72" cy="11.5" r="3.8" fill="#3FA9F5"/><circle cx="122" cy="11.5" r="3.8" fill="#3FA9F5"/><path d="M57 12L54 -12L62 -6L64 12Z" fill="#fff" opacity=".45"/><circle cx="95" cy="9.5" r="1.6" fill="#fff" opacity=".8"/></g></svg>`;
-const ACC_SVG={sunglasses:GLASS_SVG,crown:CROWN_SVG};
+const SANTA_SVG=`<svg class="m-acc" viewBox="0 0 221 320" aria-hidden="true"><g transform="rotate(-6 97 10)"><path d="M38 8Q46 -46 110 -52Q160 -55 188 -10L174 -2Q162 -26 142 -26Q152 -10 160 8Z" fill="#E5333F"/><path d="M110 -52Q160 -55 188 -10L174 -2Q162 -26 142 -26Q130 -40 110 -52Z" fill="#C4222E"/><path d="M60 -6Q70 -34 98 -42" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none" opacity=".35"/><circle cx="183" cy="-6" r="12" fill="#fff"/><circle cx="187" cy="-3" r="7" fill="#E6EAF0"/><rect x="28" y="-4" width="140" height="24" rx="12" fill="#fff"/><path d="M34 14Q98 24 162 14V18Q98 28 34 18Z" fill="#E1E6EE"/><circle cx="44" cy="-1" r="5" fill="#fff"/><circle cx="76" cy="-3" r="5" fill="#fff"/><circle cx="110" cy="-3" r="5" fill="#fff"/><circle cx="144" cy="-1" r="5" fill="#fff"/></g></svg>`;
+const PUMPKIN_SVG=`<svg class="m-acc" viewBox="0 0 221 320" aria-hidden="true"><g transform="rotate(-4 97 10)"><path d="M93 -44Q90 -58 98 -64L106 -60Q100 -54 102 -42Z" fill="#6B4A2A"/><path d="M104 -54Q122 -70 140 -58Q122 -50 104 -54Z" fill="#5BB33C"/><path d="M101 -50Q90 -66 76 -60" stroke="#5BB33C" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="38" cy="14" rx="26" ry="34" fill="#E86F0C"/><ellipse cx="158" cy="14" rx="26" ry="34" fill="#D9620A"/><ellipse cx="64" cy="8" rx="36" ry="42" fill="#F57E14"/><ellipse cx="132" cy="8" rx="36" ry="42" fill="#E87310"/><ellipse cx="98" cy="4" rx="36" ry="46" fill="#FF8A1F"/><path d="M80 -30Q86 -40 96 -42" stroke="#FFB65A" stroke-width="6" stroke-linecap="round" fill="none" opacity=".8"/><path d="M78 8L88 -6L94 10Z M104 10L110 -6L120 8Z" fill="#6A2E08"/><path d="M76 24L84 30L92 24L100 32L108 24L116 30L122 22Q100 42 76 24Z" fill="#6A2E08"/><path d="M80 9L88 1L90 9Z M108 9L110 1L116 8Z" fill="#FFC74A" opacity=".55"/></g></svg>`;
+const ACC_SVG={sunglasses:GLASS_SVG,crown:CROWN_SVG,santa:SANTA_SVG,pumpkin:PUMPKIN_SVG};
 const itemOf=id=>ITEMS.find(x=>x.id===id)||{};
 function fig(skin,face,hat){return `<img src="${skinImg(skin)}" style="${skinStyle(skin)}" alt="">${face?ACC_SVG[face]||'':''}${hat?ACC_SVG[hat]||'':''}`}
 const cur=()=>({skin:S.skin&&S.owned[S.skin]?S.skin:'',face:S.wear&&S.owned[S.wear]?S.wear:'',hat:S.hat&&S.owned[S.hat]?S.hat:''});
