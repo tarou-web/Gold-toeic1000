@@ -734,8 +734,8 @@ function renderWardrobe(){
   const c=cur(), own=it=>S.owned[it.id];
   const groups=[
     ['スキン','skin',[{id:'',name:'ふつう'},...ITEMS.filter(it=>it.type==='skin'&&own(it))],id=>fig(id,'',''),c.skin],
-    ['顔','face',[{id:'',name:'なし'},...ITEMS.filter(it=>it.slot==='face'&&own(it))],id=>fig(c.skin,id,c.hat),c.face],
-    ['頭','hat',[{id:'',name:'なし'},...ITEMS.filter(it=>it.slot==='head'&&own(it))],id=>fig(c.skin,c.face,id),c.hat]];
+    ['顔','face',[{id:'',name:'なし'},...ITEMS.filter(it=>it.slot==='face'&&own(it))],id=>fig('',id,''),c.face],
+    ['頭','hat',[{id:'',name:'なし'},...ITEMS.filter(it=>it.slot==='head'&&own(it))],id=>fig('','',id),c.hat]];
   $('wardrobe').innerHTML=groups.filter(g=>g[2].length>1).map(([title,key,list,pv,sel])=>`<h4>${title}</h4><div class="wgrid">`+list.map(it=>`<button data-${key==='skin'?'skin':'wear'}="${it.id}" data-slot="${key}" aria-pressed="${sel===it.id}"><span class="wthumb">${pv(it.id)}</span>${it.short||it.name}</button>`).join('')+'</div>').join('');
   $('wardrobe').querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{const v=b.dataset.skin??b.dataset.wear;const k=b.dataset.slot;if(k==='skin')S.skin=v;else if(k==='face')S.wear=v;else S.hat=v;save();applyWear();renderWardrobe();setTimeout(closeWardrobe,250);mascotSay('tap')});
 }
