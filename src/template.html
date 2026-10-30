@@ -332,6 +332,10 @@ body.has-hat .tracklabel{padding-right:80px}
 .sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
 .sitem{border:2px solid var(--line);border-bottom-width:4px;border-radius:18px;padding:14px 12px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
 .sitem .prev{position:relative;width:74px}
+.sitem{position:relative;overflow:hidden}
+.soldtape{position:absolute;z-index:3;top:14px;right:-40px;width:132px;transform:rotate(40deg);background:#e5333f;color:#fff;font-family:var(--f);font-weight:900;font-size:.78rem;letter-spacing:.16em;text-align:center;padding:3px 0;box-shadow:0 2px 6px rgba(0,0,0,.35);pointer-events:none}
+.soldtape::before,.soldtape::after{content:'';position:absolute;left:0;right:0;height:2px;background:rgba(255,255,255,.55)}
+.soldtape::before{top:3px}.soldtape::after{bottom:3px}
 .sitem .prev img{width:100%;display:block}
 .sitem .prev .m-glass{display:block}
 .sitem b{font-family:var(--f-jp);font-weight:800;font-size:1rem}
@@ -700,7 +704,7 @@ function renderShop(){
   const bag=$('bagBtn').querySelector('svg').outerHTML;
   $('sgrid').innerHTML=ITEMS.map(it=>{const own=S.owned[it.id], can=(S.coins||0)>=it.price;
     const prev=it.type==='skin'?fig(it.id,'',''):it.slot==='head'?fig('','',it.id):fig('',it.id,'');
-    return `<div class="sitem ${it.type==='skin'?'sk-'+it.id:''}"><div class="prev">${prev}${(it.id==='silver'||it.id==='gold')?'<i class="pk"></i><i class="pk"></i><i class="pk"></i>':''}</div><b>${it.name}</b>
+    return `<div class="sitem ${it.type==='skin'?'sk-'+it.id:''} ${own?'sold':''}">${own?'<span class="soldtape" aria-hidden="true">SOLD</span>':''}<div class="prev">${prev}${(it.id==='silver'||it.id==='gold')?'<i class="pk"></i><i class="pk"></i><i class="pk"></i>':''}</div><b>${it.name}</b>
       <span class="price">${bag}${it.price}</span>
       ${own?`<button class="btn" disabled>購入済み</button>`:`<button class="btn ${can?'ok':''}" data-buy="${it.id}" ${can?'':'disabled'}>${can?'買う':`あと${it.price-(S.coins||0)}ポイント`}</button>`}</div>`}).join('');
   $('sgrid').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{
