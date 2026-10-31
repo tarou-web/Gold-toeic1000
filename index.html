@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="フレーズ1000">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#131f24" media="(prefers-color-scheme: dark)">
@@ -14,7 +14,7 @@
 <link rel="icon" href="icon-192-parrot.png">
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html,body{overflow-x:clip;overscroll-behavior-x:none}
+html,body{overflow-x:clip;overscroll-behavior-x:none}html{background:#131f24}
 body{margin:0;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 *{touch-action:manipulation}
 img{max-width:100%}[hidden]{display:none!important}
@@ -47,7 +47,7 @@ img{max-width:100%}[hidden]{display:none!important}
   --gold:#ffc03d; --gold-d:#d99200; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font-family:var(--f);font-weight:700;font-size:15px;line-height:1.55}
-.wrap{max-width:640px;margin:0 auto;padding-block:18px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.wrap{max-width:640px;margin:0 auto;padding-block:calc(18px + env(safe-area-inset-top,0px)) 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
 
 /* header stats */
 header{display:flex;flex-direction:column;align-items:stretch;gap:10px}
@@ -854,7 +854,7 @@ async function askSend(q){
   askBusy=false; askCache[askCard.id]=askMsgs; renderAsk();
 }
 function openAsk(d){
-  if(!d)return; askCard=d; askMsgs=askCache[d.id]||[];
+  if(!d)return; sAsk(); askCard=d; askMsgs=askCache[d.id]||[];
   {const c=cur(); $('askFig').innerHTML=fig(c.skin,c.face,c.hat);}
   $('askEn').innerHTML=d.en.split(/(\s+)/).map(w=>/\S/.test(w)?`<span class="w">${esc(w)}</span>`:w).join(''); $('askJp').textContent=d.jp;
   renderAsk(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); document.body.classList.add('sv-lock'); askY=scrollY; document.body.style.top=(-askY)+'px'; document.body.classList.add('ask-lock'); fitAsk();
@@ -1085,6 +1085,13 @@ function sBadge(){if($('sound').value!=='on')return;const c=ac();if(!c)return;co
   [1318.5,1760,2349.3,2637].forEach((f,i)=>bell(c,f,t+i*0.055,i===3?0.6:0.25,0.12+i*0.02))}
 const SOUNDS=[['#hangerBtn,.wardrobe button[data-skin],.wardrobe button[data-wear]',sClothes],['#bagBtn',sShop],['#fireBtn',sFire],['#ptsBtn',sBadge],['.tabs button,.sv-x',uiClick]];
 document.addEventListener('click',e=>{if(!e.target.closest)return;for(const [sel,fn] of SOUNDS){const b=e.target.closest(sel);if(b){if(!b.disabled)fn();return}}},true);
+// opening the parrot chat: a cheerful two-note chirp
+function sAsk(){if($('sound').value!=='on')return;const c=ac();if(!c)return;const t=c.currentTime+0.01;
+  [[1400,1900,0],[1700,2400,0.09]].forEach(([f1,f2,d])=>{const o=c.createOscillator(),g=c.createGain();o.type='sine';
+    o.frequency.setValueAtTime(f1,t+d);o.frequency.exponentialRampToValueAtTime(f2,t+d+0.07);
+    g.gain.setValueAtTime(0.0001,t+d);g.gain.exponentialRampToValueAtTime(0.16,t+d+0.012);g.gain.exponentialRampToValueAtTime(0.0001,t+d+0.11);
+    o.connect(g);g.connect(c.destination);o.start(t+d);o.stop(t+d+0.13)});
+  noiseSwish(c,t+0.02,0.18,900,2200,0.8,0.05,'bandpass')}
 function fanfare(){
   if($('sound').value!=='on')return;const c=ac();if(!c)return;const t0=c.currentTime+0.02;
   [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(c,'triangle',f,t0+i*0.12,i===3?0.6:0.2,0.3));

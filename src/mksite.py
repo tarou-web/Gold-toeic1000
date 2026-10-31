@@ -6,7 +6,7 @@ headpart,bodypart=t[:i],t[i:]
 headpart=headpart.replace('<meta name="claude:viewport-fit-sides" content="cover">\n','')
 reset="""<style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html,body{overflow-x:clip;overscroll-behavior-x:none}
+html,body{overflow-x:clip;overscroll-behavior-x:none}html{background:#131f24}
 body{margin:0;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 *{touch-action:manipulation}
 img{max-width:100%}[hidden]{display:none!important}
@@ -19,7 +19,7 @@ html=f"""<!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="フレーズ1000">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#131f24" media="(prefers-color-scheme: dark)">
@@ -42,6 +42,6 @@ if('serviceWorker' in navigator){{
 """
 open('index.html','w',encoding='utf-8').write(html)
 json.dump({"name":"TOEICフレーズ1000","short_name":"フレーズ1000","start_url":"./","scope":"./","display":"standalone",
- "background_color":"#ffffff","theme_color":"#4cc21c","lang":"ja","orientation":"portrait",
+ "background_color":"#131f24","theme_color":"#4cc21c","lang":"ja","orientation":"portrait",
  "icons":[{"src":"icon-192-parrot.png","sizes":"192x192","type":"image/png"},{"src":"icon-512-parrot.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]},
  open('manifest.webmanifest','w',encoding='utf-8'),ensure_ascii=False,indent=2)
