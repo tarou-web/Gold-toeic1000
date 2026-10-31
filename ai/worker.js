@@ -1,6 +1,8 @@
 // フレーズ1000「AIに聞く」中継サーバー（Cloudflare Workers 用）
-// アプリから質問を受け取り、Gemini API に渡して答えを返します。
-// Gemini の APIキーはこのコードには書きません。Cloudflare の「シークレット」GEMINI_API_KEY に保存します。
+// アプリから質問を受け取り、AI に渡して答えを返します。
+// 1. Gemini → 2. Groq → 3. Cloudflare Workers AI の順に聞き、答えが返ってきたところで止めます。
+// 鍵はこのコードには書きません。Cloudflare の設定に保存します：
+//   シークレット GEMINI_API_KEY（Gemini） / シークレット GROQ_API_KEY（Groq） / バインディング AI（Workers AI）
 
 const ORIGIN = "https://tarou-web.github.io"; // このアプリ以外からは使えないようにする
 
@@ -12,28 +14,32 @@ export default {
       "Access-Control-Allow-Headers": "Content-Type",
     };
     const json = (obj, status = 200) =>
-      new Response(JSON.stringify(obj), { status, headers: { ...cors, "Content-Type": "application/json" } });
+      new Response(JSON.stringify(obj, null, 1), { status, headers: { ...cors, "Content-Type": "application/json; charset=utf-8" } });
 
     if (req.method === "OPTIONS") return new Response(null, { headers: cors });
     if (req.method === "GET") {
-      // ブラウザで「…workers.dev/?test」を開くと、Gemini に実際に聞いてみた結果を表示します
+      // ブラウザで「…workers.dev/?test」を開くと、3つの AI それぞれに実際に聞いてみた結果を表示します
       if (new URL(req.url).searchParams.has("test")) {
-        if (!env.GEMINI_API_KEY) return json({ ok: false, error: "GEMINI_API_KEY が設定されていません" });
-        const t0 = Date.now();
-        const r = await askGemini(env, "あなたは親切なアシスタントです。", [{ role: "user", parts: [{ text: "「こんにちは」を英語で一言だけ" }] }]);
-        return json({ ...r, ms: Date.now() - t0 });
+        const sys = "あなたは親切なアシスタントです。";
+        const msgs = [{ role: "user", text: "「こんにちは」を英語で一言だけ" }];
+        const out = {};
+        for (const [name, fn] of Object.entries(PROVIDERS)) {
+          const t0 = Date.now();
+          const r = await fn(env, sys, msgs, Date.now() + 20000);
+          out[name] = { ...r, ms: Date.now() - t0 };
+        }
+        return json(out);
       }
       return json({ ok: true, message: "フレーズ1000 AI サーバーは動いています" });
     }
     if (req.method !== "POST" || req.headers.get("Origin") !== ORIGIN) return json({ error: "forbidden" }, 403);
-    if (!env.GEMINI_API_KEY) return json({ error: "GEMINI_API_KEY が設定されていません" }, 500);
 
     let body;
     try { body = await req.json(); } catch { return json({ error: "bad request" }, 400); }
 
     const msgs = (Array.isArray(body.messages) ? body.messages : []).slice(-12).map((m) => ({
       role: m.role === "model" ? "model" : "user",
-      parts: [{ text: String(m.text || "").slice(0, 1500) }],
+      text: String(m.text || "").slice(0, 1500),
     }));
     if (!msgs.length) return json({ error: "質問がありません" }, 400);
 
@@ -45,52 +51,111 @@ export default {
       "例文を出すときは英語と日本語訳をセットにします。わからないことは推測で断定しません。" +
       `今学習しているカード → 英語：「${clip(card.en)}」 日本語：「${clip(card.jp)}」 単語メモ：「${clip(card.g)}」`;
 
-    const r = await askGemini(env, system, msgs);
-    if (r.error) return json({ error: r.error, tried: r.tried }, r.status || 500);
-    const text = r.text;
-    return json({ text: text || "（答えが空でした。もう一度聞いてみてください）" });
+    // 全体で 30 秒以内に答えを返す
+    const deadline = Date.now() + 30000;
+    const tried = [];
+    let last = { error: "使える AI がありません（キーの設定を確認してください）", status: 500 };
+    for (const [name, fn] of Object.entries(PROVIDERS)) {
+      if (Date.now() > deadline - 3000) break;
+      const r = await fn(env, system, msgs, deadline);
+      if (r.ok && r.text) return json({ text: r.text, provider: name, model: r.model, tried });
+      if (!r.skip) { tried.push(`${name}: ${r.status || "?"}`); last = r; }
+    }
+    return json({ error: last.error, tried }, last.status || 500);
   },
 };
 
-async function askGemini(env, system, contents) {
-  // 回数制限や混雑のときは、次のモデルで聞き直す（モデルごとに無料の回数が別々にある）
-  const models = env.MODEL ? [env.MODEL] : ["gemini-flash-lite-latest", "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.1-flash-lite"];
-  const t0 = Date.now();
-  const tried = [];
+// ---------- 3 つの AI ----------
+const PROVIDERS = { gemini, groq, workersAI };
+
+// 1. Gemini（Google）
+async function gemini(env, system, msgs, deadline) {
+  if (!env.GEMINI_API_KEY) return { skip: true, error: "GEMINI_API_KEY がありません" };
+  const contents = msgs.map((m) => ({ role: m.role, parts: [{ text: m.text }] }));
   let last;
-  for (const model of models) {
+  for (const model of ["gemini-flash-lite-latest", "gemini-3.8-flash", "gemini-flash-latest"]) {
     for (const thinking of [{ thinkingLevel: "low" }, null]) {
-      if (Date.now() - t0 > 24000) return { ...last, tried };
-      last = await callGemini(env, model, system, contents, thinking);
-      if (last.ok) return { ...last, tried };
+      const generationConfig = { maxOutputTokens: 4000 };
+      if (thinking) generationConfig.thinkingConfig = thinking;
+      last = await post(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        { "x-goog-api-key": env.GEMINI_API_KEY },
+        { systemInstruction: { parts: [{ text: system }] }, contents, generationConfig },
+        timeLeft(deadline, 10000),
+      );
+      last.model = model;
+      if (last.ok) {
+        const parts = (last.data.candidates && last.data.candidates[0] && last.data.candidates[0].content && last.data.candidates[0].content.parts) || [];
+        return { ok: true, text: parts.map((p) => p.text || "").join(""), model };
+      }
       if (last.status === 400 && /thinking/i.test(last.error)) continue; // この設定が使えない → 設定なしで
-      break; // 回数制限・混雑・見つからない など → 次のモデルへ
+      break;
     }
-    tried.push(`${model}: ${last.status}`);
     if (last.status === 401 || last.status === 403) break; // キーの問題はモデルを変えても同じ
+    if (Date.now() > deadline - 18000) break;               // Groq と Workers AI の時間を残す
   }
-  return { ...last, tried };
+  return last;
 }
 
-async function callGemini(env, model, system, contents, thinking) {
+// 2. Groq（OpenAI と同じ形の API）
+async function groq(env, system, msgs, deadline) {
+  if (!env.GROQ_API_KEY) return { skip: true, error: "GROQ_API_KEY がありません" };
+  const messages = toChat(system, msgs);
+  let last;
+  for (const model of ["openai/gpt-oss-120b", "qwen/qwen3.8-27b", "llama-3.3-70b-versatile"]) {
+    const body = { model, messages, max_tokens: 2000, temperature: 0.6 };
+    if (model.startsWith("openai/")) body.reasoning_effort = "low";
+    last = await post("https://api.groq.com/openai/v1/chat/completions", { Authorization: `Bearer ${env.GROQ_API_KEY}` }, body, timeLeft(deadline, 10000));
+    last.model = model;
+    if (last.ok) return { ok: true, text: chatText(last.data), model };
+    if (last.status === 401 || last.status === 403) break;
+    if (Date.now() > deadline - 8000) break; // Workers AI の時間を残す
+  }
+  return last;
+}
+
+// 3. Cloudflare Workers AI（キー不要。バインディング「AI」が必要）
+async function workersAI(env, system, msgs, deadline) {
+  if (!env.AI) return { skip: true, error: "バインディング AI がありません" };
+  const messages = toChat(system, msgs);
+  let last = { error: "Workers AI から答えがありませんでした", status: 500 };
+  for (const model of ["@cf/qwen/qwen3.8-27b", "@cf/openai/gpt-oss-20b"]) {
+    if (Date.now() > deadline - 1500) break;
+    try {
+      const r = await Promise.race([
+        env.AI.run(model, { messages, max_tokens: 2000 }),
+        new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), timeLeft(deadline, 12000))),
+      ]);
+      const text = (r && (r.response || chatText(r) || (r.result && r.result.response))) || "";
+      if (text) return { ok: true, text: String(text), model };
+      last = { error: "Workers AI の答えが空でした", status: 502, model };
+    } catch (e) {
+      last = { error: String(e.message || e), status: 502, model };
+    }
+  }
+  return last;
+}
+
+// ---------- 共通の部品 ----------
+function toChat(system, msgs) {
+  return [{ role: "system", content: system }, ...msgs.map((m) => ({ role: m.role === "model" ? "assistant" : "user", content: m.text }))];
+}
+function chatText(d) {
+  return (d && d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || "";
+}
+function timeLeft(deadline, max) {
+  return Math.max(1000, Math.min(max, deadline - Date.now()));
+}
+async function post(url, headers, body, ms) {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 15000);
+  const timer = setTimeout(() => ctrl.abort(), ms);
   try {
-    const generationConfig = { maxOutputTokens: 4000 };
-    if (thinking) generationConfig.thinkingConfig = thinking;
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: "POST",
-      signal: ctrl.signal,
-      headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
-      body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents, generationConfig }),
-    });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok) return { error: (j.error && j.error.message) || `Gemini エラー ${r.status}`, status: r.status, model };
-    const text = ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || [])
-      .map((p) => p.text || "").join("");
-    return { ok: true, text, model, thinking: thinking ? thinking.thinkingLevel : "default" };
+    const r = await fetch(url, { method: "POST", signal: ctrl.signal, headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(body) });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) return { error: (data.error && (data.error.message || data.error)) || `エラー ${r.status}`, status: r.status };
+    return { ok: true, data };
   } catch (e) {
-    return { error: e.name === "AbortError" ? "Gemini の返事が15秒以上なかったので中止しました" : String(e), status: 504, model };
+    return { error: e.name === "AbortError" ? "返事が遅いので中止しました" : String(e), status: 504 };
   } finally {
     clearTimeout(timer);
   }
