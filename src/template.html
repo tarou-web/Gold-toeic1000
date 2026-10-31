@@ -361,6 +361,36 @@ body.has-hat .tracklabel{padding-right:80px}
 .mbub.ng{border-color:var(--red);color:var(--red-ink)}
 .mbub.ng::after{border-color:var(--red)}
 .gtrack{height:12px}
+/* ask the parrot (AI) */
+.askbtn{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:10px 14px;border-radius:16px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--blue-ink);cursor:pointer}
+.askbtn img{width:26px;height:auto;margin:-6px 0}
+.askbtn:active{transform:translateY(2px);border-bottom-width:2px}
+.ask .bv-hero{background:#2f8f5b}
+.ask-card{display:flex;align-items:center;gap:14px;padding-block:4px 20px}
+.ask-card .af{width:64px;flex:0 0 64px;position:relative;aspect-ratio:221/320}
+.ask-card .af img{width:100%;display:block}
+.ask-card .en{font-family:var(--f);font-weight:900;font-size:1.25rem;line-height:1.3}
+.ask-card .jp{font-family:var(--f-jp);font-size:.95rem;opacity:.9;margin-top:2px}
+.ask-body{display:flex;flex-direction:column;gap:12px;padding-block:16px 160px}
+.qchips{display:flex;flex-wrap:wrap;gap:8px}
+.qchips button{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.85rem;padding:8px 12px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.qchips button:active{transform:scale(.96)}
+.msg{max-width:88%;padding:10px 14px;border-radius:18px;font-family:var(--f-jp);font-size:.95rem;line-height:1.65;white-space:normal;word-break:break-word}
+.msg.me{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:6px}
+.msg.ai{align-self:flex-start;background:var(--surface);border:2px solid var(--line);border-bottom-left-radius:6px}
+.msg.ai b{color:var(--blue-ink)}
+.msg.ai ul{margin:4px 0;padding-left:1.2em}
+.msg.err{border-color:var(--red);color:var(--red-ink)}
+.msg .dots span{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--muted);animation:dot 1s infinite}
+.msg .dots span:nth-child(2){animation-delay:.15s}.msg .dots span:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
+.askfoot{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--bg);border-top:2px solid var(--line);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:none}
+.ask.open ~ .askfoot,.askfoot.show{display:block}
+.askfoot .in{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.askfoot form{display:flex;gap:8px}
+.askfoot input{flex:1;min-width:0;font:inherit;font-size:16px;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--fg)}
+.askfoot .btn{padding:10px 16px}
+.askfoot small{color:var(--muted);font-size:.72rem;text-align:center}
 .gtrack i{background:var(--gold)}
 .goalbox.done .gtrack i{background:var(--gold-d)}
 /* badges screen */
@@ -506,6 +536,17 @@ body.has-hat .tracklabel{padding-right:80px}
       <div class="sgrid" id="sgrid"></div>
     </div>
   </section>
+  <section class="bv ask" id="askv" role="dialog" aria-modal="true" aria-labelledby="askTitle" aria-hidden="true">
+    <div class="bv-hero"><div class="sv-in">
+      <div class="sv-bar"><button class="sv-x" id="askClose" aria-label="閉じる">✕</button><h2 id="askTitle">ヨウムに聞く</h2><span></span></div>
+      <div class="ask-card"><div class="af" id="askFig"></div><div><div class="en" id="askEn"></div><div class="jp" id="askJp"></div></div></div>
+    </div></div>
+    <div class="sv-in ask-body" id="askLog"></div>
+  </section>
+  <div class="askfoot" id="askFoot"><div class="in">
+    <form id="askForm"><input id="askIn" placeholder="このフレーズについて質問する" autocomplete="off" enterkeyhint="send"><button class="btn ok" id="askSend">送る</button></form>
+    <small>AI（Gemini）の回答です。まちがうこともあります。</small>
+  </div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sheet" id="sheet" role="status" aria-live="polite"><div class="in" id="sheetin"></div></div>
 
@@ -708,6 +749,7 @@ function applyWear(){
   const c=cur(); const sk=c.skin;
   m.querySelector('.mfig').innerHTML=fig(sk,c.face,c.hat);
   if(sk)m.classList.add('s-'+sk);
+  const ai=$('askImg'); if(ai){ai.src=skinImg(sk)}
   document.body.classList.toggle('has-hat',!!c.hat);
   $('hangerBtn').hidden=!Object.keys(S.owned).length;
 }
@@ -737,6 +779,51 @@ function renderWardrobe(){
   $('wardrobe').innerHTML=groups.filter(g=>g[2].length>1).map(([title,key,list,pv,sel])=>`<h4>${title}</h4><div class="wgrid">`+list.map(it=>`<button data-${key==='skin'?'skin':'wear'}="${it.id}" data-slot="${key}" aria-pressed="${sel===it.id}"><span class="wthumb">${pv(it.id)}</span>${it.short||it.name}</button>`).join('')+'</div>').join('');
   $('wardrobe').querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{const v=b.dataset.skin??b.dataset.wear;const k=b.dataset.slot;if(k==='skin')S.skin=v;else if(k==='face')S.wear=v;else S.hat=v;save();applyWear();renderWardrobe();setTimeout(closeWardrobe,250);mascotSay('tap')});
 }
+// ---- ask the parrot (Gemini via Cloudflare Worker)
+const AI_URL='https://phrase1000-ai.shuyegangtian.workers.dev/';
+const ASK_CHIPS=[['意味と使い方','このフレーズの意味と、どんな場面で使うかを教えて'],['例文','このフレーズを使った例文を3つ、日本語訳つきで教えて'],['単語の意味','このフレーズに出てくる大事な単語の意味と、ほかの意味も教えて'],['似た表現','似た表現や言いかえと、その違いを教えて'],['TOEICでの出方','TOEICではどんな問題や場面で出やすいか教えて']];
+let askCard=null, askMsgs=[], askBusy=false; const askCache={};
+function mdLite(t){
+  t=esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  const lines=t.split(/\n/); let out='',inList=false;
+  for(const l of lines){const m=l.match(/^\s*[-*・]\s+(.*)/);
+    if(m){if(!inList){out+='<ul>';inList=true}out+=`<li>${m[1]}</li>`}
+    else{if(inList){out+='</ul>';inList=false}out+=l.trim()?`${l}<br>`:'<br>'}}
+  if(inList)out+='</ul>'; return out.replace(/(<br>)+$/,'');
+}
+function renderAsk(){
+  const log=$('askLog');
+  log.innerHTML=`<div class="msg ai">「${esc(askCard.en)}」について、なんでも聞いてね！下のボタンからも選べるよ。</div>
+    <div class="qchips">${ASK_CHIPS.map(([l],i)=>`<button data-q="${i}">${l}</button>`).join('')}</div>`+
+    askMsgs.map(m=>`<div class="msg ${m.role==='user'?'me':'ai'} ${m.err?'err':''}">${m.role==='user'?esc(m.text):mdLite(m.text)}</div>`).join('')+
+    (askBusy?'<div class="msg ai"><span class="dots"><span></span><span></span><span></span></span></div>':'');
+  log.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>askSend(ASK_CHIPS[+b.dataset.q][1]));
+  $('askSend').disabled=askBusy;
+  requestAnimationFrame(()=>{const v=$('askv');v.scrollTop=v.scrollHeight});
+}
+async function askSend(q){
+  q=(q||'').trim(); if(!q||askBusy)return;
+  askMsgs.push({role:'user',text:q}); askBusy=true; renderAsk();
+  try{
+    const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      card:{en:askCard.en,jp:askCard.jp,g:(askCard.g||[]).map(x=>x.join('=')).join('、')},
+      messages:askMsgs.filter(m=>!m.err).map(m=>({role:m.role,text:m.text}))})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.text)throw new Error(j.error||('HTTP '+r.status));
+    askMsgs.push({role:'model',text:j.text});
+  }catch(e){
+    const msg=String(e.message||e);
+    askMsgs.push({role:'model',err:1,text:/quota|429|RESOURCE_EXHAUSTED/i.test(msg)?'今日はたくさん質問したから、ちょっと休憩させて…（無料で使える回数をこえました。少し時間をおいてね）':navigator.onLine?`うまく答えられなかった…もう一度聞いてみてね。（${msg.slice(0,80)}）`:'電波がないみたい。インターネットにつながってから聞いてね。'});
+  }
+  askBusy=false; askCache[askCard.id]=askMsgs; renderAsk();
+}
+function openAsk(d){
+  if(!d)return; askCard=d; askMsgs=askCache[d.id]||[];
+  const c=cur(); $('askFig').innerHTML=fig(c.skin,c.face,c.hat);
+  $('askEn').textContent=d.en; $('askJp').textContent=d.jp;
+  renderAsk(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); document.body.classList.add('sv-lock');
+}
+function closeAsk(){const v=$('askv');v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');document.body.classList.remove('sv-lock');$('askIn').blur()}
 function openWardrobe(){renderWardrobe();$('wardrobe').hidden=false;$('hangerBtn').setAttribute('aria-expanded','true')}
 function closeWardrobe(){$('wardrobe').hidden=true;$('hangerBtn').setAttribute('aria-expanded','false')}
 const PARROT_FACE=`<svg class="bface" viewBox="0 0 100 100" aria-hidden="true">
@@ -988,11 +1075,14 @@ function buildCard(){
      <button class="btn ok" id="yes">覚えた</button>
      <button class="btn" id="next" aria-label="次へ">→</button>
    </div>
+   <button class="askbtn" id="askBtn"><img src="mascot.png" alt="" id="askImg">このフレーズをヨウムに聞く</button>
    <div class="keys">スペース 回転 ・ ← → 移動 ・ 1 まだ ・ 2 覚えた</div></div>`;
   $('scene').onclick=e=>{const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
   $('shuf').onclick=reshuffle;
   $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1);
   $('yes').onclick=()=>mark(true); $('no').onclick=()=>mark(false);
+  $('askBtn').onclick=()=>openAsk(P[ci]);
+  $('askImg').src=skinImg(cur().skin);
   fillCard();
 }
 function fillCard(){
@@ -1123,11 +1213,13 @@ $('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
 $('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
 for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];refresh(true)};
 for(const x of ['card','quiz','list']) $('t-'+x).onclick=()=>setTab(x);
+$('askClose').onclick=closeAsk;
+$('askForm').onsubmit=e=>{e.preventDefault();const v=$('askIn').value;$('askIn').value='';askSend(v)};
 $('bagBtn').onclick=openShop; $('shopClose').onclick=closeShop;
 $('hangerBtn').onclick=e=>{e.stopPropagation();$('wardrobe').hidden?openWardrobe():closeWardrobe()};
 $('wardrobe').onclick=e=>e.stopPropagation();
 document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
 applyWear();
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
 $('mascot').onclick=()=>mascotSay('tap');
@@ -1140,6 +1232,7 @@ $('q').oninput=()=>{LIM=150;renderList()};
 document.addEventListener('keydown',e=>{
   if($('sv').classList.contains('open')){if(e.key==='Escape')closeStreak();return}
   if($('bv').classList.contains('open')){if(e.key==='Escape')closeBadges();return}
+  if($('askv').classList.contains('open')||$('shopv').classList.contains('open'))return;
   if(/INPUT|SELECT/.test(e.target.tagName))return;
   if(tab==='quiz'){
     if(!answered&&/^[1-4]$/.test(e.key)){const b=$('v-quiz').querySelectorAll('.opt')[+e.key-1];if(b)b.click()}
