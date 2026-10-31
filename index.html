@@ -407,6 +407,7 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .msg.ai{align-self:flex-start;background:var(--surface);border:2px solid var(--line);border-bottom-left-radius:6px}
 .msg.ai b{color:var(--blue-ink)}
 .msg.ai ul{margin:4px 0;padding-left:1.2em}
+.msg .aiby{display:block;margin-top:8px;font-family:var(--f);font-size:.7rem;font-weight:700;color:var(--muted);opacity:.8}
 .msg.ai hr{border:0;border-top:1px solid var(--line);margin:8px 0}
 .msg.err{border-color:var(--red);color:var(--red-ink)}
 .msg .dots span{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--muted);animation:dot 1s infinite}
@@ -580,7 +581,7 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
   <input id="askProxy" tabindex="-1" aria-hidden="true" autocomplete="off">
   <div class="askfoot" id="askFoot"><div class="in">
     <form id="askForm"><input id="askIn" placeholder="このフレーズについて質問する" autocomplete="off" enterkeyhint="send"><button class="btn ok" id="askSend">送る</button></form>
-    <small>AI（Gemini）の回答です。まちがうこともあります。</small>
+    <small>AIの回答です。まちがうこともあります。</small>
   </div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sheet" id="sheet" role="status" aria-live="polite"><div class="in" id="sheetin"></div></div>
@@ -817,6 +818,7 @@ function renderWardrobe(){
 // ---- ask the parrot (Gemini via Cloudflare Worker)
 const AI_URL='https://phrase1000-ai.shuyegangtian.workers.dev/';
 const ASK_CHIPS=[['意味と使い方','このフレーズの意味と、どんな場面で使うかを教えて'],['例文','このフレーズを使った例文を3つ、日本語訳つきで教えて'],['単語の意味','このフレーズに出てくる大事な単語の意味と、ほかの意味も教えて'],['似た表現','似た表現や言いかえと、その違いを教えて'],['TOEICでの出方','TOEICではどんな問題や場面で出やすいか教えて']];
+const AI_NAME={gemini:'Gemini',groq:'Groq',workersAI:'Cloudflare Workers AI'};
 let askY=0, askCard=null, askMsgs=[], askBusy=false; const askCache={};
 function mdLite(t){
   t=esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
@@ -829,7 +831,7 @@ function mdLite(t){
 function renderAsk(){
   const log=$('askLog');
   log.innerHTML=`<div class="qchips">${ASK_CHIPS.map(([l],i)=>`<button data-q="${i}">${l}</button>`).join('')}</div>`+
-    askMsgs.map(m=>`<div class="msg ${m.role==='user'?'me':'ai'} ${m.err?'err':''}">${m.role==='user'?esc(m.text):mdLite(m.text)}</div>`).join('')+
+    askMsgs.map(m=>`<div class="msg ${m.role==='user'?'me':'ai'} ${m.err?'err':''}">${m.role==='user'?esc(m.text):mdLite(m.text)}${m.by?`<small class="aiby">${AI_NAME[m.by]||esc(m.by)}${m.model?` ・ ${esc(m.model.replace(/^@cf\//,''))}`:''}</small>`:''}</div>`).join('')+
     (askBusy?'<div class="msg ai"><span class="dots"><span></span><span></span><span></span></span></div>':'');
   log.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>askSend(ASK_CHIPS[+b.dataset.q][1]));
   $('askSend').disabled=askBusy;
@@ -847,7 +849,7 @@ async function askSend(q){
       messages:askMsgs.filter(m=>!m.err).map(m=>({role:m.role,text:m.text}))})});
     const j=await r.json().catch(()=>({})); clearTimeout(tm);
     if(!r.ok||!j.text)throw new Error((j.error||('HTTP '+r.status))+(j.tried?' ['+j.tried.join(' / ')+']':''));
-    askMsgs.push({role:'model',text:j.text});
+    askMsgs.push({role:'model',text:j.text,by:j.provider,model:j.model});
   }catch(e){
     const msg=e.name==='AbortError'?'40秒たっても返事がありませんでした':String(e.message||e);
     askMsgs.push({role:'model',err:1,text:/quota|429|RESOURCE_EXHAUSTED/i.test(msg)?'今日はたくさん質問したから、ちょっと休憩させて…（無料で使える回数をこえました。1分ほど待つか、夕方5時以降にまた聞いてね）':navigator.onLine?`うまく答えられなかった…もう一度聞いてみてね。（${msg.slice(0,80)}）`:'電波がないみたい。インターネットにつながってから聞いてね。'});
