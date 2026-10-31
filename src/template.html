@@ -384,6 +384,7 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .msg.ai{align-self:flex-start;background:var(--surface);border:2px solid var(--line);border-bottom-left-radius:6px}
 .msg.ai b{color:var(--blue-ink)}
 .msg.ai ul{margin:4px 0;padding-left:1.2em}
+.msg.ai hr{border:0;border-top:1px solid var(--line);margin:8px 0}
 .msg.err{border-color:var(--red);color:var(--red-ink)}
 .msg .dots span{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--muted);animation:dot 1s infinite}
 .msg .dots span:nth-child(2){animation-delay:.15s}.msg .dots span:nth-child(3){animation-delay:.3s}
@@ -791,7 +792,7 @@ let askY=0, askCard=null, askMsgs=[], askBusy=false; const askCache={};
 function mdLite(t){
   t=esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
   const lines=t.split(/\n/); let out='',inList=false;
-  for(let l of lines){l=l.replace(/^\s*#{1,6}\s+(.*)$/,'<b>$1</b>');const m=l.match(/^\s*[-*・]\s+(.*)/);
+  for(let l of lines){l=l.replace(/^\s*#{1,6}\s+(.*)$/,'<b>$1</b>').replace(/^\s*&gt;\s?/,'').replace(/(^|[^*])\*([^*\s][^*]*?)\*(?!\*)/g,'$1<b>$2</b>');if(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(l)){if(inList){out+='</ul>';inList=false}out+='<hr>';continue}const m=l.match(/^\s*[-*・]\s+(.*)/);
     if(m){if(!inList){out+='<ul>';inList=true}out+=`<li>${m[1]}</li>`}
     else{if(inList){out+='</ul>';inList=false}out+=l.trim()?`${l}<br>`:'<br>'}}
   if(inList)out+='</ul>'; return out.replace(/(<br>)+$/,'');
@@ -833,7 +834,7 @@ function fitAsk(){
   const v=$('askv'); if(!v.classList.contains('open'))return;
   const vv=window.visualViewport; const top=vv?vv.offsetTop:0, h=vv?vv.height:innerHeight;
   v.style.top=top+'px'; v.style.height=h+'px'; v.style.bottom='auto';
-  const f=$('askFoot'); f.classList.toggle('kb',h<innerHeight-120);
+  const f=$('askFoot'); f.classList.toggle('kb',document.activeElement===$('askIn'));
   f.style.top=(top+h-f.offsetHeight)+'px'; f.style.bottom='auto';
   v.style.paddingBottom=f.offsetHeight+'px';
   $('askLog').style.minHeight=(h-f.offsetHeight-v.querySelector('.bv-hero').offsetHeight+2)+'px';
