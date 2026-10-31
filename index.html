@@ -393,8 +393,8 @@ body.has-hat .tracklabel{padding-right:80px}
 .ask{overscroll-behavior:none}
 body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .ask-card .en .w{cursor:pointer;border-radius:6px;transition:background .2s}
-.ask-card .en .w.copied{background:rgba(255,255,255,.35);animation:wpop .4s}
-@keyframes wpop{40%{background:rgba(255,255,255,.6)}}
+.ask-card .en .w.copied{animation:wpop .9s ease-out}
+@keyframes wpop{0%,30%{background:rgba(255,255,255,.55)}100%{background:transparent}}
 .ask-card .en{font-family:var(--f);font-weight:900;font-size:1.25rem;line-height:1.3}
 .ask-card .jp{font-family:var(--f-jp);font-size:.95rem;opacity:.9;margin-top:2px}
 .ask-body{display:flex;flex-direction:column;gap:12px;padding-block:16px 24px}
@@ -1269,7 +1269,7 @@ $('askEn').addEventListener('click',async e=>{
   const word=w.textContent.replace(/^[^A-Za-z0-9'’-]+|[^A-Za-z0-9'’-]+$/g,''); if(!word)return;
   let ok=false; try{await navigator.clipboard.writeText(word);ok=true}catch(err){}
   if(!ok){const t=document.createElement('textarea');t.value=word;t.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(t);t.select();try{ok=document.execCommand('copy')}catch(err){}t.remove()}
-  w.classList.remove('copied');void w.offsetWidth;w.classList.add('copied');
+  w.classList.remove('copied');void w.offsetWidth;w.classList.add('copied');setTimeout(()=>w.classList.remove('copied'),950);
   toast(`<div><strong>「${esc(word)}」をコピーしました</strong></div>`);
 });
 $('askFoot').addEventListener('touchmove',e=>{if(e.target.id!=='askIn')e.preventDefault()},{passive:false});
