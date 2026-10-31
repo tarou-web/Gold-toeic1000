@@ -53,18 +53,26 @@ export default {
 };
 
 async function askGemini(env, system, contents) {
-  const model = env.MODEL || "gemini-3.8-flash";
-  // 速く答えてもらうため「low」から試し、そのモデルで使えなければ設定なしでもう一度聞く
-  for (const thinking of [{ thinkingLevel: "low" }, null]) {
-    const r = await callGemini(env, model, system, contents, thinking);
-    if (r.error && r.status === 400 && /thinking/i.test(r.error)) continue;
-    return r;
+  // 混んでいたり使えなかったりしたら、次のモデルで聞き直す
+  const models = [env.MODEL || "gemini-3.8-flash", "gemini-flash-lite-latest", "gemini-flash-latest"];
+  const t0 = Date.now();
+  let last;
+  for (const model of models) {
+    for (const thinking of [{ thinkingLevel: "low" }, null]) {
+      if (Date.now() - t0 > 24000) return last;
+      last = await callGemini(env, model, system, contents, thinking);
+      if (last.ok) return last;
+      if (last.status === 400 && /thinking/i.test(last.error)) continue; // この設定が使えない → 設定なしで
+      break; // 混雑・見つからない など → 次のモデルへ
+    }
+    if (last.status === 401 || last.status === 403) return last; // キーの問題はモデルを変えても同じ
   }
+  return last;
 }
 
 async function callGemini(env, model, system, contents, thinking) {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 28000);
+  const timer = setTimeout(() => ctrl.abort(), 15000);
   try {
     const generationConfig = { maxOutputTokens: 4000 };
     if (thinking) generationConfig.thinkingConfig = thinking;
@@ -80,7 +88,7 @@ async function callGemini(env, model, system, contents, thinking) {
       .map((p) => p.text || "").join("");
     return { ok: true, text, model, thinking: thinking ? thinking.thinkingLevel : "default" };
   } catch (e) {
-    return { error: e.name === "AbortError" ? "Gemini の返事が28秒以上なかったので中止しました" : String(e), status: 504, model };
+    return { error: e.name === "AbortError" ? "Gemini の返事が15秒以上なかったので中止しました" : String(e), status: 504, model };
   } finally {
     clearTimeout(timer);
   }
