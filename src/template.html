@@ -800,9 +800,9 @@ const AI_NAME={gemini:'Gemini',groq:'Groq',workersAI:'Cloudflare Workers AI'};
 let askY=0, askCard=null, askMsgs=[], askBusy=false; const askCache={};
 function mdLite(t){
   // tables (| a | b |) → one bullet per row; <br> → line break
-  t=t.replace(/<br\s*\/?>/gi,'\n').split('\n').filter(l=>!/^\s*\|?\s*:?-{2,}/.test(l)).map(l=>{
-    if(/^\s*\|.*\|\s*$/.test(l)){const c=l.trim().replace(/^\||\|$/g,'').split('|').map(x=>x.trim()).filter(Boolean);return c.length?'- '+c.join(' ／ '):''}
-    return l}).join('\n');
+  t=t.split('\n').filter(l=>!/^\s*\|?\s*:?-{2,}/.test(l)).map(l=>{
+    if(/^\s*\|.*\|\s*$/.test(l)){const c=l.trim().replace(/^\||\|$/g,'').split('|').map(x=>x.replace(/<br\s*\/?>/gi,' ').trim()).filter(Boolean);return c.length?'- '+c.join(' ／ '):''}
+    return l.replace(/<br\s*\/?>/gi,'\n')}).join('\n');
   t=esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
   const lines=t.split(/\n/); let out='',inList=false;
   for(let l of lines){l=l.replace(/^\s*#{1,6}\s+(.*)$/,'<b>$1</b>').replace(/^\s*&gt;\s?/,'').replace(/(^|[^*])\*([^*\s][^*]*?)\*(?!\*)/g,'$1<b>$2</b>');if(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(l)){if(inList){out+='</ul>';inList=false}out+='<hr>';continue}const m=l.match(/^\s*[-*・]\s+(.*)/);
