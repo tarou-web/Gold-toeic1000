@@ -49,6 +49,7 @@ export default {
       "あなたは英語学習アプリ「フレーズ1000」に住んでいるヨウム（灰色のオウム）のキャラクターです。" +
       "TOEICを勉強している日本人に、英語の単語やフレーズについて、日本語でやさしく、短く、正確に答えます。" +
       "例文を出すときは英語と日本語訳をセットにします。わからないことは推測で断定しません。" +
+      "スマホの小さな吹き出しに表示するので、表（|で区切る形）やHTMLタグは使わず、短い見出しと「- 」の箇条書きで書きます。絵文字は使いすぎません。" +
       `今学習しているカード → 英語：「${clip(card.en)}」 日本語：「${clip(card.jp)}」 単語メモ：「${clip(card.g)}」`;
 
     // 全体で 30 秒以内に答えを返す
@@ -66,6 +67,10 @@ export default {
 };
 
 // ---------- 3 つの AI ----------
+// 回数制限（429）や混雑（503）が返ったら、しばらくそのモデルを飛ばして、待ち時間を減らす
+const COOL = new Map();
+const cooling = (key) => (COOL.get(key) || 0) > Date.now();
+const cool = (key, r) => { if (r && (r.status === 429 || r.status === 503 || r.status === 504)) COOL.set(key, Date.now() + (r.status === 429 ? 10 * 60000 : 60000)); };
 const PROVIDERS = { gemini, groq, workersAI };
 
 // 1. Gemini（Google）
@@ -74,6 +79,7 @@ async function gemini(env, system, msgs, deadline) {
   const contents = msgs.map((m) => ({ role: m.role, parts: [{ text: m.text }] }));
   let last;
   for (const model of ["gemini-flash-lite-latest", "gemini-3.8-flash", "gemini-flash-latest"]) {
+    if (cooling(model)) { last = { error: "しばらく休み中", status: 429, model }; continue; }
     for (const thinking of [{ thinkingLevel: "low" }, null]) {
       const generationConfig = { maxOutputTokens: 4000 };
       if (thinking) generationConfig.thinkingConfig = thinking;
@@ -81,9 +87,10 @@ async function gemini(env, system, msgs, deadline) {
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
         { "x-goog-api-key": env.GEMINI_API_KEY },
         { systemInstruction: { parts: [{ text: system }] }, contents, generationConfig },
-        timeLeft(deadline, 10000),
+        timeLeft(deadline, 8000),
       );
       last.model = model;
+      cool(model, last);
       if (last.ok) {
         const parts = (last.data.candidates && last.data.candidates[0] && last.data.candidates[0].content && last.data.candidates[0].content.parts) || [];
         return { ok: true, text: parts.map((p) => p.text || "").join(""), model };
@@ -92,7 +99,7 @@ async function gemini(env, system, msgs, deadline) {
       break;
     }
     if (last.status === 401 || last.status === 403) break; // キーの問題はモデルを変えても同じ
-    if (Date.now() > deadline - 18000) break;               // Groq と Workers AI の時間を残す
+    if (Date.now() > deadline - 20000) break;               // Groq と Workers AI の時間を残す
   }
   return last;
 }
@@ -103,10 +110,12 @@ async function groq(env, system, msgs, deadline) {
   const messages = toChat(system, msgs);
   let last;
   for (const model of ["openai/gpt-oss-120b", "qwen/qwen3.8-27b", "llama-3.3-70b-versatile"]) {
+    if (cooling(model)) { last = { error: "しばらく休み中", status: 429, model }; continue; }
     const body = { model, messages, max_tokens: 2000, temperature: 0.6 };
     if (model.startsWith("openai/")) body.reasoning_effort = "low";
     last = await post("https://api.groq.com/openai/v1/chat/completions", { Authorization: `Bearer ${env.GROQ_API_KEY}` }, body, timeLeft(deadline, 10000));
     last.model = model;
+    cool(model, last);
     if (last.ok) return { ok: true, text: chatText(last.data), model };
     if (last.status === 401 || last.status === 403) break;
     if (Date.now() > deadline - 8000) break; // Workers AI の時間を残す
