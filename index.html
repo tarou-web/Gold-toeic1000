@@ -391,7 +391,8 @@ body.has-hat .tracklabel{padding-right:80px}
 .ask-card .af img{width:100%;display:block}
 .ask-card .en{font-family:var(--f);font-weight:900;font-size:1.25rem;line-height:1.3}
 .ask-card .jp{font-family:var(--f-jp);font-size:.95rem;opacity:.9;margin-top:2px}
-.ask-body{display:flex;flex-direction:column;gap:12px;padding-block:16px 160px}
+.ask-body{display:flex;flex-direction:column;gap:12px;padding-block:16px 24px}
+.ask{overscroll-behavior:contain}
 .qchips{display:flex;flex-wrap:wrap;gap:8px}
 .qchips button{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.85rem;padding:8px 12px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
 .qchips button:active{transform:scale(.96)}
@@ -844,9 +845,18 @@ function openAsk(d){
   if(!d)return; askCard=d; askMsgs=askCache[d.id]||[];
   const c=cur(); $('askFig').innerHTML=fig(c.skin,c.face,c.hat);
   $('askEn').textContent=d.en; $('askJp').textContent=d.jp;
-  renderAsk(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); document.body.classList.add('sv-lock');
+  renderAsk(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); document.body.classList.add('sv-lock'); fitAsk();
 }
-function closeAsk(){const v=$('askv');v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');document.body.classList.remove('sv-lock');$('askIn').blur()}
+// keep the chat header still and lift only the input bar above the keyboard (iOS pans the page otherwise)
+function fitAsk(){
+  const v=$('askv'); if(!v.classList.contains('open'))return;
+  const vv=window.visualViewport; const top=vv?vv.offsetTop:0, h=vv?vv.height:innerHeight;
+  v.style.top=top+'px'; v.style.height=h+'px'; v.style.bottom='auto';
+  const f=$('askFoot'); f.style.top=(top+h-f.offsetHeight)+'px'; f.style.bottom='auto';
+  v.style.paddingBottom=f.offsetHeight+'px';
+}
+if(window.visualViewport){visualViewport.addEventListener('resize',fitAsk);visualViewport.addEventListener('scroll',fitAsk)}
+function closeAsk(){const v=$('askv');v.style.cssText='';$('askFoot').style.cssText='';v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');document.body.classList.remove('sv-lock');$('askIn').blur()}
 function openWardrobe(){renderWardrobe();$('wardrobe').hidden=false;$('hangerBtn').setAttribute('aria-expanded','true')}
 function closeWardrobe(){$('wardrobe').hidden=true;$('hangerBtn').setAttribute('aria-expanded','false')}
 const PARROT_FACE=`<svg class="bface" viewBox="0 0 100 100" aria-hidden="true">
@@ -1237,6 +1247,8 @@ $('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
 for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];refresh(true)};
 for(const x of ['card','quiz','list']) $('t-'+x).onclick=()=>setTab(x);
 $('askClose').onclick=closeAsk;
+$('askIn').addEventListener('focus',()=>{[0,100,300,600].forEach(t=>setTimeout(()=>{fitAsk();const v=$('askv');v.scrollTop=v.scrollHeight},t))});
+$('askIn').addEventListener('blur',()=>setTimeout(fitAsk,100));
 $('askForm').onsubmit=e=>{e.preventDefault();const v=$('askIn').value;$('askIn').value='';askSend(v)};
 $('bagBtn').onclick=openShop; $('shopClose').onclick=closeShop;
 $('hangerBtn').onclick=e=>{e.stopPropagation();$('wardrobe').hidden?openWardrobe():closeWardrobe()};
