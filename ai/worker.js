@@ -53,7 +53,7 @@ export default {
 };
 
 async function askGemini(env, system, contents) {
-  const model = env.MODEL || "gemini-2.5-flash";
+  const model = env.MODEL || "gemini-3.8-flash";
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 25000);
   try {
@@ -64,7 +64,7 @@ async function askGemini(env, system, contents) {
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: system }] },
         contents,
-        generationConfig: { maxOutputTokens: 1500, temperature: 0.6, thinkingConfig: { thinkingBudget: 0 } },
+        generationConfig: { maxOutputTokens: 4000, temperature: 0.6 },
       }),
     });
     const j = await r.json().catch(() => ({}));
