@@ -823,11 +823,11 @@ async function askSend(q){
       card:{en:askCard.en,jp:askCard.jp,g:(askCard.g||[]).map(x=>x.join('=')).join('、')},
       messages:askMsgs.filter(m=>!m.err).map(m=>({role:m.role,text:m.text}))})});
     const j=await r.json().catch(()=>({})); clearTimeout(tm);
-    if(!r.ok||!j.text)throw new Error(j.error||('HTTP '+r.status));
+    if(!r.ok||!j.text)throw new Error((j.error||('HTTP '+r.status))+(j.tried?' ['+j.tried.join(' / ')+']':''));
     askMsgs.push({role:'model',text:j.text});
   }catch(e){
     const msg=e.name==='AbortError'?'35秒たっても返事がありませんでした':String(e.message||e);
-    askMsgs.push({role:'model',err:1,text:/quota|429|RESOURCE_EXHAUSTED/i.test(msg)?'今日はたくさん質問したから、ちょっと休憩させて…（無料で使える回数をこえました。少し時間をおいてね）':navigator.onLine?`うまく答えられなかった…もう一度聞いてみてね。（${msg.slice(0,80)}）`:'電波がないみたい。インターネットにつながってから聞いてね。'});
+    askMsgs.push({role:'model',err:1,text:/quota|429|RESOURCE_EXHAUSTED/i.test(msg)?'今日はたくさん質問したから、ちょっと休憩させて…（無料で使える回数をこえました。1分ほど待つか、夕方5時以降にまた聞いてね）':navigator.onLine?`うまく答えられなかった…もう一度聞いてみてね。（${msg.slice(0,80)}）`:'電波がないみたい。インターネットにつながってから聞いてね。'});
   }
   askBusy=false; askCache[askCard.id]=askMsgs; renderAsk();
 }

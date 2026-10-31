@@ -46,28 +46,30 @@ export default {
       `今学習しているカード → 英語：「${clip(card.en)}」 日本語：「${clip(card.jp)}」 単語メモ：「${clip(card.g)}」`;
 
     const r = await askGemini(env, system, msgs);
-    if (r.error) return json({ error: r.error }, r.status || 500);
+    if (r.error) return json({ error: r.error, tried: r.tried }, r.status || 500);
     const text = r.text;
     return json({ text: text || "（答えが空でした。もう一度聞いてみてください）" });
   },
 };
 
 async function askGemini(env, system, contents) {
-  // 混んでいたり使えなかったりしたら、次のモデルで聞き直す
-  const models = [env.MODEL || "gemini-3.8-flash", "gemini-flash-lite-latest", "gemini-flash-latest"];
+  // 回数制限や混雑のときは、次のモデルで聞き直す（モデルごとに無料の回数が別々にある）
+  const models = env.MODEL ? [env.MODEL] : ["gemini-flash-lite-latest", "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.1-flash-lite"];
   const t0 = Date.now();
+  const tried = [];
   let last;
   for (const model of models) {
     for (const thinking of [{ thinkingLevel: "low" }, null]) {
-      if (Date.now() - t0 > 24000) return last;
+      if (Date.now() - t0 > 24000) return { ...last, tried };
       last = await callGemini(env, model, system, contents, thinking);
-      if (last.ok) return last;
+      if (last.ok) return { ...last, tried };
       if (last.status === 400 && /thinking/i.test(last.error)) continue; // この設定が使えない → 設定なしで
-      break; // 混雑・見つからない など → 次のモデルへ
+      break; // 回数制限・混雑・見つからない など → 次のモデルへ
     }
-    if (last.status === 401 || last.status === 403) return last; // キーの問題はモデルを変えても同じ
+    tried.push(`${model}: ${last.status}`);
+    if (last.status === 401 || last.status === 403) break; // キーの問題はモデルを変えても同じ
   }
-  return last;
+  return { ...last, tried };
 }
 
 async function callGemini(env, model, system, contents, thinking) {
