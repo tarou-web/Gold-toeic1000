@@ -15,7 +15,16 @@ export default {
       new Response(JSON.stringify(obj), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
     if (req.method === "OPTIONS") return new Response(null, { headers: cors });
-    if (req.method === "GET") return json({ ok: true, message: "フレーズ1000 AI サーバーは動いています" });
+    if (req.method === "GET") {
+      // ブラウザで「…workers.dev/?test」を開くと、Gemini に実際に聞いてみた結果を表示します
+      if (new URL(req.url).searchParams.has("test")) {
+        if (!env.GEMINI_API_KEY) return json({ ok: false, error: "GEMINI_API_KEY が設定されていません" });
+        const t0 = Date.now();
+        const r = await askGemini(env, "あなたは親切なアシスタントです。", [{ role: "user", parts: [{ text: "「こんにちは」を英語で一言だけ" }] }]);
+        return json({ ...r, ms: Date.now() - t0 });
+      }
+      return json({ ok: true, message: "フレーズ1000 AI サーバーは動いています" });
+    }
     if (req.method !== "POST" || req.headers.get("Origin") !== ORIGIN) return json({ error: "forbidden" }, 403);
     if (!env.GEMINI_API_KEY) return json({ error: "GEMINI_API_KEY が設定されていません" }, 500);
 
@@ -36,20 +45,36 @@ export default {
       "例文を出すときは英語と日本語訳をセットにします。わからないことは推測で断定しません。" +
       `今学習しているカード → 英語：「${clip(card.en)}」 日本語：「${clip(card.jp)}」 単語メモ：「${clip(card.g)}」`;
 
-    const model = env.MODEL || "gemini-flash-latest";
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
-        contents: msgs,
-        generationConfig: { maxOutputTokens: 800, temperature: 0.6 },
-      }),
-    });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok) return json({ error: (j.error && j.error.message) || "Gemini からエラーが返りました" }, r.status);
-    const text = ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || [])
-      .map((p) => p.text || "").join("");
+    const r = await askGemini(env, system, msgs);
+    if (r.error) return json({ error: r.error }, r.status || 500);
+    const text = r.text;
     return json({ text: text || "（答えが空でした。もう一度聞いてみてください）" });
   },
 };
+
+async function askGemini(env, system, contents) {
+  const model = env.MODEL || "gemini-2.5-flash";
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 25000);
+  try {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+      method: "POST",
+      signal: ctrl.signal,
+      headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: system }] },
+        contents,
+        generationConfig: { maxOutputTokens: 1500, temperature: 0.6, thinkingConfig: { thinkingBudget: 0 } },
+      }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) return { error: (j.error && j.error.message) || `Gemini エラー ${r.status}`, status: r.status, model };
+    const text = ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || [])
+      .map((p) => p.text || "").join("");
+    return { ok: true, text, model };
+  } catch (e) {
+    return { error: e.name === "AbortError" ? "Gemini の返事が25秒以上なかったので中止しました" : String(e), status: 504, model };
+  } finally {
+    clearTimeout(timer);
+  }
+}

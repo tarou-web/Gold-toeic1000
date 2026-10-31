@@ -805,14 +805,15 @@ async function askSend(q){
   q=(q||'').trim(); if(!q||askBusy)return;
   askMsgs.push({role:'user',text:q}); askBusy=true; renderAsk();
   try{
-    const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    const ac_=new AbortController(); const tm=setTimeout(()=>ac_.abort(),35000);
+    const r=await fetch(AI_URL,{method:'POST',signal:ac_.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({
       card:{en:askCard.en,jp:askCard.jp,g:(askCard.g||[]).map(x=>x.join('=')).join('、')},
       messages:askMsgs.filter(m=>!m.err).map(m=>({role:m.role,text:m.text}))})});
-    const j=await r.json().catch(()=>({}));
+    const j=await r.json().catch(()=>({})); clearTimeout(tm);
     if(!r.ok||!j.text)throw new Error(j.error||('HTTP '+r.status));
     askMsgs.push({role:'model',text:j.text});
   }catch(e){
-    const msg=String(e.message||e);
+    const msg=e.name==='AbortError'?'35秒たっても返事がありませんでした':String(e.message||e);
     askMsgs.push({role:'model',err:1,text:/quota|429|RESOURCE_EXHAUSTED/i.test(msg)?'今日はたくさん質問したから、ちょっと休憩させて…（無料で使える回数をこえました。少し時間をおいてね）':navigator.onLine?`うまく答えられなかった…もう一度聞いてみてね。（${msg.slice(0,80)}）`:'電波がないみたい。インターネットにつながってから聞いてね。'});
   }
   askBusy=false; askCache[askCard.id]=askMsgs; renderAsk();
