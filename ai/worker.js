@@ -54,24 +54,31 @@ export default {
 
 async function askGemini(env, system, contents) {
   const model = env.MODEL || "gemini-3.8-flash";
+  // 速く答えてもらうため「low」から試し、そのモデルで使えなければ設定なしでもう一度聞く
+  for (const thinking of [{ thinkingLevel: "low" }, null]) {
+    const r = await callGemini(env, model, system, contents, thinking);
+    if (r.error && r.status === 400 && /thinking/i.test(r.error)) continue;
+    return r;
+  }
+}
+
+async function callGemini(env, model, system, contents, thinking) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 28000);
   try {
+    const generationConfig = { maxOutputTokens: 4000 };
+    if (thinking) generationConfig.thinkingConfig = thinking;
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: "POST",
       signal: ctrl.signal,
       headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_API_KEY },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
-        contents,
-        generationConfig: { maxOutputTokens: 4000, thinkingConfig: { thinkingLevel: "minimal" } },
-      }),
+      body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents, generationConfig }),
     });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) return { error: (j.error && j.error.message) || `Gemini エラー ${r.status}`, status: r.status, model };
     const text = ((j.candidates && j.candidates[0] && j.candidates[0].content && j.candidates[0].content.parts) || [])
       .map((p) => p.text || "").join("");
-    return { ok: true, text, model };
+    return { ok: true, text, model, thinking: thinking ? thinking.thinkingLevel : "default" };
   } catch (e) {
     return { error: e.name === "AbortError" ? "Gemini の返事が28秒以上なかったので中止しました" : String(e), status: 504, model };
   } finally {
