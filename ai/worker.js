@@ -78,7 +78,8 @@ async function gemini(env, system, msgs, deadline) {
   if (!env.GEMINI_API_KEY) return { skip: true, error: "GEMINI_API_KEY がありません" };
   const contents = msgs.map((m) => ({ role: m.role, parts: [{ text: m.text }] }));
   let last;
-  for (const model of ["gemini-flash-lite-latest", "gemini-3.8-flash", "gemini-flash-latest"]) {
+  // Flash Lite は1日500回。ほかの Gemini は1日20回しかないので使わない
+  for (const model of ["gemini-flash-lite-latest"]) {
     if (cooling(model)) { last = { error: "しばらく休み中", status: 429, model }; continue; }
     for (const thinking of [{ thinkingLevel: "low" }, null]) {
       const generationConfig = { maxOutputTokens: 4000 };
