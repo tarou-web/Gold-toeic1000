@@ -55,13 +55,29 @@ export default {
     // 全体で 30 秒以内に答えを返す
     const deadline = Date.now() + 30000;
     const tried = [];
-    let last = { error: "使える AI がありません（キーの設定を確認してください）", status: 500 };
-    for (const [name, fn] of Object.entries(PROVIDERS)) {
-      if (Date.now() > deadline - 3000) break;
-      const r = await fn(env, system, msgs, deadline);
-      if (r.ok && r.text) return json({ text: r.text, provider: name, model: r.model, tried });
-      if (!r.skip) { tried.push(`${name}: ${r.status || "?"}`); last = r; }
+    const note = (name, r) => { if (!r.skip) tried.push(`${name}: ${r.status || "?"}`); return r; };
+    const ok = (r) => r && r.ok && r.text;
+
+    // Gemini を先に聞き、5秒たっても返事がなければ Groq にも同時に聞いて、先に答えたほうを使う
+    const pG = gemini(env, system, msgs, deadline).then((r) => ({ name: "gemini", r }));
+    let first = await Promise.race([pG, sleep(5000).then(() => null)]);
+    if (first && ok(first.r)) return json({ text: first.r.text, provider: "gemini", model: first.r.model, tried });
+    if (first) note("gemini", first.r);
+
+    const pQ = groq(env, system, msgs, deadline).then((r) => ({ name: "groq", r }));
+    const pending = first ? [pQ] : [pG, pQ];
+    while (pending.length) {
+      const done = await Promise.race(pending.map((p, i) => p.then((v) => ({ v, i }))));
+      pending.splice(done.i, 1);
+      if (ok(done.v.r)) return json({ text: done.v.r.text, provider: done.v.name, model: done.v.r.model, tried });
+      note(done.v.name, done.v.r);
     }
+
+    // どちらもだめなら Workers AI
+    const w = await workersAI(env, system, msgs, deadline);
+    if (ok(w)) return json({ text: w.text, provider: "workersAI", model: w.model, tried });
+    note("workersAI", w);
+    const last = w.skip ? { error: "答えられる AI がありませんでした", status: 503 } : w;
     return json({ error: last.error, tried }, last.status || 500);
   },
 };
@@ -88,7 +104,7 @@ async function gemini(env, system, msgs, deadline) {
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
         { "x-goog-api-key": env.GEMINI_API_KEY },
         { systemInstruction: { parts: [{ text: system }] }, contents, generationConfig },
-        timeLeft(deadline, 8000),
+        timeLeft(deadline, 20000),
       );
       last.model = model;
       cool(model, last);
@@ -152,6 +168,9 @@ function toChat(system, msgs) {
 }
 function chatText(d) {
   return (d && d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content) || "";
+}
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
 }
 function timeLeft(deadline, max) {
   return Math.max(1000, Math.min(max, deadline - Date.now()));
