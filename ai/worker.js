@@ -55,7 +55,7 @@ export default {
 async function askGemini(env, system, contents) {
   const model = env.MODEL || "gemini-3.8-flash";
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 25000);
+  const timer = setTimeout(() => ctrl.abort(), 28000);
   try {
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: "POST",
@@ -64,7 +64,7 @@ async function askGemini(env, system, contents) {
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: system }] },
         contents,
-        generationConfig: { maxOutputTokens: 4000, temperature: 0.6 },
+        generationConfig: { maxOutputTokens: 4000, thinkingConfig: { thinkingLevel: "minimal" } },
       }),
     });
     const j = await r.json().catch(() => ({}));
@@ -73,7 +73,7 @@ async function askGemini(env, system, contents) {
       .map((p) => p.text || "").join("");
     return { ok: true, text, model };
   } catch (e) {
-    return { error: e.name === "AbortError" ? "Gemini の返事が25秒以上なかったので中止しました" : String(e), status: 504, model };
+    return { error: e.name === "AbortError" ? "Gemini の返事が28秒以上なかったので中止しました" : String(e), status: 504, model };
   } finally {
     clearTimeout(timer);
   }
