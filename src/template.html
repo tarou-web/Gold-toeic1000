@@ -481,7 +481,7 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
   <div class="track" id="mainbar"><i id="bar"></i></div>
   <div class="tracklabel"><span>全体の進み具合</span><span id="pct">0%</span></div>
   <div class="gzone">
-  <button class="mascot" id="mascot" aria-label="ヨウム"><span class="msparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="mfig"><img src="mascot.png" alt=""></span></button>
+  <button class="mascot" id="mascot" aria-label="ヨウムに聞く"><span class="msparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="mfig"><img src="mascot.png" alt=""></span></button>
   <button class="hanger" id="hangerBtn" aria-label="着せ替え" aria-expanded="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5a2.3 2.3 0 1 1 2.3-2.3c0 1.3-1 1.7-2.3 2.6L3 14.6c-1 .8-.4 2.4.9 2.4h16.2c1.3 0 1.9-1.6.9-2.4L12 8.1"/></svg></button>
   <div class="wardrobe" id="wardrobe" role="dialog" aria-label="着せ替え" hidden></div>
   <div class="mbub" id="mbub" aria-live="polite"></div>
@@ -1103,14 +1103,11 @@ function buildCard(){
      <button class="btn ok" id="yes">覚えた</button>
      <button class="btn" id="next" aria-label="次へ">→</button>
    </div>
-   <button class="askbtn" id="askBtn"><img src="mascot.png" alt="" id="askImg">このフレーズをヨウムに聞く</button>
    <div class="keys">スペース 回転 ・ ← → 移動 ・ 1 まだ ・ 2 覚えた</div></div>`;
   $('scene').onclick=e=>{const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
   $('shuf').onclick=reshuffle;
   $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1);
   $('yes').onclick=()=>mark(true); $('no').onclick=()=>mark(false);
-  $('askBtn').onclick=()=>openAsk(P[ci]);
-  $('askImg').src=skinImg(cur().skin);
   fillCard();
 }
 function fillCard(){
@@ -1271,7 +1268,7 @@ document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
 applyWear();
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
-$('mascot').onclick=()=>mascotSay('tap');
+$('mascot').onclick=()=>{const d=(tab==='quiz'&&QP[qi])||P[ci]||DATA[0];openAsk(d)};
 $('goal').value=String(S.goal);
 $('goal').onchange=()=>{S.goal=+$('goal').value;if(checkGoal())celebrateGoal();save();header()};
 $('fireBtn').onclick=openStreak; $('svClose').onclick=closeStreak;
