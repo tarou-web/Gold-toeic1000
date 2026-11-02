@@ -395,6 +395,40 @@ body.has-hat .tracklabel{padding-right:80px}
 .mbub.ng{border-color:var(--red);color:var(--red-ink)}
 .mbub.ng::after{border-color:var(--red)}
 .gtrack{height:12px}
+/* bottom navigation */
+.wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:58;display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg);border-top:2px solid var(--line);padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
+.bnav button{height:50px;border:0;background:none;color:var(--muted);display:grid;place-items:center;border-radius:14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bnav button svg{width:28px;height:28px}
+.bnav button.on{color:var(--blue);background:var(--blue-s)}
+.bnav button:active{transform:scale(.92)}
+.bv.navv{bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:57}
+.bv.deckv{z-index:62}
+.libv .bv-hero{background:#2b7bd6}
+.setv .bv-hero{background:#4b5563}
+.navv .sv-bar{grid-template-columns:44px 1fr 44px}
+.lib{display:flex;flex-direction:column;gap:10px}
+.lib-item{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-bottom-width:4px;border-radius:18px;padding:12px 14px;background:var(--surface);cursor:pointer;text-align:left;font:inherit;color:var(--fg);width:100%}
+.lib-item.cur{border-color:var(--blue)}
+.lib-item .li-main{flex:1;min-width:0}
+.lib-item b{display:block;font-family:var(--f-jp);font-weight:800;font-size:1.05rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lib-item small{display:block;color:var(--muted);font-weight:700;font-size:.8rem;margin-top:2px}
+.lib-item .li-bar{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}
+.lib-item .li-bar i{display:block;height:100%;background:var(--green)}
+.lib-item .li-edit{flex:0 0 auto;font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.8rem;padding:8px 12px;border-radius:12px;border:2px solid var(--line);background:none;color:var(--blue-ink);cursor:pointer}
+.lib-item .li-cur{flex:0 0 auto;font-size:.75rem;font-weight:800;color:var(--blue-ink)}
+.setgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.setgrid label.ctl{font-size:.8rem}
+.setgrid select{font-size:16px}
+.pill.gear{padding:5px 8px;display:grid;place-items:center}
+.pill.gear svg{width:18px;height:18px}
+.optv{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.optv.open{opacity:1;pointer-events:auto}
+.optin{width:100%;max-width:640px;background:var(--bg);border-radius:22px 22px 0 0;border:2px solid var(--line);border-bottom:0;padding:14px 16px calc(20px + env(safe-area-inset-bottom,0px));transform:translateY(40px);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.optv.open .optin{transform:none}
+.opthead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.opthead h3{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1.1rem}
+.opthead .sv-x{color:var(--fg)}
 /* decks */
 .deckbar{display:flex;gap:8px;align-items:center}
 .deckpick{flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:2px solid var(--line);border-radius:14px;padding:4px 10px;background:var(--surface)}
@@ -552,11 +586,6 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
       <span class="stat know" title="覚えたフレーズ"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.3 14.3-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z"/></svg><span id="known">0</span></span>
     </div>
   </header>
-  <div class="deckbar">
-    <label class="deckpick"><span>単語帳</span><select id="deck" aria-label="単語帳を選ぶ"></select></label>
-    <button class="deckbtn" id="deckEdit" aria-label="単語帳を編集">編集</button>
-    <button class="deckbtn add" id="deckNew" aria-label="新しい単語帳を作る">＋ 新しく作る</button>
-  </div>
   <div class="track" id="mainbar"><i id="bar"></i></div>
   <div class="tracklabel"><span>全体の進み具合</span><span id="pct">0%</span></div>
   <div class="gzone">
@@ -668,16 +697,32 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sheet" id="sheet" role="status" aria-live="polite"><div class="in" id="sheetin"></div></div>
 
-  <div class="controls">
-    <label class="ctl">範囲<select id="range"></select></label>
-    <label class="ctl">出題<select id="filter"><option value="all">すべて</option><option value="todo">未習得のみ</option><option value="weak">苦手のみ</option><option value="fix">修正した項目</option><option value="add">追加した語だけ</option></select></label>
-    <label class="ctl">表面<select id="dir"><option value="je">日本語</option><option value="ej">英語</option></select></label>
-    <label class="ctl">順番<select id="order"><option value="seq">番号順</option><option value="shuf">シャッフル</option></select></label>
-    <label class="ctl">効果音<select id="sound"><option value="on">オン</option><option value="off">オフ</option></select></label>
-    <label class="ctl">1日の目標<select id="goal"><option value="5">5問</option><option value="10">10問</option><option value="15">15問</option><option value="20">20問</option><option value="30">30問</option></select></label>
-    <label class="ctl">振動<select id="vib"><option value="on">オン</option><option value="off">オフ</option></select></label>
-  </div>
+</div>
 
+<nav class="bnav" aria-label="メニュー">
+  <button id="navHome" class="on" aria-label="ホーム"><svg viewBox="0 0 24 24"><path d="M3.5 10.6 12 3.5l8.5 7.1V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z" fill="currentColor"/></svg></button>
+  <button id="navNew" aria-label="新しい単語帳を作る"><svg viewBox="0 0 24 24"><path d="M12 4v16M4 12h16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button>
+  <button id="navLib" aria-label="単語帳のライブラリ"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></button>
+  <button id="navSet" aria-label="設定"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L4.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></button>
+</nav>
+
+<section class="bv navv libv" id="libv" role="dialog" aria-labelledby="libTitle" aria-hidden="true">
+  <div class="bv-hero"><div class="sv-in"><div class="sv-bar"><span></span><h2 id="libTitle">ライブラリ</h2><span></span></div></div></div>
+  <div class="sv-in bv-body"><div class="lib" id="libList"></div>
+    <button class="btn ok" id="libNew">＋ 新しい単語帳を作る</button></div>
+</section>
+
+<section class="bv navv setv" id="setv" role="dialog" aria-labelledby="setTitle" aria-hidden="true">
+  <div class="bv-hero"><div class="sv-in"><div class="sv-bar"><span></span><h2 id="setTitle">設定</h2><span></span></div></div></div>
+  <div class="sv-in bv-body">
+  <section class="sync" aria-labelledby="prefTitle">
+    <h2 id="prefTitle">基本の設定</h2>
+    <div class="setgrid">
+    <label class="ctl">1日の目標<select id="goal"><option value="5">5問</option><option value="10">10問</option><option value="15">15問</option><option value="20">20問</option><option value="30">30問</option></select></label>
+    <label class="ctl">効果音<select id="sound"><option value="on">オン</option><option value="off">オフ</option></select></label>
+    <label class="ctl">振動<select id="vib"><option value="on">オン</option><option value="off">オフ</option></select></label>
+    </div>
+  </section>
   <section class="sync aisec" aria-labelledby="aiTitle">
     <h2 id="aiTitle">ヨウム（AI）に質問した回数</h2>
     <div class="aistats" id="aiStats"></div>
@@ -699,6 +744,19 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
       <p class="sync-msg" id="resetMsg" role="status"></p>
     </details>
   </section>
+  </div>
+</section>
+
+<div class="optv" id="optv" role="dialog" aria-labelledby="optTitle" aria-hidden="true">
+  <div class="optin">
+    <div class="opthead"><h3 id="optTitle">出題の設定</h3><button class="sv-x" id="optClose" aria-label="閉じる">✕</button></div>
+    <div class="setgrid">
+    <label class="ctl">範囲<select id="range"></select></label>
+    <label class="ctl">出題<select id="filter"><option value="all">すべて</option><option value="todo">未習得のみ</option><option value="weak">苦手のみ</option><option value="fix">修正した項目</option><option value="add">追加した語だけ</option></select></label>
+    <label class="ctl">表面<select id="dir"><option value="je">日本語</option><option value="ej">英語</option></select></label>
+    <label class="ctl">順番<select id="order"><option value="seq">番号順</option><option value="shuf">シャッフル</option></select></label>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -949,7 +1007,8 @@ function openDeckEdit(id){
 function closeDeckEdit(){
   const dk=deckOf(dkId);
   if(dk){dk.name=$('dkName').value.trim()||dk.name||'新しい単語帳'; save(); selectDeck(dk.id)}
-  const v=$('deckv'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); document.body.classList.remove('sv-lock'); dkId=null;
+  const v=$('deckv'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); dkId=null;
+  if($('libv').classList.contains('open'))renderLib(); else document.body.classList.remove('sv-lock');
 }
 function renderDeckEdit(){
   const dk=deckOf(dkId); if(!dk)return; const cs=dk.cards||[];
@@ -978,6 +1037,19 @@ function parseBulk(t){
   }
   return {out,bad};
 }
+// ---- bottom navigation, library, settings, study options
+function navOn(id){for(const b of document.querySelectorAll('.bnav button'))b.classList.toggle('on',b.id===id)}
+function closeNavViews(){for(const id of ['libv','setv']){const v=$(id);v.classList.remove('open');v.setAttribute('aria-hidden','true')} document.body.classList.remove('sv-lock')}
+function openNavView(id){closeNavViews();closeOpt();const v=$(id);v.classList.add('open');v.setAttribute('aria-hidden','false');v.scrollTop=0;document.body.classList.add('sv-lock')}
+function goHome(){closeNavViews();closeOpt();navOn('navHome');scrollTo({top:0,behavior:'smooth'})}
+function renderLib(){
+  const all=[{id:'gold',name:'金のフレーズ',cards:BUILTIN,builtin:1},...S.decks.map(d=>({...d,cards:d.cards||[]}))];
+  $('libList').innerHTML=all.map(d=>{const n=d.cards.length,k=d.cards.reduce((a,c)=>a+(S.known[c.id]?1:0),0),cur=S.deck===d.id;
+    return `<div class="lib-item ${cur?'cur':''}" role="button" tabindex="0" data-deck="${d.id}"><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚 ・ 覚えた ${k}枚${d.builtin?' ・ 最初から入っている単語帳':''}</small><div class="li-bar"><i style="width:${n?k/n*100:0}%"></i></div></div>${cur?'<span class="li-cur">勉強中</span>':''}${d.builtin?'':`<button class="li-edit" data-edit="${d.id}">編集</button>`}</div>`}).join('');
+  $('libList').querySelectorAll('[data-deck]').forEach(el=>el.onclick=e=>{const ed=e.target.closest('[data-edit]');if(ed){e.stopPropagation();openDeckEdit(ed.dataset.edit);return}selectDeck(el.dataset.deck);goHome()});
+}
+function openOpt(){const v=$('optv');v.classList.add('open');v.setAttribute('aria-hidden','false')}
+function closeOpt(){const v=$('optv');v.classList.remove('open');v.setAttribute('aria-hidden','true')}
 // ---- ask the parrot (Gemini via Cloudflare Worker)
 const AI_URL='https://phrase1000-ai.shuyegangtian.workers.dev/';
 const ASK_CHIPS=[['意味と使い方','このフレーズの意味と、どんな場面で使うかを教えて'],['例文','このフレーズを使った例文を3つ、日本語訳つきで教えて'],['単語の意味','このフレーズに出てくる大事な単語の意味と、ほかの意味も教えて'],['似た表現','似た表現や言いかえと、その違いを教えて'],['TOEICでの出方','TOEICではどんな問題や場面で出やすいか教えて']];
@@ -1269,7 +1341,7 @@ function sFire(){if($('sound').value!=='on')return;const c=ac();if(!c)return;con
 // badges: medal sparkle "キラーン"
 function sBadge(){if($('sound').value!=='on')return;const c=ac();if(!c)return;const t=c.currentTime+0.01;
   [1318.5,1760,2349.3,2637].forEach((f,i)=>bell(c,f,t+i*0.055,i===3?0.6:0.25,0.12+i*0.02))}
-const SOUNDS=[['#hangerBtn,.wardrobe button[data-skin],.wardrobe button[data-wear]',sClothes],['#bagBtn',sShop],['#fireBtn',sFire],['#ptsBtn',sBadge],['.tabs button,.sv-x,.deckbtn',uiClick]];
+const SOUNDS=[['#hangerBtn,.wardrobe button[data-skin],.wardrobe button[data-wear]',sClothes],['#bagBtn',sShop],['#fireBtn',sFire],['#ptsBtn',sBadge],['.tabs button,.sv-x,.bnav button,.pill.gear',uiClick]];
 document.addEventListener('click',e=>{if(!e.target.closest)return;for(const [sel,fn] of SOUNDS){const b=e.target.closest(sel);if(b){if(!b.disabled)fn();return}}},true);
 // opening the parrot chat: a cheerful two-note chirp
 function sAsk(){if($('sound').value!=='on')return;const c=ac();if(!c)return;const t=c.currentTime+0.01;
@@ -1308,7 +1380,7 @@ function buildCard(){
   const v=$('v-card');
   if(!P.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。<br>下の「出題」や「範囲」を変えてみてください。</div>';return}
   v.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
-   <div class="meta"><span id="pos"></span><span style="display:flex;gap:10px;align-items:center"><span id="st"></span><button class="pill" id="shuf">⇄ シャッフル</button></span></div>
+   <div class="meta"><span id="pos"></span><span style="display:flex;gap:10px;align-items:center"><span id="st"></span><button class="pill" id="shuf">⇄ シャッフル</button><button class="pill gear" id="optBtn" aria-label="出題の設定"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L4.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></button></span></div>
    <div class="scene" id="scene" tabindex="0" role="button" aria-label="カードを回転させる">
      <div class="flip" id="flip"><div class="face front" id="front"></div><div class="face back" id="back"></div></div>
    </div>
@@ -1320,7 +1392,7 @@ function buildCard(){
    </div>
    <div class="keys">スペース 回転 ・ ← → 移動 ・ 1 まだ ・ 2 覚えた</div></div>`;
   $('scene').onclick=e=>{const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
-  $('shuf').onclick=reshuffle;
+  $('shuf').onclick=reshuffle; $('optBtn').onclick=openOpt;
   $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1);
   $('yes').onclick=()=>mark(true); $('no').onclick=()=>mark(false);
   fillCard();
@@ -1455,9 +1527,12 @@ $('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
 for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];refresh(true)};
 for(const x of ['card','quiz','list']) $('t-'+x).onclick=()=>setTab(x);
 $('askClose').onclick=closeAsk;
-$('deck').onchange=()=>selectDeck($('deck').value);
-$('deckNew').onclick=()=>openDeckEdit('new');
-$('deckEdit').onclick=()=>openDeckEdit(S.deck);
+$('navHome').onclick=goHome;
+$('navNew').onclick=()=>{closeNavViews();navOn('navHome');openDeckEdit('new')};
+$('navLib').onclick=()=>{renderLib();openNavView('libv');navOn('navLib')};
+$('navSet').onclick=()=>{renderAiStats();openNavView('setv');navOn('navSet')};
+$('libNew').onclick=()=>{closeNavViews();navOn('navHome');openDeckEdit('new')};
+$('optClose').onclick=closeOpt; $('optv').onclick=e=>{if(e.target.id==='optv')closeOpt()};
 $('deckClose').onclick=closeDeckEdit;
 $('dkName').onchange=()=>{const dk=deckOf(dkId);if(dk){dk.name=$('dkName').value.trim();save()}};
 const dkAdd=()=>{const en=$('dkEn').value.trim(),jp=$('dkJp').value.trim(); if(!en){$('dkEn').focus();return} if(!jp){$('dkJp').focus();return}
@@ -1498,7 +1573,7 @@ $('bagBtn').onclick=openShop; $('shopClose').onclick=closeShop;
 $('hangerBtn').onclick=e=>{e.stopPropagation();$('wardrobe').hidden?openWardrobe():closeWardrobe()};
 $('wardrobe').onclick=e=>e.stopPropagation();
 document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('deckv').classList.contains('open'))closeDeckEdit();if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOpt();if($('deckv').classList.contains('open'))closeDeckEdit();if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
 applyWear(); renderAiStats();
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
 $('mascot').onclick=()=>{const d=(tab==='quiz'&&QP[qi])||P[ci]||DATA[0];if(d)openAsk(d);else openDeckEdit(S.deck==='gold'?'new':S.deck)};
