@@ -1391,7 +1391,7 @@ function buildCard(){
      <button class="btn ok" id="yes">覚えた</button>
      <button class="btn" id="next" aria-label="次へ">→</button>
    </div>
-   <div class="keys">スペース 回転 ・ ← → 移動 ・ 1 まだ ・ 2 覚えた</div></div>`;
+   </div>`;
   $('scene').onclick=e=>{const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
   $('shuf').onclick=reshuffle; $('optBtn').onclick=openOpt;
   $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1);
