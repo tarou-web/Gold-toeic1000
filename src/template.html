@@ -375,6 +375,7 @@ body.has-hat .tracklabel{padding-right:80px}
 .mbub.ng{border-color:var(--red);color:var(--red-ink)}
 .mbub.ng::after{border-color:var(--red)}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+html.homefix,html.homefix body{overflow:hidden;overscroll-behavior:none}
 .gtrack{height:12px}
 /* bottom navigation */
 .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
@@ -1492,8 +1493,10 @@ function renderList(){
 function setTab(t){
   tab=t; hideSheet();
   for(const x of ['card','quiz','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
-  savePrefs(); refresh(false);
+  savePrefs(); refresh(false); lockHome();
 }
+// the card screen does not scroll (the page stays where it is)
+function lockHome(){const on=tab==='card';document.documentElement.classList.toggle('homefix',on);if(on)scrollTo(0,0)}
 function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({range:$('range').value,filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab}))}catch(e){}}
 function refresh(reset=true){
   if(reset||!P.length){P=pool();ci=0}
