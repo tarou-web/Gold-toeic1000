@@ -164,7 +164,7 @@
     <button class="glassbtn" id="saveAll">すべて保存</button>
   </div>
   <div id="lib"></div>
-  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.15</div>
+  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.16</div>
 </div>
 
 <div class="sheet" id="viewer">
@@ -195,7 +195,7 @@
 <script>
 (() => {
   // 新しい版が公開されていたら自動で読み込み直す（ホーム画面アプリは古い版を長く覚えているため）
-  const VERSION = '15';
+  const VERSION = '16';
   try {
     fetch(location.pathname + '?check=' + Date.now(), {cache:'no-store'})
       .then(r => r.ok ? r.text() : '')
@@ -269,15 +269,30 @@
     z.style.transform='translateX('+(-(idx*35+16.5))+'px)';
   }
   function fmtZ(l, on){ const s = l<1 ? '.'+String(l).split('.')[1] : String(l); return on ? s+'×' : s; }
-  async function setZoom(l){
-    zoom = l;
+  let zBusy=false, zNext=null;
+  async function applyHw(l){
+    if (zBusy){ zNext=l; return; }
+    zBusy=true;
+    try { await track().applyConstraints({advanced:[{zoom:l}]}); } catch(_){}
+    zBusy=false;
+    if (zNext!=null){ const n=zNext; zNext=null; applyHw(n); }
+  }
+  function zoomRange(){ return hwZoom ? [hwZoom.min, Math.min(hwZoom.max, 15)] : [1, 5]; }
+  function fmtFree(z){ if (z<1) return '.'+Math.round(z*10); const r=Math.round(z*10)/10; return (r%1===0? String(r) : r.toFixed(1)); }
+  function setZoom(l){
+    const [mn,mx]=zoomRange(); l=Math.min(mx,Math.max(mn,l)); zoom = l;
     if (hwZoom){
-      try { await track().applyConstraints({advanced:[{zoom:l}]}); } catch(_){}
+      applyHw(l);
       video.style.transform = facing==='user' ? 'scaleX(-1)' : '';
     } else {
       video.style.transform = (facing==='user' ? 'scaleX(-1) ' : '') + 'scale('+l+')';
     }
-    [...$('zooms').children].forEach(b=>{ const on = +b.dataset.z===l; b.classList.toggle('on',on); b.textContent=fmtZ(+b.dataset.z,on); });
+    // 純正と同じく、今の倍率以下でいちばん近いボタンを光らせ、その中に今の倍率を表示
+    const btns=[...$('zooms').children]; let act=null;
+    btns.forEach(b=>{ if (+b.dataset.z <= l+0.001) act=b; });
+    if (!act) act=btns[0];
+    btns.forEach(b=>{ const on=b===act; b.classList.toggle('on',on);
+      b.textContent = on ? fmtFree(l)+'×' : fmtZ(+b.dataset.z,false); });
   }
 
   // ---------- photo ----------
@@ -371,9 +386,18 @@
   }
   $('mVideo').onclick=()=>setMode('video'); $('mPhoto').onclick=()=>setMode('photo');
   // 左右スワイプでも切り替え
-  let sx0=null;
-  $('stage').addEventListener('touchstart',e=>{ sx0=e.touches[0].clientX; },{passive:true});
-  $('stage').addEventListener('touchend',e=>{ if(sx0==null) return; const dx=e.changedTouches[0].clientX-sx0; sx0=null;
+  let sx0=null, pinch=null;
+  const dist=t=>Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
+  $('stage').addEventListener('touchstart',e=>{
+    if (e.touches.length===2){ pinch={d:dist(e.touches), z:zoom}; sx0=null; }
+    else if (e.touches.length===1 && !pinch) sx0=e.touches[0].clientX;
+  },{passive:true});
+  $('stage').addEventListener('touchmove',e=>{
+    if (pinch && e.touches.length===2 && facing!=='user'){ setZoom(pinch.z * dist(e.touches)/pinch.d); }
+  },{passive:true});
+  $('stage').addEventListener('touchend',e=>{
+    if (pinch){ if (e.touches.length===0) pinch=null; return; }
+    if(sx0==null) return; const dx=e.changedTouches[0].clientX-sx0; sx0=null;
     if(Math.abs(dx)>60) setMode(dx>0?'video':'photo'); },{passive:true});
 
   let flipDeg=0;
@@ -465,7 +489,7 @@
     // 機種によって符号が逆なので、最初に縦に持っているときの値で向きを覚える
     if (sign===0 && Math.abs(g.y)>8 && Math.abs(g.x)<3) sign = g.y<0 ? 1 : -1;
     const k = sign||1, ax=g.x*k, ay=g.y*k; let r=rot;
-    if (Math.abs(ax)>6 && Math.abs(ax)>Math.abs(ay)+2) r = ax<0 ? -90 : 90;
+    if (Math.abs(ax)>6 && Math.abs(ax)>Math.abs(ay)+2) r = ax<0 ? 90 : -90;
     else if (ay<-6 && Math.abs(ay)>Math.abs(ax)+2) r = 0;
     if (r!==rot){ rot=r; applyRot(); }
   }
