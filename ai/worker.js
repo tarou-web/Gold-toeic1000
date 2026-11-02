@@ -37,6 +37,15 @@ export default {
     let body;
     try { body = await req.json(); } catch { return json({ error: "bad request" }, 400); }
 
+    // 写真から単語帳のカードを読み取る
+    if (body.type === "photo") {
+      const image = String(body.image || "");
+      if (!image || image.length > 6_000_000) return json({ error: "写真が大きすぎるか、ありません" }, 400);
+      const mime = /^image\/(jpeg|png|webp)$/.test(body.mime) ? body.mime : "image/jpeg";
+      const r = await photoCards(env, image, mime, Date.now() + 45000);
+      return r.ok ? json({ cards: r.cards, provider: r.provider, model: r.model }) : json({ error: r.error }, r.status || 500);
+    }
+
     const msgs = (Array.isArray(body.messages) ? body.messages : []).slice(-12).map((m) => ({
       role: m.role === "model" ? "model" : "user",
       text: String(m.text || "").slice(0, 1500),
@@ -157,6 +166,80 @@ async function workersAI(env, system, msgs, deadline) {
       last = { error: "Workers AI の答えが空でした", status: 502, model };
     } catch (e) {
       last = { error: String(e.message || e), status: 502, model };
+    }
+  }
+  return last;
+}
+
+// ---------- 写真の読み取り ----------
+const PHOTO_PROMPT =
+  "この写真は英語の単語帳・教科書・プリント・メモなどです。写っている英単語や英語のフレーズと、その日本語の意味を組にして読み取ってください。" +
+  "写真に日本語の意味が書いてあればそれを使い、書いていなければ TOEIC でよく使う意味を短く補ってください。" +
+  "英語は写真のとおりに書き、番号・記号・発音記号・品詞の記号は入れません。例文だけの行や、ページ番号・見出しは入れません。" +
+  "最大100組まで。英語が見つからなければ空の配列にします。" +
+  '答えは JSON だけで、形は {"cards":[{"en":"英語","jp":"日本語"}]} です。';
+
+async function photoCards(env, image, mime, deadline) {
+  const tidy = (list) => {
+    const seen = new Set(), out = [];
+    for (const c of Array.isArray(list) ? list : []) {
+      const en = String((c && c.en) || "").trim().slice(0, 200), jp = String((c && c.jp) || "").trim().slice(0, 200);
+      const k = en.toLowerCase();
+      if (!en || !jp || seen.has(k)) continue;
+      seen.add(k); out.push({ en, jp });
+      if (out.length >= 100) break;
+    }
+    return out;
+  };
+  const parse = (t) => {
+    t = String(t || "").replace(/^```(json)?|```$/gm, "").trim();
+    const i = t.indexOf("{"), j = t.lastIndexOf("}");
+    try { const d = JSON.parse(i >= 0 ? t.slice(i, j + 1) : t); return tidy(d.cards || d); } catch { return null; }
+  };
+  let last = { error: "写真を読み取れる AI がありませんでした", status: 503 };
+
+  // 1. Gemini（写真が得意）
+  if (env.GEMINI_API_KEY) {
+    for (const model of ["gemini-flash-lite-latest", "gemini-flash-latest"]) {
+      if (cooling(model)) continue;
+      const r = await post(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        { "x-goog-api-key": env.GEMINI_API_KEY },
+        {
+          contents: [{ role: "user", parts: [{ inline_data: { mime_type: mime, data: image } }, { text: PHOTO_PROMPT }] }],
+          generationConfig: { maxOutputTokens: 8000, responseMimeType: "application/json", thinkingConfig: { thinkingLevel: "low" } },
+        },
+        timeLeft(deadline, 30000),
+      );
+      cool(model, r);
+      if (r.ok) {
+        const parts = (r.data.candidates && r.data.candidates[0] && r.data.candidates[0].content && r.data.candidates[0].content.parts) || [];
+        const cards = parse(parts.map((p) => p.text || "").join(""));
+        if (cards) return { ok: true, cards, provider: "gemini", model };
+        last = { error: "読み取った結果の形がおかしかったです", status: 502 };
+      } else last = r;
+      if (r.status === 401 || r.status === 403) break;
+      if (Date.now() > deadline - 15000) break;
+    }
+  }
+  // 2. Groq（写真も読めるモデル）
+  if (env.GROQ_API_KEY && Date.now() < deadline - 5000) {
+    const model = "meta-llama/llama-4-scout-17b-16e-instruct";
+    if (!cooling(model)) {
+      const r = await post(
+        "https://api.groq.com/openai/v1/chat/completions",
+        { Authorization: `Bearer ${env.GROQ_API_KEY}` },
+        {
+          model, max_tokens: 4000, temperature: 0.2, response_format: { type: "json_object" },
+          messages: [{ role: "user", content: [{ type: "text", text: PHOTO_PROMPT }, { type: "image_url", image_url: { url: `data:${mime};base64,${image}` } }] }],
+        },
+        timeLeft(deadline, 25000),
+      );
+      cool(model, r);
+      if (r.ok) {
+        const cards = parse(chatText(r.data));
+        if (cards) return { ok: true, cards, provider: "groq", model };
+      } else last = r;
     }
   }
   return last;
