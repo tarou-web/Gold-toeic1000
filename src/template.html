@@ -746,7 +746,8 @@ const KEY='toeic1000-v1';
 let S={known:{},miss:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}catch(e){}
 S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}}; S.coins=S.coins||0; S.owned=S.owned||{}; S.wear=S.wear||''; S.skin=S.skin||''; S.hat=S.hat||''; S.neck=S.neck||''; S.cpd=S.cpd||{d:'',ids:{}};
-S.decks=(Array.isArray(S.decks)?S.decks:[]).filter(d=>d&&(d.cards||[]).length); S.deck=S.deck||'gold'; S.nid=S.nid||100001;
+S.decks=(Array.isArray(S.decks)?S.decks:[]).filter(d=>d&&(d.cards||[]).length); S.deck=S.deck||'gold'; if(S.deck!=='gold'&&!S.decks.some(d=>d.id===S.deck))S.deck='gold';
+var dkId=null, dkDraft=null, libSel=null, libArm=false; S.nid=S.nid||100001;
 if(!S.bcoin){S.bcoin={};}
 if(!S.bcoinInit){for(const b of [0,10,30,50,100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1500,2000,2500,3000,3500,4000,4500,5000,6000,7000,8000,9000,10000])if(b<=(S.points||0))S.bcoin[b]=1;S.bcoinInit=1}
 // one-time gift: answers made before the shop existed
@@ -964,7 +965,7 @@ function renderWardrobe(){
   $('wardrobe').querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{const v=b.dataset.skin??b.dataset.wear;const k=b.dataset.slot;if(k==='skin')S.skin=v;else if(k==='face')S.wear=v;else if(k==='neck')S.neck=v;else S.hat=v;save();applyWear();renderWardrobe();setTimeout(closeWardrobe,250);mascotSay('tap')});
 }
 // ---- your own decks
-const deckOf=id=>S.decks.find(x=>x.id===id);
+function deckOf(id){return S.decks.find(x=>x.id===id)}
 function deckCards(dk){return (dk.cards||[]).map((c,i)=>({...c,no:i+1}))}
 function selectDeck(id,quiet){
   const dk=id!=='gold'&&deckOf(id); S.deck=dk?id:'gold'; DATA=dk?deckCards(dk):BUILTIN;
@@ -975,9 +976,9 @@ function renderDeckBar(){
   sel.innerHTML=`<option value="gold">金のフレーズ（${BUILTIN.length}）</option>`+S.decks.map(d=>`<option value="${d.id}">${esc(d.name||'名前なし')}（${(d.cards||[]).length}）</option>`).join('');
   sel.value=S.deck; $('deckEdit').hidden=S.deck==='gold';
 }
-let dkId=null, dkDraft=null;
+
 // a new deck is only kept once it has a name and at least one card
-const edDeck=()=>dkDraft&&dkDraft.id===dkId?dkDraft:deckOf(dkId);
+function edDeck(){return dkDraft&&dkDraft.id===dkId?dkDraft:deckOf(dkId)}
 function commitDraft(){
   const d=dkDraft; if(!d||d.id!==dkId)return;
   d.name=$('dkName').value.trim();
@@ -1031,7 +1032,6 @@ function navOn(id){for(const b of document.querySelectorAll('.bnav button'))b.cl
 function closeNavViews(){libSel=null;libArm=false;for(const id of ['libv','setv']){const v=$(id);v.classList.remove('open');v.setAttribute('aria-hidden','true')} document.body.classList.remove('sv-lock')}
 function openNavView(id){closeNavViews();closeOpt();const v=$(id);v.classList.add('open');v.setAttribute('aria-hidden','false');v.scrollTop=0;document.body.classList.add('sv-lock')}
 function goHome(){closeNavViews();closeOpt();navOn('navHome');scrollTo({top:0,behavior:'smooth'})}
-let libSel=null, libArm=false;
 function setLibSel(on){libSel=on?new Set():null;libArm=false;renderLib()}
 function renderLib(){
   const sel=libSel; $('libSel').textContent=sel?'キャンセル':'選択'; $('libSel').hidden=!S.decks.length&&!sel;
