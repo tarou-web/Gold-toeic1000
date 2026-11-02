@@ -20,23 +20,23 @@
   button { color:inherit; font:inherit; cursor:pointer; border:none; background:none; padding:0; }
   svg { display:block; }
 
-  #app { position:fixed; inset:0; display:flex; flex-direction:column; }
+  #app { position:fixed; left:0; right:0; top:0; height:100vh; height:100svh; display:flex; flex-direction:column; }
 
   /* ---- top ---- */
-  #top { flex:none; height:calc(env(safe-area-inset-top) + 92px); position:relative; }
-  #tools { position:absolute; right:16px; bottom:14px; height:46px; padding:0 8px; border-radius:23px;
-    background:var(--glass); display:flex; align-items:center; gap:4px;
+  #top { flex:none; height:calc(env(safe-area-inset-top) + 66px); position:relative; }
+  #tools { position:absolute; right:16px; top:calc(env(safe-area-inset-top) + 17px); height:35px; padding:0 8px; border-radius:18px;
+    background:var(--glass); display:flex; align-items:center; gap:0;
     box-shadow:inset 0 0 0 .5px rgba(255,255,255,.12); }
-  #tools button { width:44px; height:44px; display:grid; place-items:center; border-radius:50%; position:relative; }
+  #tools button { width:34px; height:35px; display:grid; place-items:center; position:relative; }
   #tools button.on { color:var(--yellow); }
-  #tools .lbl { position:absolute; right:3px; bottom:5px; font-size:10px; font-weight:700; }
-  #rec { position:absolute; left:50%; bottom:22px; transform:translateX(-50%); background:#ff3b30;
-    padding:4px 10px; border-radius:7px; font-size:17px; font-variant-numeric:tabular-nums; display:none; }
+  #tools .lbl { position:absolute; right:0; bottom:3px; font-size:9px; font-weight:700; }
+  #rec { position:absolute; left:50%; top:calc(env(safe-area-inset-top) + 20px); transform:translateX(-50%); background:#ff3b30;
+    padding:3px 8px; border-radius:6px; font-size:15px; font-variant-numeric:tabular-nums; display:none; }
   #rec.on { display:block; }
   body.recording #tools { display:none; }
 
   /* ---- preview ---- */
-  #stage { flex:none; position:relative; width:100%; aspect-ratio:3/4; overflow:hidden; background:#111; }
+  #stage { flex:none; position:relative; width:100%; height:min(133.333vw, calc(100svh - env(safe-area-inset-top) - 66px - 175px - max(env(safe-area-inset-bottom), 14px))); overflow:hidden; background:#111; }
   video#video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform-origin:center; }
   #grid { position:absolute; inset:0; pointer-events:none; display:none;
     background:
@@ -47,34 +47,34 @@
   #blink.on { opacity:1; transition:none; }
   #countdown { position:absolute; inset:0; display:grid; place-items:center; font-size:120px; font-weight:200;
     pointer-events:none; text-shadow:0 2px 12px rgba(0,0,0,.5); }
-  #zooms { position:absolute; left:50%; bottom:22px; transform:translateX(-50%); display:flex; gap:6px; align-items:center; }
-  #zooms button { width:40px; height:40px; border-radius:50%; font-size:15px; font-weight:600;
+  #zooms { position:absolute; left:50%; bottom:17px; transform:translateX(-50%); display:flex; gap:2px; align-items:center; }
+  #zooms button { width:36px; height:36px; border-radius:50%; font-size:13px; font-weight:600;
     display:grid; place-items:center; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5); }
-  #zooms button.on { width:52px; height:52px; background:rgba(30,30,32,.62); color:var(--yellow); font-size:17px;
+  #zooms button.on { background:rgba(30,30,32,.55); color:var(--yellow);
     backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); text-shadow:none; }
 
   /* ---- bottom ---- */
-  #bottom { flex:1; display:flex; flex-direction:column; justify-content:space-evenly; align-items:center;
-    padding-bottom:env(safe-area-inset-bottom); min-height:200px; }
-  #shutter { width:84px; height:84px; border-radius:50%; border:4px solid rgba(255,255,255,.35);
+  #bottom { flex:1; display:flex; flex-direction:column; justify-content:space-between; align-items:center;
+    padding:16px 0 max(calc(env(safe-area-inset-bottom) - 4px), 14px); }
+  #shutter { flex:none; width:78px; height:78px; border-radius:50%; border:3px solid rgba(255,255,255,.3);
     display:grid; place-items:center; }
-  #shutter i { display:block; width:68px; height:68px; border-radius:50%; background:#fff;
+  #shutter i { display:block; width:66px; height:66px; border-radius:50%; background:#fff;
     transition:transform .1s, width .2s, height .2s, border-radius .2s, background .2s; }
   #shutter:active i { transform:scale(.9); }
   body.video #shutter i { background:#ff3b30; }
-  body.recording #shutter i { width:32px; height:32px; border-radius:7px; }
-  #row { width:100%; display:flex; align-items:center; justify-content:space-between; padding:0 22px; }
-  #thumb { width:58px; height:58px; border-radius:50%; overflow:hidden; background:#1c1c1e center/cover no-repeat;
-    box-shadow:0 0 0 1px rgba(255,255,255,.15); }
-  #modes { height:56px; padding:4px; border-radius:28px; background:var(--glass2); display:flex; position:relative;
+  body.recording #shutter i { width:30px; height:30px; border-radius:7px; }
+  #row { flex:none; width:100%; display:flex; align-items:center; justify-content:space-between; padding:0 33px 0 33px; }
+  #thumb { width:47px; height:47px; border-radius:50%; overflow:hidden; background:#1c1c1e center/cover no-repeat;
+    box-shadow:0 0 0 .5px rgba(255,255,255,.15); }
+  #modes { height:46px; padding:3px; border-radius:23px; background:var(--glass2); display:flex; position:relative;
     box-shadow:inset 0 0 0 .5px rgba(255,255,255,.1); }
-  #modes button { width:100px; height:48px; border-radius:24px; font-size:19px; font-weight:500; position:relative; z-index:1;
+  #modes button { width:78px; height:40px; border-radius:20px; font-size:16px; font-weight:500; position:relative; z-index:1;
     transition:color .2s; }
   #modes button.on { color:var(--yellow); }
-  #pillbg { position:absolute; top:4px; width:100px; height:48px; border-radius:24px; background:#000;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.14); transition:left .25s cubic-bezier(.3,.7,.3,1); left:104px; }
-  body.video #pillbg { left:4px; }
-  #flip { width:58px; height:58px; border-radius:50%; background:var(--glass2); display:grid; place-items:center;
+  #pillbg { position:absolute; top:3px; width:78px; height:40px; border-radius:20px; background:#000;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.14); transition:left .25s cubic-bezier(.3,.7,.3,1); left:81px; }
+  body.video #pillbg { left:3px; }
+  #flip { width:47px; height:47px; border-radius:50%; background:var(--glass2); display:grid; place-items:center;
     transition:transform .4s; }
 
   /* ---- library ---- */
@@ -113,14 +113,14 @@
     <div id="rec">00:00</div>
     <div id="tools">
       <button id="bFlash" aria-label="ライト">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 2 5 13.2h5.6L9.4 22 18 10.6h-5.6z"/><path id="flashSlash" d="M4 3.5 20 20.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 2 5 13.2h5.6L9.4 22 18 10.6h-5.6z"/><path id="flashSlash" d="M4 3.5 20 20.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
       <button id="bTimer" aria-label="タイマー">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg>
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg>
         <span class="lbl" id="timerLbl"></span>
       </button>
       <button id="bGrid" aria-label="グリッド">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M9.2 3.5v17M14.8 3.5v17M3.5 9.2h17M3.5 14.8h17"/></svg>
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M9.2 3.5v17M14.8 3.5v17M3.5 9.2h17M3.5 14.8h17"/></svg>
       </button>
     </div>
   </div>
@@ -143,7 +143,7 @@
         <button id="mPhoto" class="on">写真</button>
       </div>
       <button id="flip" aria-label="カメラ切り替え">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 10A7.5 7.5 0 0 0 5.6 7.8"/><path d="M5 4v4h4"/><path d="M4.5 14a7.5 7.5 0 0 0 13.9 2.2"/><path d="M19 20v-4h-4"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 10A7.5 7.5 0 0 0 5.6 7.8"/><path d="M5 4v4h4"/><path d="M4.5 14a7.5 7.5 0 0 0 13.9 2.2"/><path d="M19 20v-4h-4"/></svg>
       </button>
     </div>
   </div>
@@ -258,10 +258,11 @@
     const vw=video.videoWidth, vh=video.videoHeight;
     if(!vw||!vh){ toast('カメラの準備中です'); return; }
     // 画面と同じ 3:4 で切り出し（デジタルズーム込み）
-    let cw=vw, ch=vw*4/3; if(ch>vh){ ch=vh; cw=vh*3/4; }
+    const st=$('stage'), asp=st.clientWidth/st.clientHeight; // 幅/高さ
+    let cw=vw, ch=vw/asp; if(ch>vh){ ch=vh; cw=vh*asp; }
     const dz = hwZoom ? 1 : zoom; cw/=dz; ch/=dz;
     const sx=(vw-cw)/2, sy=(vh-ch)/2;
-    const outW=Math.round(hwZoom||zoom===1?cw:cw*Math.min(zoom,2)), outH=Math.round(outW*4/3);
+    const outW=Math.round(hwZoom||zoom===1?cw:cw*Math.min(zoom,2)), outH=Math.round(outW/asp);
     const c=document.createElement('canvas'); c.width=outW; c.height=outH;
     const ctx=c.getContext('2d'); ctx.imageSmoothingQuality='high';
     if(facing==='user'){ ctx.translate(outW,0); ctx.scale(-1,1); }
