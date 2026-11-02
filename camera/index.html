@@ -114,15 +114,15 @@
   #vMenu.open { display:flex; }
   #vMenu button { text-align:left; padding:13px 16px; font-size:16px; border-bottom:.5px solid rgba(255,255,255,.12); }
   #vMenu button:last-child { border-bottom:none; }
-  #viewer .media { position:absolute; left:0; right:0; top:calc(var(--st) + 50px); bottom:calc(var(--sb) + 125px);
+  #viewer .media { position:absolute; left:0; right:0; top:calc(var(--st) + 50px); bottom:calc(var(--sb) + 140px);
     display:flex; align-items:center; justify-content:center; overflow:hidden; }
-  #vStrip { position:absolute; left:0; right:0; bottom:calc(var(--sb) + 70px); height:30px; display:flex; align-items:center;
+  #vStrip { position:absolute; left:0; right:0; bottom:calc(var(--sb) + 85px); height:30px; display:flex; align-items:center;
     gap:2px; overflow-x:auto; padding:0 50%; scrollbar-width:none; }
   #vStrip::-webkit-scrollbar { display:none; }
   #vStrip .t { flex:none; width:20px; height:30px; border-radius:3px; overflow:hidden; background:#222; position:relative; transition:width .2s; }
   #vStrip .t.cur { width:30px; margin:0 6px; }
   #vStrip img, #vStrip video { width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
-  #vbottom { position:absolute; left:0; right:0; bottom:calc(var(--sb) + 8px); height:42px; padding:0 30px;
+  #vbottom { position:absolute; left:0; right:0; bottom:calc(var(--sb) + 23px); height:42px; padding:0 30px;
     display:flex; align-items:center; justify-content:space-between; }
   #viewer img, #viewer video { max-width:100%; max-height:100%; -webkit-touch-callout:default; }
 
@@ -193,7 +193,7 @@
     <button class="glassbtn" id="saveAll">すべて保存</button>
   </div>
   <div id="lib"></div>
-  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.21</div>
+  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.22</div>
 </div>
 
 <div class="sheet" id="viewer">
@@ -249,7 +249,7 @@
 <script>
 (() => {
   // 新しい版が公開されていたら自動で読み込み直す（ホーム画面アプリは古い版を長く覚えているため）
-  const VERSION = '21';
+  const VERSION = '22';
   try {
     fetch(location.pathname + '?check=' + Date.now(), {cache:'no-store'})
       .then(r => r.ok ? r.text() : '')
