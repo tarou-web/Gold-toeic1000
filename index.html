@@ -417,6 +417,17 @@ body.has-hat .tracklabel{padding-right:80px}
 .lib-item .li-bar{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}
 .lib-item .li-bar i{display:block;height:100%;background:var(--green)}
 .lib-item .li-edit{flex:0 0 auto;font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.8rem;padding:8px 12px;border-radius:12px;border:2px solid var(--line);background:none;color:var(--blue-ink);cursor:pointer}
+.lib-bar{grid-template-columns:84px 1fr 84px!important}
+.lib-sel{justify-self:end;font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.9rem;color:#fff;background:rgba(255,255,255,.18);border:0;border-radius:12px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+.lib-sel[hidden]{display:none}
+.li-check{flex:0 0 auto;width:26px;height:26px;border-radius:50%;border:2.5px solid var(--line);display:grid;place-items:center}
+.lib-item.picked{border-color:var(--red-ink)}
+.lib-item.picked .li-check{background:var(--red-ink);border-color:var(--red-ink)}
+.lib-item.picked .li-check::after{content:"";width:7px;height:12px;border:solid #fff;border-width:0 3px 3px 0;transform:translateY(-2px) rotate(45deg)}
+.lib-item.nosel{opacity:.45;cursor:default}
+.lib-item.nosel .li-check{visibility:hidden}
+.lib-selbar{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lib-selbar[hidden]{display:none}
 .lib-item .li-cur{flex:0 0 auto;font-size:.75rem;font-weight:800;color:var(--blue-ink)}
 .setgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
 .setgrid label.ctl{font-size:.8rem}
@@ -708,9 +719,10 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 </nav>
 
 <section class="bv navv libv" id="libv" role="dialog" aria-labelledby="libTitle" aria-hidden="true">
-  <div class="bv-hero"><div class="sv-in"><div class="sv-bar"><span></span><h2 id="libTitle">ライブラリ</h2><span></span></div></div></div>
+  <div class="bv-hero"><div class="sv-in"><div class="sv-bar lib-bar"><span></span><h2 id="libTitle">ライブラリ</h2><button class="lib-sel" id="libSel">選択</button></div></div></div>
   <div class="sv-in bv-body"><div class="lib" id="libList"></div>
-    <button class="btn ok" id="libNew">＋ 新しい単語帳を作る</button></div>
+    <button class="btn ok" id="libNew">＋ 新しい単語帳を作る</button>
+    <div class="lib-selbar" id="libSelBar" hidden><button class="btn" id="libAll">すべて選択</button><button class="btn bad" id="libDel" disabled>削除</button></div></div>
 </section>
 
 <section class="bv navv setv" id="setv" role="dialog" aria-labelledby="setTitle" aria-hidden="true">
@@ -756,7 +768,7 @@ const KEY='toeic1000-v1';
 let S={known:{},miss:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}catch(e){}
 S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}}; S.coins=S.coins||0; S.owned=S.owned||{}; S.wear=S.wear||''; S.skin=S.skin||''; S.hat=S.hat||''; S.neck=S.neck||''; S.cpd=S.cpd||{d:'',ids:{}};
-S.decks=Array.isArray(S.decks)?S.decks:[]; S.deck=S.deck||'gold'; S.nid=S.nid||100001;
+S.decks=(Array.isArray(S.decks)?S.decks:[]).filter(d=>d&&(d.cards||[]).length); S.deck=S.deck||'gold'; S.nid=S.nid||100001;
 if(!S.bcoin){S.bcoin={};}
 if(!S.bcoinInit){for(const b of [0,10,30,50,100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1500,2000,2500,3000,3500,4000,4500,5000,6000,7000,8000,9000,10000])if(b<=(S.points||0))S.bcoin[b]=1;S.bcoinInit=1}
 // one-time gift: answers made before the shop existed
@@ -985,23 +997,32 @@ function renderDeckBar(){
   sel.innerHTML=`<option value="gold">金のフレーズ（${BUILTIN.length}）</option>`+S.decks.map(d=>`<option value="${d.id}">${esc(d.name||'名前なし')}（${(d.cards||[]).length}）</option>`).join('');
   sel.value=S.deck; $('deckEdit').hidden=S.deck==='gold';
 }
-let dkId=null;
+let dkId=null, dkDraft=null;
+// a new deck is only kept once it has a name and at least one card
+const edDeck=()=>dkDraft&&dkDraft.id===dkId?dkDraft:deckOf(dkId);
+function commitDraft(){
+  const d=dkDraft; if(!d||d.id!==dkId)return;
+  d.name=$('dkName').value.trim();
+  if(d.name&&d.cards.length){S.decks.push(d);dkDraft=null;save();selectDeck(d.id,true);save();renderDeckBar()}
+}
 function openDeckEdit(id){
-  if(id==='new'){const d={id:'d'+Date.now().toString(36),name:'',cards:[]};S.decks.push(d);id=d.id;selectDeck(id);save()}
-  dkId=id; const dk=deckOf(id); if(!dk)return;
+  if(id==='new'){dkDraft={id:'d'+Date.now().toString(36),name:'',cards:[]};id=dkDraft.id}else dkDraft=null;
+  dkId=id; const dk=edDeck(); if(!dk)return;
   $('dkName').value=dk.name||''; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
   renderDeckEdit();
   const v=$('deckv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); document.body.classList.add('sv-lock');
   setTimeout(()=>{(dk.name?$('dkEn'):$('dkName')).focus({preventScroll:true})},350);
 }
 function closeDeckEdit(){
-  const dk=deckOf(dkId);
-  if(dk){dk.name=$('dkName').value.trim()||dk.name||'新しい単語帳'; save(); selectDeck(dk.id)}
+  commitDraft();
+  if(dkDraft&&dkDraft.id===dkId){const d=dkDraft;dkDraft=null;
+    if(d.cards.length||$('dkName').value.trim())toast('<div><strong>単語帳は作られませんでした</strong><span>名前とカード1枚以上が必要です</span></div>')}
+  else{const dk=deckOf(dkId); if(dk){dk.name=$('dkName').value.trim()||dk.name||'新しい単語帳'; save(); selectDeck(dk.id)}}
   const v=$('deckv'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); dkId=null;
   if($('libv').classList.contains('open'))renderLib(); else document.body.classList.remove('sv-lock');
 }
 function renderDeckEdit(){
-  const dk=deckOf(dkId); if(!dk)return; const cs=dk.cards||[];
+  const dk=edDeck(); if(!dk)return; const cs=dk.cards||[];
   $('dkCount').textContent=`${cs.length}枚`; $('dkListTitle').textContent=`カード（${cs.length}枚）`;
   $('dkList').innerHTML=cs.length?cs.map((c,i)=>`<div class="dk-row" data-i="${i}"><span class="n">${i+1}</span><input class="en" value="${esc(c.en)}" aria-label="英語" autocapitalize="off" spellcheck="false"><input class="jp" value="${esc(c.jp)}" aria-label="日本語"><button aria-label="このカードを消す">✕</button></div>`).reverse().join(''):'<div class="dk-empty">まだカードがありません。上から追加してください。</div>';
   $('dkList').querySelectorAll('.dk-row').forEach(r=>{
@@ -1012,10 +1033,10 @@ function renderDeckEdit(){
   });
 }
 function addCards(pairs){
-  const dk=deckOf(dkId); if(!dk)return 0; dk.cards=dk.cards||[];
+  const dk=edDeck(); if(!dk)return 0; dk.cards=dk.cards||[];
   const have=new Set(dk.cards.map(c=>c.en.toLowerCase()+'\t'+c.jp)); let n=0;
   for(const [en,jp] of pairs){const k=en.toLowerCase()+'\t'+jp; if(!en||!jp||have.has(k))continue; have.add(k); dk.cards.push({id:S.nid++,en:en.slice(0,200),jp:jp.slice(0,200)}); n++}
-  if(n){save();renderDeckEdit()} return n;
+  if(n){commitDraft();save();renderDeckEdit()} return n;
 }
 function parseBulk(t){
   const out=[],bad=[];
@@ -1029,13 +1050,20 @@ function parseBulk(t){
 }
 // ---- bottom navigation, library, settings, study options
 function navOn(id){for(const b of document.querySelectorAll('.bnav button'))b.classList.toggle('on',b.id===id)}
-function closeNavViews(){for(const id of ['libv','setv']){const v=$(id);v.classList.remove('open');v.setAttribute('aria-hidden','true')} document.body.classList.remove('sv-lock')}
+function closeNavViews(){libSel=null;libArm=false;for(const id of ['libv','setv']){const v=$(id);v.classList.remove('open');v.setAttribute('aria-hidden','true')} document.body.classList.remove('sv-lock')}
 function openNavView(id){closeNavViews();closeOpt();const v=$(id);v.classList.add('open');v.setAttribute('aria-hidden','false');v.scrollTop=0;document.body.classList.add('sv-lock')}
 function goHome(){closeNavViews();closeOpt();navOn('navHome');scrollTo({top:0,behavior:'smooth'})}
+let libSel=null, libArm=false;
+function setLibSel(on){libSel=on?new Set():null;libArm=false;renderLib()}
 function renderLib(){
+  const sel=libSel; $('libSel').textContent=sel?'キャンセル':'選択'; $('libSel').hidden=!S.decks.length&&!sel;
+  $('libNew').hidden=!!sel; $('libSelBar').hidden=!sel; $('libv').classList.toggle('selmode',!!sel);
+  if(sel){$('libDel').disabled=!sel.size;$('libDel').textContent=libArm?`もう一度押すと${sel.size}個削除`:`削除（${sel.size}）`;$('libAll').textContent=sel.size===S.decks.length?'選択をはずす':'すべて選択'}
   const all=[{id:'gold',name:'金のフレーズ',cards:BUILTIN,builtin:1},...S.decks.map(d=>({...d,cards:d.cards||[]}))];
   $('libList').innerHTML=all.map(d=>{const n=d.cards.length,k=d.cards.reduce((a,c)=>a+(S.known[c.id]?1:0),0),cur=S.deck===d.id;
+    if(sel)return `<div class="lib-item ${d.builtin?'nosel':''} ${sel.has(d.id)?'picked':''}" role="checkbox" aria-checked="${sel.has(d.id)}" tabindex="0" data-pick="${d.builtin?'':d.id}"><span class="li-check" aria-hidden="true"></span><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚${d.builtin?' ・ 消せません':''}</small></div></div>`;
     return `<div class="lib-item ${cur?'cur':''}" role="button" tabindex="0" data-deck="${d.id}"><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚 ・ 覚えた ${k}枚${d.builtin?' ・ 最初から入っている単語帳':''}</small><div class="li-bar"><i style="width:${n?k/n*100:0}%"></i></div></div>${cur?'<span class="li-cur">勉強中</span>':''}${d.builtin?'':`<button class="li-edit" data-edit="${d.id}">編集</button>`}</div>`}).join('');
+  $('libList').querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>{const id=el.dataset.pick;if(!id)return;sel.has(id)?sel.delete(id):sel.add(id);libArm=false;renderLib()});
   $('libList').querySelectorAll('[data-deck]').forEach(el=>el.onclick=e=>{const ed=e.target.closest('[data-edit]');if(ed){e.stopPropagation();openDeckEdit(ed.dataset.edit);return}selectDeck(el.dataset.deck);goHome()});
 }
 function closeOpt(){}
@@ -1520,10 +1548,16 @@ $('navHome').onclick=goHome;
 $('navNew').onclick=()=>{closeNavViews();navOn('navHome');openDeckEdit('new')};
 $('navLib').onclick=()=>{renderLib();openNavView('libv');navOn('navLib')};
 $('navSet').onclick=()=>{renderAiStats();openNavView('setv');navOn('navSet')};
+$('libSel').onclick=()=>setLibSel(!libSel);
+$('libAll').onclick=()=>{if(libSel.size===S.decks.length)libSel.clear();else S.decks.forEach(d=>libSel.add(d.id));libArm=false;renderLib()};
+$('libDel').onclick=()=>{if(!libSel||!libSel.size)return; if(!libArm){libArm=true;renderLib();return}
+  const n=libSel.size; for(const dk of S.decks.filter(d=>libSel.has(d.id)))for(const c of dk.cards||[]){delete S.known[c.id];delete S.miss[c.id]}
+  const gone=libSel.has(S.deck); S.decks=S.decks.filter(d=>!libSel.has(d.id)); save(); if(gone)selectDeck('gold'); renderDeckBar();
+  setLibSel(false); toast(`<div><strong>${n}個の単語帳を削除しました</strong></div>`)};
 $('libNew').onclick=()=>{closeNavViews();navOn('navHome');openDeckEdit('new')};
 
 $('deckClose').onclick=closeDeckEdit;
-$('dkName').onchange=()=>{const dk=deckOf(dkId);if(dk){dk.name=$('dkName').value.trim();save()}};
+$('dkName').onchange=()=>{if(dkDraft&&dkDraft.id===dkId){commitDraft();return}const dk=deckOf(dkId);if(dk){dk.name=$('dkName').value.trim();save()}};
 const dkAdd=()=>{const en=$('dkEn').value.trim(),jp=$('dkJp').value.trim(); if(!en){$('dkEn').focus();return} if(!jp){$('dkJp').focus();return}
   if(addCards([[en,jp]])){$('dkEn').value='';$('dkJp').value='';$('dkEn').focus();toast('<div><strong>カードを追加しました</strong></div>')}else toast('<div><strong>同じカードがもうあります</strong></div>')};
 $('dkAddBtn').onclick=dkAdd;
@@ -1534,7 +1568,7 @@ $('dkBulkBtn').onclick=()=>{const {out,bad}=parseBulk($('dkBulk').value); const 
   if(n){$('dkBulk').value=bad.join('\n')}};
 let dkArm=false;
 $('dkDelete').onclick=()=>{ if(!dkArm){dkArm=true;$('dkDelete').textContent='もう一度押すと削除';return}
-  const dk=deckOf(dkId); if(dk){for(const c of dk.cards||[]){delete S.known[c.id];delete S.miss[c.id]} S.decks=S.decks.filter(x=>x!==dk)}
+  const dk=deckOf(dkId); dkDraft=null; if(dk){for(const c of dk.cards||[]){delete S.known[c.id];delete S.miss[c.id]} S.decks=S.decks.filter(x=>x!==dk)}
   dkArm=false;$('dkDelete').textContent='削除する'; const v=$('deckv'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); document.body.classList.remove('sv-lock'); dkId=null; selectDeck('gold'); toast('<div><strong>単語帳を削除しました</strong></div>')};
 $('askEn').addEventListener('click',async e=>{
   const w=e.target.closest('.w'); if(!w)return;
