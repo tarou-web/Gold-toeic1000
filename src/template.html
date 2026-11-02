@@ -1577,10 +1577,21 @@ function renderList(){
   const m=$('more'); if(m) m.onclick=()=>{LIM+=300;renderList()};
 }
 
+// shrink the card (only as much as needed) so the まだ / 覚えた buttons stay above the bottom menu
+function fitCard(){
+  const f=$('flip'), y=$('yes'), nav=document.querySelector('.bnav'); if(!f||!y||!nav||!f.offsetParent)return;
+  f.style.height='';f.style.minHeight=''; const full=f.getBoundingClientRect().height;
+  const top=f.getBoundingClientRect().top+scrollY, below=y.getBoundingClientRect().bottom-f.getBoundingClientRect().bottom;
+  const room=innerHeight-nav.getBoundingClientRect().height-top-below-12;
+  if(room<full){f.style.minHeight='0';f.style.height=Math.max(200,Math.round(room))+'px'}
+}
+addEventListener('resize',()=>requestAnimationFrame(fitCard));
+addEventListener('load',()=>setTimeout(fitCard,50));
+document.fonts&&document.fonts.ready.then(()=>setTimeout(fitCard,30));
 function setTab(t){
   tab=t; hideSheet();
   for(const x of ['card','quiz','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
-  savePrefs(); refresh(false);
+  savePrefs(); refresh(false); requestAnimationFrame(fitCard);
 }
 function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({range:$('range').value,filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab}))}catch(e){}}
 function refresh(reset=true){
