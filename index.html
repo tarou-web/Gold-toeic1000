@@ -394,6 +394,7 @@ body.has-hat .tracklabel{padding-right:80px}
 .mbub.ok::after{border-color:var(--green)}
 .mbub.ng{border-color:var(--red);color:var(--red-ink)}
 .mbub.ng::after{border-color:var(--red)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .gtrack{height:12px}
 /* bottom navigation */
 .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
@@ -578,7 +579,7 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 <body>
 <div class="wrap">
   <header>
-    <h1>フレーズ<span>1000</span></h1>
+    <h1 class="vh">フレーズ1000</h1>
     <div class="stats">
       <button class="stat bag" id="bagBtn" aria-label="ショップを開く"><svg viewBox="0 0 24 24"><path d="M8 8.5V6.8a4 4 0 0 1 8 0v1.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path fill="currentColor" d="M5.3 8h13.4c.6 0 1 .4 1.1 1l.9 10.8A2 2 0 0 1 18.7 22H5.3a2 2 0 0 1-2-2.2L4.2 9c.1-.6.5-1 1.1-1z"/><circle cx="9" cy="11.5" r="1.1" fill="#fff" opacity=".85"/><circle cx="15" cy="11.5" r="1.1" fill="#fff" opacity=".85"/></svg><span id="coins">0</span></button>
       <button class="stat fire" id="fireBtn" aria-label="連続記録を見る"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.4 1.1-4 2.3-5.2.2 1.7 1 2.7 2 3.1C11 8 10.6 5 12 2z"/></svg><span id="streak">0</span></button>
