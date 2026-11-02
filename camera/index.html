@@ -6,7 +6,7 @@
 <title>しずかメラ</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="しずかメラ">
 <meta name="theme-color" content="#000000">
 <link rel="manifest" href="manifest.webmanifest">
@@ -417,17 +417,8 @@
   });
   window.addEventListener('beforeunload',e=>{ if(items.length){ e.preventDefault(); e.returnValue=''; } });
 
-  // iOS 26 のホーム画面アプリでは画面の高さが短く報告され、下に黒い帯が出るので実際の画面の高さに合わせる
-  function fitHeight(){
-    const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
-    let h = window.innerHeight;
-    if (standalone){
-      const sh = Math.max(screen.width, screen.height);
-      const portrait = window.innerHeight >= window.innerWidth;
-      if (portrait && sh > h) h = sh;
-    }
-    document.documentElement.style.setProperty('--appH', h+'px');
-  }
+  // 表示できる高さに合わせる（iOS 26 のホーム画面アプリは不透明ステータスバーにして下の黒帯を回避）
+  function fitHeight(){ document.documentElement.style.setProperty('--appH', window.innerHeight+'px'); }
   fitHeight();
   window.addEventListener('resize', fitHeight);
   window.addEventListener('orientationchange', ()=>setTimeout(fitHeight,300));
