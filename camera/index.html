@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>しずかメラ</title>
+<title>大学カメラ</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="しずかメラ">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEF0lEQVR42u3dP27UQBQHYGe0XSoQBU2qiDaXySG4AYfgBjkEl6FFVPR09BSRIqSwG9vr+fPefL82u96s37cz9tieuXn34eMi8r8Uu0DgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA45Jr8/vIJDjU++65KPuAYSMbWGv/7+ho+bjLNQ/rr5/d6G7+7f2jTZrz/+mN3S7PyvXPhqMqiKpF9Nb7QThzoo5DR8bPO1fhyH3HNX+fC0VLGsZ+4r8Zv1l7L0U3GgZ+7o+9oKcPZSuds8tFYRmwcvZqNYz99pY/2MrQc8dqPZjLgCOOjvQw4wvuoJwOO2D6qyoAjsI/aMuCI6qOBDDiWoNfu693DAUeGuzoa+Bjiqmzf4axxcvv0ONTZSk8cTFwpo7aPPjiwOEpGthFSMrbK+PP5W5fjj0JGCBldfBQyorQZ7X0UMgL1Jo19FDJ65XKlz/21pY9CxoA+9rmJdw8pGYf3HRde4x7SzD7WyDj3ymD3kGo2NlV6vYzXPmqMg9UdIR0fx5tPsI3/FW6fHiuNkM6IY/cjjcm+Tk8cA+7KQ/Zj1u/1OqcZevRj993L1tIfURUyBtzyIDlhcf1HZG1CChmakLlwtK9WSh+FDD5mwdG3Qsl8FDL4yI9jnKqk8XEio8bMfHf3DwnObzMMn++TsemOqX1K4k6AOdHw+fU30j2/pc3jy445uv1orrnFcut7ox98FDL4cJvgYbdlt5n+AI6oi5JM4qPM0KfUqOX6bcbtWYo2Q/uRDcfKn2Pt+q3cftDGw3MrMiWONs1+4s5FyyG5cETswiP+z0WfomfRrQgcAofAIXAIHAKHwCFwLPOttzjyZ8Gx5JuHLuL/rFuRKXG0ae0TP8yi5ZB0OFZ24bV/1iu3H/S52WKZVh1KQhzrf441qrh+m3Efty+WedZmOCA9rKLzPGsfG8fWFvv6um7dQugpXMK3HC19TCVjmXPylucaN5jZZzHt0wi/m9HmBAv09adYUmOoB0NyfPc8ZyvjdPBp5slPdSo7QlUyraCQbZyjb22Sra2RcBCsV4XyrbqSc4S0fZ1SrseTdvi8ZbWyrtSUeRDsuWZVT3FzrwGY/8JbvfqlXx1yiuHzlypmXVcWjv4dzTwsFmvZ51jLvt5B1YxXZWduDByQSgQc6Rf0zj1JoZZD+uHQeMTdt8X8rGR07lb4iLg/i/mdyRjigJSPWPuwmB+ejIFOZfmIst/qXltZDF1H/jn1xEHJ4E3sEDhkceFN4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQ+AQgUPgkAPyFyAGt8ZecoEyAAAAAElFTkSuQmCC">
+<meta name="apple-mobile-web-app-title" content="大学カメラ">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=14">
+<link rel="icon" href="apple-touch-icon.png">
 <style>
   :root { --appH:100svh; --stageH:min(133.333vw, calc(var(--appH) - var(--st) - var(--sb) - 227px)); --belowTop:calc(var(--st) + 58px + var(--stageH)); --st:clamp(0px, env(safe-area-inset-top), 62px); --sb:clamp(12px, env(safe-area-inset-bottom), 34px); --yellow:#ffd60a; --glass:rgba(40,40,42,.82); --glass2:rgba(28,28,30,.9); }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -160,7 +160,7 @@
     <button class="glassbtn" id="saveAll">すべて保存</button>
   </div>
   <div id="lib"></div>
-  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>しずかメラ ver.13</div>
+  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.14</div>
 </div>
 
 <div class="sheet" id="viewer">
@@ -190,7 +190,7 @@
 <script>
 (() => {
   // 新しい版が公開されていたら自動で読み込み直す（ホーム画面アプリは古い版を長く覚えているため）
-  const VERSION = '13';
+  const VERSION = '14';
   try {
     fetch(location.pathname + '?check=' + Date.now(), {cache:'no-store'})
       .then(r => r.ok ? r.text() : '')
