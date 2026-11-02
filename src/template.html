@@ -416,6 +416,14 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .askfoot.kb{padding-bottom:6px}
 .askfoot{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
 #askProxy{position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px;border:0;padding:0;pointer-events:none}
+.aicnt{display:block;font-family:var(--f);font-size:.72rem;font-weight:700;opacity:.85;margin-top:2px}
+.aistats{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:baseline}
+.ais-row{display:flex;align-items:baseline;gap:6px}
+.ais-row b{font-family:var(--f);font-weight:900;font-size:1.6rem;color:var(--fg)}
+.ais-row span{font-size:.85rem;color:var(--muted);font-weight:700}
+.ais-by{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px}
+.ais-by span{font-size:.78rem;font-weight:700;padding:4px 10px;border-radius:999px;border:2px solid var(--line);color:var(--muted)}
+.ais-note{flex-basis:100%;margin:0;font-size:.75rem;color:var(--muted)}
 .askfoot small{color:var(--muted);font-size:.72rem;text-align:center}
 .gtrack i{background:var(--gold)}
 .goalbox.done .gtrack i{background:var(--gold-d)}
@@ -565,7 +573,7 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
   </section>
   <section class="bv ask" id="askv" role="dialog" aria-modal="true" aria-labelledby="askTitle" aria-hidden="true">
     <div class="bv-hero"><div class="sv-in">
-      <div class="sv-bar"><button class="sv-x" id="askClose" aria-label="閉じる">✕</button><h2 id="askTitle">ヨウムに聞く</h2><span></span></div>
+      <div class="sv-bar"><button class="sv-x" id="askClose" aria-label="閉じる">✕</button><h2 id="askTitle">ヨウムに聞く<small class="aicnt" id="aiCnt"></small></h2><span></span></div>
       <div class="ask-card"><div class="af" id="askFig" aria-hidden="true"></div><div><div class="en" id="askEn"></div><div class="jp" id="askJp"></div></div></div>
     </div></div>
     <div class="sv-in ask-body" id="askLog"></div>
@@ -588,6 +596,10 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
     <label class="ctl">振動<select id="vib"><option value="on">オン</option><option value="off">オフ</option></select></label>
   </div>
 
+  <section class="sync aisec" aria-labelledby="aiTitle">
+    <h2 id="aiTitle">ヨウム（AI）に質問した回数</h2>
+    <div class="aistats" id="aiStats"></div>
+  </section>
   <section class="sync" aria-labelledby="syncTitle">
     <h2 id="syncTitle">ウィジェット連携・バックアップ</h2>
     <p class="sync-st" id="syncSt">準備中…</p>
@@ -630,7 +642,7 @@ var syncTimer=null,syncBusy=false,syncDirty=false;
 function syncPayload(){
   const td=todayState();
   return {points:S.points||0,goal:S.goal||10,todayKey:td.d,todayDone:Object.keys(td.done).length,todayPts:td.pts,todayDoneMap:td.done,streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},days:S.days||{},
-    coins:S.coins||0,bcoin:S.bcoin||{},bcoinInit:S.bcoinInit||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',hat:S.hat||'',neck:S.neck||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:Date.now(),tz:-new Date().getTimezoneOffset()};
+    ai:S.ai||{n:0,by:{},days:{}},coins:S.coins||0,bcoin:S.bcoin||{},bcoinInit:S.bcoinInit||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',hat:S.hat||'',neck:S.neck||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:Date.now(),tz:-new Date().getTimezoneOffset()};
 }
 function scheduleSync(){ if(!FB_ON||!S.syncKey)return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
 async function pushSync(keepalive){
@@ -665,9 +677,9 @@ function initSync(){
       if(!r.ok||!d){m.textContent='その合言葉の記録が見つかりませんでした。';m.classList.add('bad');armed=null;$('syncLoad').textContent='読み込む';return}
       // the database may return numbered maps as arrays with gaps; turn them back into plain maps
       const obj=x=>{const o={};if(x)for(const k of Object.keys(x))if(x[k]!=null)o[k]=x[k];return o};
-      Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},coins:d.coins||0,bcoin:obj(d.bcoin),bcoinInit:d.bcoinInit||1,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',hat:d.hat||'',neck:d.neck||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}},syncKey:k});
+      Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},ai:d.ai&&d.ai.n?{n:d.ai.n,by:obj(d.ai.by),days:obj(d.ai.days)}:(S.ai||{n:0,by:{},days:{}}),coins:d.coins||0,bcoin:obj(d.bcoin),bcoinInit:d.bcoinInit||1,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',hat:d.hat||'',neck:d.neck||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}},syncKey:k});
       $('goal').value=String(S.goal);
-      applyWear();
+      applyWear(); renderAiStats();
       try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
       $('syncKey').value=k; header(); refresh(false); m.textContent='記録を読み込みました。'; armed=null; $('syncLoad').textContent='読み込む'; syncStatus();
     }catch(e){m.textContent='読み込めませんでした。電波を確認してもう一度試してください。';m.classList.add('bad')}
@@ -823,6 +835,20 @@ function renderWardrobe(){
 // ---- ask the parrot (Gemini via Cloudflare Worker)
 const AI_URL='https://phrase1000-ai.shuyegangtian.workers.dev/';
 const ASK_CHIPS=[['意味と使い方','このフレーズの意味と、どんな場面で使うかを教えて'],['例文','このフレーズを使った例文を3つ、日本語訳つきで教えて'],['単語の意味','このフレーズに出てくる大事な単語の意味と、ほかの意味も教えて'],['似た表現','似た表現や言いかえと、その違いを教えて'],['TOEICでの出方','TOEICではどんな問題や場面で出やすいか教えて']];
+// count questions answered by the AI (total, per provider, per day)
+function countAsk(by){
+  const a=S.ai=S.ai||{n:0,by:{},days:{}}; const t=today();
+  a.n++; a.by[by||'?']=(a.by[by||'?']||0)+1; a.days[t]=(a.days[t]||0)+1; save(); renderAiStats();
+}
+function renderAiStats(){
+  const a=S.ai||{n:0,by:{},days:{}}, t=a.days[today()]||0;
+  const el=$('aiCnt'); if(el)el.textContent=`今日 ${t}回 ・ 合計 ${a.n}回`;
+  const box=$('aiStats'); if(!box)return;
+  const since=Object.keys(a.days).sort((x,y)=>new Date(x)-new Date(y))[0];
+  box.innerHTML=`<div class="ais-row"><b>${a.n}</b><span>合計</span></div><div class="ais-row"><b>${t}</b><span>今日</span></div>`+
+    `<div class="ais-by">${Object.entries(a.by).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`<span>${AI_NAME[k]||esc(k)} ${v}回</span>`).join('')||'<span>まだ質問していません</span>'}</div>`+
+    (since?`<p class="ais-note">${since.replace(/-/g,'/')} から数えています</p>`:'');
+}
 const AI_NAME={gemini:'Gemini',groq:'Groq',workersAI:'Cloudflare Workers AI'};
 let askY=0, askCard=null, askMsgs=[], askBusy=false; const askCache={};
 function mdLite(t){
@@ -858,7 +884,7 @@ async function askSend(q){
       messages:askMsgs.filter(m=>!m.err).map(m=>({role:m.role,text:m.text}))})});
     const j=await r.json().catch(()=>({})); clearTimeout(tm);
     if(!r.ok||!j.text)throw new Error((j.error||('HTTP '+r.status))+(j.tried?' ['+j.tried.join(' / ')+']':''));
-    askMsgs.push({role:'model',text:j.text,by:j.provider,model:j.model});
+    askMsgs.push({role:'model',text:j.text,by:j.provider,model:j.model}); countAsk(j.provider);
   }catch(e){
     const msg=e.name==='AbortError'?'40秒たっても返事がありませんでした':String(e.message||e);
     askMsgs.push({role:'model',err:1,text:/quota|429|RESOURCE_EXHAUSTED/i.test(msg)?'今日はたくさん質問したから、ちょっと休憩させて…（無料で使える回数をこえました。1分ほど待つか、夕方5時以降にまた聞いてね）':navigator.onLine?`うまく答えられなかった…もう一度聞いてみてね。（${msg.slice(0,80)}）`:'電波がないみたい。インターネットにつながってから聞いてね。'});
@@ -869,7 +895,7 @@ function openAsk(d){
   if(!d)return; sAsk(); askCard=d; askMsgs=askCache[d.id]||[];
   {const c=cur(); $('askFig').innerHTML=fig(c.skin,c.face,c.hat,c.neck);}
   $('askEn').innerHTML=d.en.split(/(\s+)/).map(w=>/\S/.test(w)?`<span class="w">${esc(w)}</span>`:w).join(''); $('askJp').textContent=d.jp;
-  renderAsk(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); document.body.classList.add('sv-lock'); askY=scrollY; document.body.style.top=(-askY)+'px'; document.body.classList.add('ask-lock'); fitAsk();
+  renderAsk(); renderAiStats(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); document.body.classList.add('sv-lock'); askY=scrollY; document.body.style.top=(-askY)+'px'; document.body.classList.add('ask-lock'); fitAsk();
 }
 // keep the chat header still and lift only the input bar above the keyboard (iOS pans the page otherwise)
 function fitAsk(){
@@ -1307,7 +1333,7 @@ $('hangerBtn').onclick=e=>{e.stopPropagation();$('wardrobe').hidden?openWardrobe
 $('wardrobe').onclick=e=>e.stopPropagation();
 document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
-applyWear();
+applyWear(); renderAiStats();
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
 $('mascot').onclick=()=>{const d=(tab==='quiz'&&QP[qi])||P[ci]||DATA[0];openAsk(d)};
 $('goal').value=String(S.goal);
