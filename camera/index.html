@@ -164,7 +164,7 @@
     <button class="glassbtn" id="saveAll">すべて保存</button>
   </div>
   <div id="lib"></div>
-  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.18</div>
+  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.19</div>
 </div>
 
 <div class="sheet" id="viewer">
@@ -195,7 +195,7 @@
 <script>
 (() => {
   // 新しい版が公開されていたら自動で読み込み直す（ホーム画面アプリは古い版を長く覚えているため）
-  const VERSION = '18';
+  const VERSION = '19';
   try {
     fetch(location.pathname + '?check=' + Date.now(), {cache:'no-store'})
       .then(r => r.ok ? r.text() : '')
@@ -386,7 +386,7 @@
   }
   $('mVideo').onclick=()=>setMode('video'); $('mPhoto').onclick=()=>setMode('photo');
   // 左右スワイプでも切り替え
-  // ズーム倍率の数字の上を横にスライドしてズーム（左へで拡大、右へで縮小）
+  // ズーム倍率の数字の上を横にスライドしてズーム（右へで拡大、左へで縮小）
   let zs=null, zDragged=false;
   const zEl=$('zooms');
   zEl.addEventListener('touchstart',e=>{ e.stopPropagation(); if(e.touches.length===1){ zs={x:e.touches[0].clientX, z:zoom}; zDragged=false; } },{passive:true});
@@ -394,7 +394,7 @@
     e.stopPropagation(); if(!zs || facing==='user') return;
     const dx=e.touches[0].clientX-zs.x;
     if (Math.abs(dx)>6) zDragged=true;
-    if (zDragged){ e.preventDefault(); setZoom(zs.z * Math.pow(2, -dx/70)); }
+    if (zDragged){ e.preventDefault(); setZoom(zs.z * Math.pow(2, dx/70)); }
   },{passive:false});
   zEl.addEventListener('touchend',e=>{ e.stopPropagation(); zs=null; },{passive:true});
   // スライドした直後はボタンのタップ扱いにしない
