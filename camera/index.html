@@ -93,9 +93,37 @@
   #lib img, #lib video { width:100%; height:100%; object-fit:cover; display:block; }
   #lib .dur { position:absolute; right:6px; bottom:4px; font-size:12px; font-weight:600; text-shadow:0 1px 2px #000; }
   .note { font-size:12px; color:#8e8e93; text-align:center; padding:10px 16px calc(env(safe-area-inset-bottom) + 10px); }
-  #viewer .media { flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  #viewer { background:#000; }
+  #vtop { position:absolute; left:0; right:0; top:calc(var(--st) + 0px); height:43px; padding:0 16px; display:flex; align-items:center; justify-content:space-between; z-index:2; }
+  .pcircle { width:43px; height:43px; border-radius:50%; background:#1c1c1e; display:grid; place-items:center;
+    box-shadow:inset 0 0 0 .5px rgba(255,255,255,.12); }
+  .pcircle.big { width:47px; height:47px; }
+  .ppill { height:43px; border-radius:22px; background:#1c1c1e; box-shadow:inset 0 0 0 .5px rgba(255,255,255,.12); display:flex; align-items:center; }
+  .ppill.big { height:47px; border-radius:24px; }
+  #vWhen { width:159px; flex-direction:column; justify-content:center; line-height:1.15; }
+  #vWhen b { font-size:13.5px; font-weight:600; }
+  #vWhen span { font-size:11.5px; font-variant-numeric:tabular-nums; }
+  #vRight { width:108px; justify-content:space-around; padding:0 6px; }
+  #vRight button, #vMid button { height:100%; display:grid; place-items:center; padding:0 8px; }
+  #vMid { width:162px; justify-content:space-around; padding:0 10px; }
+  #vFav.on { color:#ff375f; }
+  #vFav.on path { fill:#ff375f; }
+  #vMenu { position:absolute; right:16px; top:calc(var(--st) + 50px); z-index:3; background:rgba(44,44,46,.97); border-radius:14px;
+    display:none; flex-direction:column; min-width:230px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,.5); }
+  #vMenu.open { display:flex; }
+  #vMenu button { text-align:left; padding:13px 16px; font-size:16px; border-bottom:.5px solid rgba(255,255,255,.12); }
+  #vMenu button:last-child { border-bottom:none; }
+  #viewer .media { position:absolute; left:0; right:0; top:calc(var(--st) + 55px); bottom:calc(var(--sb) + 120px);
+    display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  #vStrip { position:absolute; left:0; right:0; bottom:calc(var(--sb) + 60px); height:30px; display:flex; align-items:center;
+    gap:2px; overflow-x:auto; padding:0 50%; scrollbar-width:none; }
+  #vStrip::-webkit-scrollbar { display:none; }
+  #vStrip .t { flex:none; width:20px; height:30px; border-radius:3px; overflow:hidden; background:#222; position:relative; transition:width .2s; }
+  #vStrip .t.cur { width:30px; margin:0 6px; }
+  #vStrip img, #vStrip video { width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+  #vbottom { position:absolute; left:0; right:0; bottom:max(calc(var(--sb) - 5px), 8px); height:47px; padding:0 28px;
+    display:flex; align-items:center; justify-content:space-between; }
   #viewer img, #viewer video { max-width:100%; max-height:100%; -webkit-touch-callout:default; }
-  #vbar { display:flex; justify-content:space-between; align-items:center; padding:10px 16px calc(env(safe-area-inset-bottom) + 12px); }
 
   /* ---- messages ---- */
   #msg { position:absolute; left:0; top:0; width:100%; height:var(--appH); display:none; flex-direction:column; align-items:center; justify-content:center;
@@ -164,23 +192,48 @@
     <button class="glassbtn" id="saveAll">すべて保存</button>
   </div>
   <div id="lib"></div>
-  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.19</div>
+  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.20</div>
 </div>
 
 <div class="sheet" id="viewer">
-  <div class="head">
-    <button class="glassbtn round" id="vClose" aria-label="戻る">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+  <div id="vtop">
+    <button class="pcircle" id="vClose" aria-label="戻る">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg>
     </button>
-    <h2 id="vTitle"></h2>
-    <button class="glassbtn round" id="vDel" aria-label="削除">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6"/></svg>
-    </button>
+    <div class="ppill" id="vWhen"><b id="vDay">今日</b><span id="vTime"></span></div>
+    <div class="ppill" id="vRight">
+      <button id="vLib" aria-label="一覧">
+        <svg width="28" height="24" viewBox="0 0 28 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="6" width="19" height="15" rx="3"/><path d="M3 16V6a3 3 0 0 1 3-3h14"/><path d="m8 19 6-6 4 4 3-3 5 5" stroke-linejoin="round"/><circle cx="20" cy="10" r="1.6" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <button id="vMore" aria-label="その他">
+        <svg width="26" height="8" viewBox="0 0 26 8" fill="currentColor"><circle cx="4" cy="4" r="2.7"/><circle cx="13" cy="4" r="2.7"/><circle cx="22" cy="4" r="2.7"/></svg>
+      </button>
+    </div>
+  </div>
+  <div id="vMenu">
+    <button id="mSaveAll">すべて写真アプリに保存</button>
+    <button id="mHelp">保存できないときは…</button>
   </div>
   <div class="media" id="vMedia"></div>
-  <div id="vbar">
-    <span class="note" style="padding:0;text-align:left">保存できないときは写真を長押し</span>
-    <button class="glassbtn" id="vSave" style="background:var(--yellow);color:#000;font-weight:600">保存</button>
+  <div id="vStrip"></div>
+  <div id="vbottom">
+    <button class="pcircle big" id="vSave" aria-label="保存">
+      <svg width="24" height="28" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v15M6.5 7.5 12 2l5.5 5.5"/><path d="M8 11.5H5.5A2.5 2.5 0 0 0 3 14v9a2.5 2.5 0 0 0 2.5 2.5h13A2.5 2.5 0 0 0 21 23v-9a2.5 2.5 0 0 0-2.5-2.5H16"/></svg>
+    </button>
+    <div class="ppill big" id="vMid">
+      <button id="vFav" aria-label="お気に入り">
+        <svg width="26" height="24" viewBox="0 0 26 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"><path d="M13 22S2 15.5 2 8.2A5.6 5.6 0 0 1 13 5.6 5.6 5.6 0 0 1 24 8.2C24 15.5 13 22 13 22z"/></svg>
+      </button>
+      <button id="vInfo" aria-label="情報">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.1"><circle cx="13" cy="13" r="11"/><path d="M13 11.5v7M10.5 18.5h5M10.8 11.5H13" stroke-linecap="round"/><circle cx="12.8" cy="7.6" r="1.4" fill="currentColor" stroke="none"/></svg>
+      </button>
+      <button id="vEdit" aria-label="編集">
+        <svg width="26" height="24" viewBox="0 0 26 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M2 5h22M2 12h22M2 19h22"/><circle cx="16" cy="5" r="2.6" fill="#1c1c1e"/><circle cx="9" cy="12" r="2.6" fill="#1c1c1e"/><circle cx="17" cy="19" r="2.6" fill="#1c1c1e"/></svg>
+      </button>
+    </div>
+    <button class="pcircle big" id="vDel" aria-label="削除">
+      <svg width="22" height="26" viewBox="0 0 22 26" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 5.5h19M7.5 5.5V3a1.5 1.5 0 0 1 1.5-1.5h4A1.5 1.5 0 0 1 14.5 3v2.5M3.8 5.5l1.2 17A2 2 0 0 0 7 24.5h8a2 2 0 0 0 2-2l1.2-17M8.5 10v10M11 10v10M13.5 10v10"/></svg>
+    </button>
   </div>
 </div>
 
@@ -195,7 +248,7 @@
 <script>
 (() => {
   // 新しい版が公開されていたら自動で読み込み直す（ホーム画面アプリは古い版を長く覚えているため）
-  const VERSION = '19';
+  const VERSION = '20';
   try {
     fetch(location.pathname + '?check=' + Date.now(), {cache:'no-store'})
       .then(r => r.ok ? r.text() : '')
@@ -315,7 +368,7 @@
       out=document.createElement('canvas'); out.width=outH; out.height=outW;
       const o=out.getContext('2d'); o.translate(outH/2,outW/2); o.rotate(-rot*Math.PI/180); o.drawImage(c,-outW/2,-outH/2);
     }
-    out.toBlob(blob=>{ if(blob){ items.push({blob,url:URL.createObjectURL(blob),kind:'photo'}); updateThumb(); } },'image/jpeg',0.92);
+    out.toBlob(blob=>{ if(blob){ items.push({blob,url:URL.createObjectURL(blob),kind:'photo',t:Date.now()}); updateThumb(); } },'image/jpeg',0.92);
   }
 
   // ---------- video ----------
@@ -335,7 +388,7 @@
     recorder.onstop=()=>{
       const blob=new Blob(chunks,{type:recorder.mimeType||type||'video/mp4'});
       const dur=Math.round((Date.now()-recStart)/1000);
-      items.push({blob,url:URL.createObjectURL(blob),kind:'video',dur}); updateThumb();
+      items.push({blob,url:URL.createObjectURL(blob),kind:'video',dur,t:Date.now()}); updateThumb();
     };
     recorder.start(1000); recStart=Date.now();
     body.classList.add('recording'); $('rec').classList.add('on'); $('rec').textContent='00:00';
@@ -443,10 +496,35 @@
     current=i; const it=items[i], m=$('vMedia'); m.innerHTML='';
     if(it.kind==='photo'){ const im=document.createElement('img'); im.src=it.url; m.appendChild(im); }
     else { const v=document.createElement('video'); v.src=it.url; v.controls=true; v.playsInline=true; m.appendChild(v); }
-    $('vTitle').textContent=(i+1)+' / '+items.length;
+    const d=new Date(it.t||Date.now()), now=new Date();
+    $('vDay').textContent = d.toDateString()===now.toDateString() ? '今日' : (d.getMonth()+1)+'月'+d.getDate()+'日';
+    $('vTime').textContent = d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+    $('vFav').classList.toggle('on', !!it.fav);
+    $('vMenu').classList.remove('open');
     $('viewer').classList.add('open');
+    renderStrip();
   }
-  $('vTitle').onclick=()=>{ renderLib(); $('library').classList.add('open'); $('viewer').classList.remove('open'); };
+  function renderStrip(){
+    const st=$('vStrip'); st.innerHTML='';
+    items.forEach((it,i)=>{
+      const t=document.createElement('div'); t.className='t'+(i===current?' cur':''); t.onclick=()=>openViewer(i);
+      if(it.kind==='photo'){ const im=document.createElement('img'); im.src=it.url; t.appendChild(im); }
+      else { const v=document.createElement('video'); v.src=it.url+'#t=0.1'; v.muted=true; v.playsInline=true; v.preload='metadata'; t.appendChild(v); }
+      st.appendChild(t);
+    });
+    requestAnimationFrame(()=>{ const cur=st.children[current]; if(cur) st.scrollLeft = cur.offsetLeft + cur.offsetWidth/2 - st.clientWidth/2; });
+  }
+  $('vLib').onclick=()=>{ renderLib(); $('library').classList.add('open'); $('viewer').classList.remove('open'); };
+  $('vMore').onclick=e=>{ e.stopPropagation(); $('vMenu').classList.toggle('open'); };
+  $('viewer').addEventListener('click',e=>{ if(!e.target.closest('#vMenu,#vMore')) $('vMenu').classList.remove('open'); });
+  $('mSaveAll').onclick=async()=>{ $('vMenu').classList.remove('open'); if(!(await share(items))) toast('1つずつ保存してください'); };
+  $('mHelp').onclick=()=>{ $('vMenu').classList.remove('open'); toast('写真を長押しして「写真に保存」'); };
+  $('vFav').onclick=()=>{ const it=items[current]; it.fav=!it.fav; $('vFav').classList.toggle('on',it.fav); };
+  $('vInfo').onclick=()=>{ const it=items[current], m=$('vMedia').firstChild;
+    const size= it.blob.size>=1048576 ? (it.blob.size/1048576).toFixed(1)+'MB' : Math.max(1,Math.round(it.blob.size/1024))+'KB';
+    const dim = it.kind==='photo' && m ? m.naturalWidth+'×'+m.naturalHeight : (it.dur!=null? fmtDur(it.dur):'');
+    toast((it.kind==='photo'?'写真':'ビデオ')+'  '+dim+'  '+size); };
+  $('vEdit').onclick=()=>toast('編集は写真アプリに保存してからできます');
   $('vClose').onclick=()=>$('viewer').classList.remove('open');
   $('libClose').onclick=()=>$('library').classList.remove('open');
   // ビューア内で左右スワイプで前後へ
