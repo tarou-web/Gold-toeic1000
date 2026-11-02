@@ -183,7 +183,7 @@ input[type=search],select{font:inherit;font-weight:700;font-size:.92rem;color:va
 .more{text-align:center;padding:10px}
 
 /* settings */
-.controls{margin-top:6px;padding-top:18px;border-top:2px solid var(--line);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.controls{margin-top:6px;padding-top:18px;border-top:2px solid var(--line);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 @media (max-width:560px){.controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
 label.ctl{display:flex;flex-direction:column;gap:4px;font-size:.72rem;color:var(--muted);font-weight:800}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -375,7 +375,6 @@ body.has-hat .tracklabel{padding-right:80px}
 .mbub.ng{border-color:var(--red);color:var(--red-ink)}
 .mbub.ng::after{border-color:var(--red)}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-html.homefix,html.homefix body{overflow:hidden;overscroll-behavior:none}
 .gtrack{height:12px}
 /* bottom navigation */
 .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
@@ -404,13 +403,6 @@ html.homefix,html.homefix body{overflow:hidden;overscroll-behavior:none}
 .setgrid select{font-size:16px}
 .pill.gear{padding:5px 8px;display:grid;place-items:center}
 .pill.gear svg{width:18px;height:18px}
-.optv{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
-.optv.open{opacity:1;pointer-events:auto}
-.optin{width:100%;max-width:640px;background:var(--bg);border-radius:22px 22px 0 0;border:2px solid var(--line);border-bottom:0;padding:14px 16px calc(20px + env(safe-area-inset-bottom,0px));transform:translateY(40px);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
-.optv.open .optin{transform:none}
-.opthead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.opthead h3{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1.1rem}
-.opthead .sv-x{color:var(--fg)}
 /* decks */
 .deckbar{display:flex;gap:8px;align-items:center}
 .deckpick{flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:2px solid var(--line);border-radius:14px;padding:4px 10px;background:var(--surface)}
@@ -594,6 +586,13 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
     </div>
   </section>
 
+  <div class="controls">
+    <label class="ctl">範囲<select id="range"></select></label>
+    <label class="ctl">出題<select id="filter"><option value="all">すべて</option><option value="todo">未習得のみ</option><option value="weak">苦手のみ</option><option value="fix">修正した項目</option><option value="add">追加した語だけ</option></select></label>
+    <label class="ctl">表面<select id="dir"><option value="je">日本語</option><option value="ej">英語</option></select></label>
+    <label class="ctl">順番<select id="order"><option value="seq">番号順</option><option value="shuf">シャッフル</option></select></label>
+  </div>
+
   <label id="hapt" aria-hidden="true" style="position:fixed;top:0;left:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none"><input type="checkbox" switch tabindex="-1"></label>
 <section class="sv" id="sv" role="dialog" aria-modal="true" aria-labelledby="svTitle" aria-hidden="true">
   <div class="sv-hero"><div class="sv-in">
@@ -727,17 +726,6 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
   </div>
 </section>
 
-<div class="optv" id="optv" role="dialog" aria-labelledby="optTitle" aria-hidden="true">
-  <div class="optin">
-    <div class="opthead"><h3 id="optTitle">出題の設定</h3><button class="sv-x" id="optClose" aria-label="閉じる">✕</button></div>
-    <div class="setgrid">
-    <label class="ctl">範囲<select id="range"></select></label>
-    <label class="ctl">出題<select id="filter"><option value="all">すべて</option><option value="todo">未習得のみ</option><option value="weak">苦手のみ</option><option value="fix">修正した項目</option><option value="add">追加した語だけ</option></select></label>
-    <label class="ctl">表面<select id="dir"><option value="je">日本語</option><option value="ej">英語</option></select></label>
-    <label class="ctl">順番<select id="order"><option value="seq">番号順</option><option value="shuf">シャッフル</option></select></label>
-    </div>
-  </div>
-</div>
 
 <script>
 const BUILTIN = __DATA__;
@@ -1028,8 +1016,7 @@ function renderLib(){
     return `<div class="lib-item ${cur?'cur':''}" role="button" tabindex="0" data-deck="${d.id}"><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚 ・ 覚えた ${k}枚${d.builtin?' ・ 最初から入っている単語帳':''}</small><div class="li-bar"><i style="width:${n?k/n*100:0}%"></i></div></div>${cur?'<span class="li-cur">勉強中</span>':''}${d.builtin?'':`<button class="li-edit" data-edit="${d.id}">編集</button>`}</div>`}).join('');
   $('libList').querySelectorAll('[data-deck]').forEach(el=>el.onclick=e=>{const ed=e.target.closest('[data-edit]');if(ed){e.stopPropagation();openDeckEdit(ed.dataset.edit);return}selectDeck(el.dataset.deck);goHome()});
 }
-function openOpt(){const v=$('optv');v.classList.add('open');v.setAttribute('aria-hidden','false')}
-function closeOpt(){const v=$('optv');v.classList.remove('open');v.setAttribute('aria-hidden','true')}
+function closeOpt(){}
 // ---- ask the parrot (Gemini via Cloudflare Worker)
 const AI_URL='https://phrase1000-ai.shuyegangtian.workers.dev/';
 const ASK_CHIPS=[['意味と使い方','このフレーズの意味と、どんな場面で使うかを教えて'],['例文','このフレーズを使った例文を3つ、日本語訳つきで教えて'],['単語の意味','このフレーズに出てくる大事な単語の意味と、ほかの意味も教えて'],['似た表現','似た表現や言いかえと、その違いを教えて'],['TOEICでの出方','TOEICではどんな問題や場面で出やすいか教えて']];
@@ -1360,7 +1347,7 @@ function buildCard(){
   const v=$('v-card');
   if(!P.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。<br>下の「出題」や「範囲」を変えてみてください。</div>';return}
   v.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
-   <div class="meta"><span id="pos"></span><span style="display:flex;gap:10px;align-items:center"><span id="st"></span><button class="pill" id="shuf">⇄ シャッフル</button><button class="pill gear" id="optBtn" aria-label="出題の設定"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.4 7.4 0 0 0-1.7-1L15 3.3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.5-1-2 3.5L4.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></button></span></div>
+   <div class="meta"><span id="pos"></span><span style="display:flex;gap:10px;align-items:center"><span id="st"></span><button class="pill" id="shuf">⇄ シャッフル</button></span></div>
    <div class="scene" id="scene" tabindex="0" role="button" aria-label="カードを回転させる">
      <div class="flip" id="flip"><div class="face front" id="front"></div><div class="face back" id="back"></div></div>
    </div>
@@ -1372,7 +1359,7 @@ function buildCard(){
    </div>
    </div>`;
   $('scene').onclick=e=>{const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
-  $('shuf').onclick=reshuffle; $('optBtn').onclick=openOpt;
+  $('shuf').onclick=reshuffle;
   $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1);
   $('yes').onclick=()=>mark(true); $('no').onclick=()=>mark(false);
   fillCard();
@@ -1493,10 +1480,8 @@ function renderList(){
 function setTab(t){
   tab=t; hideSheet();
   for(const x of ['card','quiz','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
-  savePrefs(); refresh(false); lockHome();
+  savePrefs(); refresh(false);
 }
-// the card screen does not scroll (the page stays where it is)
-function lockHome(){const on=tab==='card';document.documentElement.classList.toggle('homefix',on);if(on)scrollTo(0,0)}
 function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({range:$('range').value,filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab}))}catch(e){}}
 function refresh(reset=true){
   if(reset||!P.length){P=pool();ci=0}
@@ -1514,7 +1499,7 @@ $('navNew').onclick=()=>{closeNavViews();navOn('navHome');openDeckEdit('new')};
 $('navLib').onclick=()=>{renderLib();openNavView('libv');navOn('navLib')};
 $('navSet').onclick=()=>{renderAiStats();openNavView('setv');navOn('navSet')};
 $('libNew').onclick=()=>{closeNavViews();navOn('navHome');openDeckEdit('new')};
-$('optClose').onclick=closeOpt; $('optv').onclick=e=>{if(e.target.id==='optv')closeOpt()};
+
 $('deckClose').onclick=closeDeckEdit;
 $('dkName').onchange=()=>{const dk=deckOf(dkId);if(dk){dk.name=$('dkName').value.trim();save()}};
 const dkAdd=()=>{const en=$('dkEn').value.trim(),jp=$('dkJp').value.trim(); if(!en){$('dkEn').focus();return} if(!jp){$('dkJp').focus();return}
