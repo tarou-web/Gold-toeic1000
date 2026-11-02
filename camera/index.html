@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>しずかメラ</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="しずかメラ">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEF0lEQVR42u3dP27UQBQHYGe0XSoQBU2qiDaXySG4AYfgBjkEl6FFVPR09BSRIqSwG9vr+fPefL82u96s37cz9tieuXn34eMi8r8Uu0DgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA45Jr8/vIJDjU++65KPuAYSMbWGv/7+ho+bjLNQ/rr5/d6G7+7f2jTZrz/+mN3S7PyvXPhqMqiKpF9Nb7QThzoo5DR8bPO1fhyH3HNX+fC0VLGsZ+4r8Zv1l7L0U3GgZ+7o+9oKcPZSuds8tFYRmwcvZqNYz99pY/2MrQc8dqPZjLgCOOjvQw4wvuoJwOO2D6qyoAjsI/aMuCI6qOBDDiWoNfu693DAUeGuzoa+Bjiqmzf4axxcvv0ONTZSk8cTFwpo7aPPjiwOEpGthFSMrbK+PP5W5fjj0JGCBldfBQyorQZ7X0UMgL1Jo19FDJ65XKlz/21pY9CxoA+9rmJdw8pGYf3HRde4x7SzD7WyDj3ymD3kGo2NlV6vYzXPmqMg9UdIR0fx5tPsI3/FW6fHiuNkM6IY/cjjcm+Tk8cA+7KQ/Zj1u/1OqcZevRj993L1tIfURUyBtzyIDlhcf1HZG1CChmakLlwtK9WSh+FDD5mwdG3Qsl8FDL4yI9jnKqk8XEio8bMfHf3DwnObzMMn++TsemOqX1K4k6AOdHw+fU30j2/pc3jy445uv1orrnFcut7ox98FDL4cJvgYbdlt5n+AI6oi5JM4qPM0KfUqOX6bcbtWYo2Q/uRDcfKn2Pt+q3cftDGw3MrMiWONs1+4s5FyyG5cETswiP+z0WfomfRrQgcAofAIXAIHAKHwCFwLPOttzjyZ8Gx5JuHLuL/rFuRKXG0ae0TP8yi5ZB0OFZ24bV/1iu3H/S52WKZVh1KQhzrf441qrh+m3Efty+WedZmOCA9rKLzPGsfG8fWFvv6um7dQugpXMK3HC19TCVjmXPylucaN5jZZzHt0wi/m9HmBAv09adYUmOoB0NyfPc8ZyvjdPBp5slPdSo7QlUyraCQbZyjb22Sra2RcBCsV4XyrbqSc4S0fZ1SrseTdvi8ZbWyrtSUeRDsuWZVT3FzrwGY/8JbvfqlXx1yiuHzlypmXVcWjv4dzTwsFmvZ51jLvt5B1YxXZWduDByQSgQc6Rf0zj1JoZZD+uHQeMTdt8X8rGR07lb4iLg/i/mdyRjigJSPWPuwmB+ejIFOZfmIst/qXltZDF1H/jn1xEHJ4E3sEDhkceFN4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQ+AQgUPgkAPyFyAGt8ZecoEyAAAAAElFTkSuQmCC">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEF0lEQVR42u3dP27UQBQHYGe0XSoQBU2qiDaXySG4AYfgBjkEl6FFVPR09BSRIqSwG9vr+fPefL82u96s37cz9tieuXn34eMi8r8Uu0DgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA45Jr8/vIJDjU++65KPuAYSMbWGv/7+ho+bjLNQ/rr5/d6G7+7f2jTZrz/+mN3S7PyvXPhqMqiKpF9Nb7QThzoo5DR8bPO1fhyH3HNX+fC0VLGsZ+4r8Zv1l7L0U3GgZ+7o+9oKcPZSuds8tFYRmwcvZqNYz99pY/2MrQc8dqPZjLgCOOjvQw4wvuoJwOO2D6qyoAjsI/aMuCI6qOBDDiWoNfu693DAUeGuzoa+Bjiqmzf4axxcvv0ONTZSk8cTFwpo7aPPjiwOEpGthFSMrbK+PP5W5fjj0JGCBldfBQyorQZ7X0UMgL1Jo19FDJ65XKlz/21pY9CxoA+9rmJdw8pGYf3HRde4x7SzD7WyDj3ymD3kGo2NlV6vYzXPmqMg9UdIR0fx5tPsI3/FW6fHiuNkM6IY/cjjcm+Tk8cA+7KQ/Zj1u/1OqcZevRj993L1tIfURUyBtzyIDlhcf1HZG1CChmakLlwtK9WSh+FDD5mwdG3Qsl8FDL4yI9jnKqk8XEio8bMfHf3DwnObzMMn++TsemOqX1K4k6AOdHw+fU30j2/pc3jy445uv1orrnFcut7ox98FDL4cJvgYbdlt5n+AI6oi5JM4qPM0KfUqOX6bcbtWYo2Q/uRDcfKn2Pt+q3cftDGw3MrMiWONs1+4s5FyyG5cETswiP+z0WfomfRrQgcAofAIXAIHAKHwCFwLPOttzjyZ8Gx5JuHLuL/rFuRKXG0ae0TP8yi5ZB0OFZ24bV/1iu3H/S52WKZVh1KQhzrf441qrh+m3Efty+WedZmOCA9rKLzPGsfG8fWFvv6um7dQugpXMK3HC19TCVjmXPylucaN5jZZzHt0wi/m9HmBAv09adYUmOoB0NyfPc8ZyvjdPBp5slPdSo7QlUyraCQbZyjb22Sra2RcBCsV4XyrbqSc4S0fZ1SrseTdvi8ZbWyrtSUeRDsuWZVT3FzrwGY/8JbvfqlXx1yiuHzlypmXVcWjv4dzTwsFmvZ51jLvt5B1YxXZWduDByQSgQc6Rf0zj1JoZZD+uHQeMTdt8X8rGR07lb4iLg/i/mdyRjigJSPWPuwmB+ejIFOZfmIst/qXltZDF1H/jn1xEHJ4E3sEDhkceFN4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQ+AQgUPgkAPyFyAGt8ZecoEyAAAAAElFTkSuQmCC">
+<style>
+  :root { --accent:#ff8a3d; --fg:#f4f1ea; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; height:100%; background:#000; color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;
+    overflow:hidden; overscroll-behavior:none; -webkit-user-select:none; user-select:none; }
+  #view { position:fixed; inset:0; display:flex; flex-direction:column; }
+  #stage { position:relative; flex:1; overflow:hidden; background:#000; }
+  video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  video.mirror { transform:scaleX(-1); }
+  #flash { position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; transition:opacity .25s ease-out; }
+  #flash.on { opacity:.7; transition:none; }
+  #badge { position:absolute; top:calc(env(safe-area-inset-top) + 12px); left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,.45); padding:6px 12px; border-radius:999px; font-size:13px; letter-spacing:.04em;
+    display:flex; align-items:center; gap:6px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+  #badge i { width:7px; height:7px; border-radius:50%; background:var(--accent); display:inline-block; }
+  #bar { flex:none; display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+    padding:18px 28px calc(env(safe-area-inset-bottom) + 22px); background:#000; }
+  #thumb { width:52px; height:52px; border-radius:10px; border:2px solid rgba(255,255,255,.85);
+    background:#222 center/cover no-repeat; justify-self:start; position:relative; padding:0; }
+  #thumb:empty::after { content:""; }
+  #count { position:absolute; top:-8px; right:-8px; min-width:20px; height:20px; padding:0 5px; border-radius:10px;
+    background:var(--accent); color:#000; font-size:12px; font-weight:700; line-height:20px; text-align:center; display:none; }
+  #shutter { width:76px; height:76px; border-radius:50%; border:4px solid var(--fg); background:transparent; padding:5px; }
+  #shutter span { display:block; width:100%; height:100%; border-radius:50%; background:var(--fg); transition:transform .08s; }
+  #shutter:active span { transform:scale(.88); }
+  #flip { justify-self:end; width:52px; height:52px; border-radius:50%; border:none; background:rgba(255,255,255,.14);
+    display:grid; place-items:center; }
+  button { color:inherit; font:inherit; cursor:pointer; }
+  /* gallery */
+  #gallery { position:fixed; inset:0; background:#0b0b0c; display:none; flex-direction:column; z-index:10; }
+  #gallery.open { display:flex; }
+  #ghead { display:flex; justify-content:space-between; align-items:center;
+    padding:calc(env(safe-area-inset-top) + 10px) 16px 10px; }
+  #ghead h2 { font-size:17px; margin:0; font-weight:600; }
+  .txtbtn { background:none; border:none; color:var(--accent); font-size:16px; padding:8px 4px; }
+  #grid { flex:1; overflow-y:auto; display:grid; grid-template-columns:repeat(3,1fr); gap:2px; align-content:start;
+    -webkit-overflow-scrolling:touch; }
+  #grid img { width:100%; aspect-ratio:1; object-fit:cover; display:block; }
+  #note { font-size:12px; color:#9a978f; text-align:center; padding:10px 16px calc(env(safe-area-inset-bottom) + 10px); }
+  /* viewer */
+  #viewer { position:fixed; inset:0; background:#000; display:none; flex-direction:column; z-index:20; }
+  #viewer.open { display:flex; }
+  #viewer .imgwrap { flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  #viewer img { max-width:100%; max-height:100%; -webkit-touch-callout:default; user-select:auto; -webkit-user-select:auto; }
+  #vbar { display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:12px 16px calc(env(safe-area-inset-bottom) + 14px); }
+  .pill { border:none; border-radius:999px; padding:12px 20px; font-size:15px; font-weight:600; }
+  .pill.main { background:var(--accent); color:#000; }
+  .pill.sub { background:rgba(255,255,255,.12); }
+  #vhint { font-size:12px; color:#9a978f; text-align:center; padding:0 16px; }
+  /* error / start */
+  #msg { position:fixed; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:32px; gap:14px; background:#0b0b0c; z-index:30; }
+  #msg.open { display:flex; }
+  #msg p { margin:0; line-height:1.7; color:#cfcbc2; font-size:15px; max-width:340px; }
+  #msg h1 { margin:0; font-size:22px; }
+  #toast { position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom) + 130px); transform:translateX(-50%);
+    background:rgba(30,30,30,.92); padding:10px 16px; border-radius:12px; font-size:14px; opacity:0;
+    transition:opacity .2s; pointer-events:none; z-index:40; white-space:nowrap; }
+  #toast.on { opacity:1; }
+</style>
+</head>
+<body>
+<div id="view">
+  <div id="stage">
+    <video id="video" playsinline muted autoplay></video>
+    <div id="flash"></div>
+    <div id="badge"><i></i>無音モード</div>
+  </div>
+  <div id="bar">
+    <button id="thumb" aria-label="撮った写真"><span id="count"></span></button>
+    <button id="shutter" aria-label="撮影"><span></span></button>
+    <button id="flip" aria-label="カメラ切り替え">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3l-2-3H9L7 7H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1z"/><path d="M9 13.5a3 3 0 0 1 5.2-2"/><path d="M15 13.5a3 3 0 0 1-5.2 2"/><path d="M14.5 9.5v2h-2"/><path d="M9.5 17.5v-2h2"/></svg>
+    </button>
+  </div>
+</div>
+
+<div id="gallery">
+  <div id="ghead">
+    <button class="txtbtn" id="gclose">カメラに戻る</button>
+    <h2>撮った写真</h2>
+    <button class="txtbtn" id="gsaveall">すべて保存</button>
+  </div>
+  <div id="grid"></div>
+  <div id="note">写真はこの画面を閉じると消えます。残したい写真は「保存」で写真アプリへ。</div>
+</div>
+
+<div id="viewer">
+  <div class="imgwrap"><img id="vimg" alt=""></div>
+  <div id="vhint">保存ボタンが使えないときは、写真を長押しして「"写真"に保存」</div>
+  <div id="vbar">
+    <button class="pill sub" id="vclose">戻る</button>
+    <button class="pill sub" id="vdel">削除</button>
+    <button class="pill main" id="vsave">保存</button>
+  </div>
+</div>
+
+<div id="msg">
+  <h1 id="msgTitle">しずかメラ</h1>
+  <p id="msgText">シャッター音の鳴らないカメラです。</p>
+  <button class="pill main" id="msgBtn">カメラを起動</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const video = $('video'), flash = $('flash'), thumb = $('thumb'), count = $('count');
+  let stream = null, facing = 'environment';
+  const photos = []; // {blob, url}
+  let current = -1;
+
+  function toast(t){ const el=$('toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove('on'),1600); }
+  function showMsg(title, text, btn, onClick){
+    $('msgTitle').textContent=title; $('msgText').textContent=text;
+    const b=$('msgBtn'); if(btn){ b.style.display=''; b.textContent=btn; b.onclick=onClick; } else b.style.display='none';
+    $('msg').classList.add('open');
+  }
+  function hideMsg(){ $('msg').classList.remove('open'); }
+
+  async function start(){
+    if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      showMsg('カメラが使えません','このページは https のアドレスで開く必要があります。Safari で開き直してください。');
+      return;
+    }
+    if (stream) stream.getTracks().forEach(t=>t.stop());
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio:false,
+        video:{ facingMode:{ideal:facing}, width:{ideal:3840}, height:{ideal:2160} }
+      });
+    } catch(e){
+      const denied = e && (e.name==='NotAllowedError' || e.name==='SecurityError');
+      showMsg('カメラを使えませんでした',
+        denied ? 'カメラへのアクセスが許可されていません。もう一度ボタンを押して「許可」を選んでください。iPhoneの「設定 > Safari > カメラ」が「拒否」になっていないかも確認してください。'
+               : 'カメラを起動できませんでした（'+(e&&e.name||'エラー')+'）。ほかのアプリでカメラを使っていないか確認してください。',
+        'もう一度試す', start);
+      return;
+    }
+    video.srcObject = stream;
+    video.classList.toggle('mirror', facing==='user');
+    try { await video.play(); } catch(_){}
+    hideMsg();
+  }
+
+  function capture(){
+    const w = video.videoWidth, h = video.videoHeight;
+    if (!w || !h){ toast('カメラの準備中です'); return; }
+    const c = document.createElement('canvas'); c.width=w; c.height=h;
+    const ctx = c.getContext('2d');
+    if (facing==='user'){ ctx.translate(w,0); ctx.scale(-1,1); }
+    ctx.drawImage(video,0,0,w,h);
+    flash.classList.add('on'); requestAnimationFrame(()=>requestAnimationFrame(()=>flash.classList.remove('on')));
+    if (navigator.vibrate) try{ navigator.vibrate(15); }catch(_){}
+    c.toBlob(blob=>{
+      if(!blob) return;
+      const url = URL.createObjectURL(blob);
+      photos.push({blob,url});
+      updateThumb();
+    },'image/jpeg',0.92);
+  }
+
+  function updateThumb(){
+    const last = photos[photos.length-1];
+    thumb.style.backgroundImage = last ? 'url('+last.url+')' : '';
+    count.textContent = photos.length; count.style.display = photos.length ? 'block' : 'none';
+  }
+
+  function stamp(){ const d=new Date(), p=n=>String(n).padStart(2,'0');
+    return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds()); }
+
+  async function share(list){
+    const files = list.map((p,i)=>new File([p.blob],'photo_'+stamp()+'_'+(i+1)+'.jpg',{type:'image/jpeg'}));
+    if (navigator.canShare && navigator.canShare({files})){
+      try { await navigator.share({files}); return true; }
+      catch(e){ if (e && e.name==='AbortError') return true; }
+    }
+    return false;
+  }
+
+  function renderGrid(){
+    const g=$('grid'); g.innerHTML='';
+    photos.slice().reverse().forEach((p,ri)=>{
+      const i = photos.length-1-ri;
+      const img=document.createElement('img'); img.src=p.url; img.onclick=()=>openViewer(i); g.appendChild(img);
+    });
+    $('gsaveall').style.visibility = photos.length ? 'visible' : 'hidden';
+  }
+  function openGallery(){ if(!photos.length){ toast('まだ写真がありません'); return; } renderGrid(); $('gallery').classList.add('open'); }
+  function openViewer(i){ current=i; $('vimg').src=photos[i].url; $('viewer').classList.add('open'); }
+
+  $('shutter').addEventListener('click', capture);
+  thumb.addEventListener('click', openGallery);
+  $('flip').addEventListener('click', ()=>{ facing = facing==='environment' ? 'user' : 'environment'; start(); });
+  $('gclose').addEventListener('click', ()=>$('gallery').classList.remove('open'));
+  $('vclose').addEventListener('click', ()=>$('viewer').classList.remove('open'));
+  $('vsave').addEventListener('click', async ()=>{
+    if(!(await share([photos[current]]))) toast('写真を長押しして保存してください');
+  });
+  $('gsaveall').addEventListener('click', async ()=>{
+    if(!(await share(photos))) toast('1枚ずつ開いて長押しで保存してください');
+  });
+  $('vdel').addEventListener('click', ()=>{
+    URL.revokeObjectURL(photos[current].url); photos.splice(current,1);
+    $('viewer').classList.remove('open'); updateThumb(); renderGrid();
+    if(!photos.length) $('gallery').classList.remove('open');
+  });
+
+  // 画面に戻ってきたらカメラを再開
+  document.addEventListener('visibilitychange', ()=>{
+    if (document.visibilityState==='visible' && (!stream || stream.getVideoTracks().every(t=>t.readyState==='ended'))) start();
+  });
+  window.addEventListener('beforeunload', e=>{ if(photos.length){ e.preventDefault(); e.returnValue=''; } });
+
+  showMsg('しずかメラ','シャッター音の鳴らないカメラです。撮った写真は「保存」で写真アプリに入れられます。','カメラを起動', start);
+})();
+</script>
+</body>
+</html>
