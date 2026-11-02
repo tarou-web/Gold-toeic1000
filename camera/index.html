@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEF0lEQVR42u3dP27UQBQHYGe0XSoQBU2qiDaXySG4AYfgBjkEl6FFVPR09BSRIqSwG9vr+fPefL82u96s37cz9tieuXn34eMi8r8Uu0DgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA45Jr8/vIJDjU++65KPuAYSMbWGv/7+ho+bjLNQ/rr5/d6G7+7f2jTZrz/+mN3S7PyvXPhqMqiKpF9Nb7QThzoo5DR8bPO1fhyH3HNX+fC0VLGsZ+4r8Zv1l7L0U3GgZ+7o+9oKcPZSuds8tFYRmwcvZqNYz99pY/2MrQc8dqPZjLgCOOjvQw4wvuoJwOO2D6qyoAjsI/aMuCI6qOBDDiWoNfu693DAUeGuzoa+Bjiqmzf4axxcvv0ONTZSk8cTFwpo7aPPjiwOEpGthFSMrbK+PP5W5fjj0JGCBldfBQyorQZ7X0UMgL1Jo19FDJ65XKlz/21pY9CxoA+9rmJdw8pGYf3HRde4x7SzD7WyDj3ymD3kGo2NlV6vYzXPmqMg9UdIR0fx5tPsI3/FW6fHiuNkM6IY/cjjcm+Tk8cA+7KQ/Zj1u/1OqcZevRj993L1tIfURUyBtzyIDlhcf1HZG1CChmakLlwtK9WSh+FDD5mwdG3Qsl8FDL4yI9jnKqk8XEio8bMfHf3DwnObzMMn++TsemOqX1K4k6AOdHw+fU30j2/pc3jy445uv1orrnFcut7ox98FDL4cJvgYbdlt5n+AI6oi5JM4qPM0KfUqOX6bcbtWYo2Q/uRDcfKn2Pt+q3cftDGw3MrMiWONs1+4s5FyyG5cETswiP+z0WfomfRrQgcAofAIXAIHAKHwCFwLPOttzjyZ8Gx5JuHLuL/rFuRKXG0ae0TP8yi5ZB0OFZ24bV/1iu3H/S52WKZVh1KQhzrf441qrh+m3Efty+WedZmOCA9rKLzPGsfG8fWFvv6um7dQugpXMK3HC19TCVjmXPylucaN5jZZzHt0wi/m9HmBAv09adYUmOoB0NyfPc8ZyvjdPBp5slPdSo7QlUyraCQbZyjb22Sra2RcBCsV4XyrbqSc4S0fZ1SrseTdvi8ZbWyrtSUeRDsuWZVT3FzrwGY/8JbvfqlXx1yiuHzlypmXVcWjv4dzTwsFmvZ51jLvt5B1YxXZWduDByQSgQc6Rf0zj1JoZZD+uHQeMTdt8X8rGR07lb4iLg/i/mdyRjigJSPWPuwmB+ejIFOZfmIst/qXltZDF1H/jn1xEHJ4E3sEDhkceFN4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQ+AQgUPgkAPyFyAGt8ZecoEyAAAAAElFTkSuQmCC">
 <style>
-  :root { --yellow:#ffd60a; --glass:rgba(40,40,42,.82); --glass2:rgba(28,28,30,.9); }
+  :root { --appH:100svh; --yellow:#ffd60a; --glass:rgba(40,40,42,.82); --glass2:rgba(28,28,30,.9); }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { margin:0; height:100%; background:#000; color:#fff;
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Hiragino Sans",sans-serif;
@@ -21,10 +21,10 @@
   button { color:inherit; font:inherit; cursor:pointer; border:none; background:none; padding:0; }
   svg { display:block; }
 
-  #bgv { position:fixed; left:-40px; top:-40px; width:calc(100% + 80px); height:calc(100lvh + 80px); object-fit:cover;
+  #bgv { position:fixed; left:-40px; top:-40px; width:calc(100% + 80px); height:calc(var(--appH) + 80px); object-fit:cover;
     filter:blur(30px) brightness(.55) saturate(1.2); -webkit-filter:blur(30px) brightness(.55) saturate(1.2); pointer-events:none; }
   #bgv.mirror { transform:scaleX(-1); }
-  #app { position:fixed; left:0; right:0; top:0; height:100vh; height:100svh; display:flex; flex-direction:column; }
+  #app { position:fixed; left:0; right:0; top:0; height:100vh; height:var(--appH); display:flex; flex-direction:column; }
 
   /* ---- top ---- */
   #top { flex:none; height:calc(env(safe-area-inset-top) + 66px); position:relative; }
@@ -40,7 +40,7 @@
   body.recording #tools { display:none; }
 
   /* ---- preview ---- */
-  #stage { flex:none; position:relative; width:100%; height:min(133.333vw, calc(100svh - env(safe-area-inset-top) - 66px - 175px - max(env(safe-area-inset-bottom), 14px))); overflow:hidden; background:#111; }
+  #stage { flex:none; position:relative; width:100%; height:min(133.333vw, calc(var(--appH) - env(safe-area-inset-top) - 66px - 175px - max(env(safe-area-inset-bottom), 14px))); overflow:hidden; background:#111; }
   video#video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform-origin:center; }
   #grid { position:absolute; inset:0; pointer-events:none; display:none;
     background:
@@ -416,6 +416,21 @@
     if(document.visibilityState==='visible' && (!stream || stream.getVideoTracks().every(t=>t.readyState==='ended'))) start();
   });
   window.addEventListener('beforeunload',e=>{ if(items.length){ e.preventDefault(); e.returnValue=''; } });
+
+  // iOS 26 のホーム画面アプリでは画面の高さが短く報告され、下に黒い帯が出るので実際の画面の高さに合わせる
+  function fitHeight(){
+    const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+    let h = window.innerHeight;
+    if (standalone){
+      const sh = Math.max(screen.width, screen.height);
+      const portrait = window.innerHeight >= window.innerWidth;
+      if (portrait && sh > h) h = sh;
+    }
+    document.documentElement.style.setProperty('--appH', h+'px');
+  }
+  fitHeight();
+  window.addEventListener('resize', fitHeight);
+  window.addEventListener('orientationchange', ()=>setTimeout(fitHeight,300));
 
   start();
 })();
