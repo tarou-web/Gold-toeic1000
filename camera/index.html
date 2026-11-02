@@ -104,6 +104,10 @@
   #msg h1 { margin:0; font-size:21px; }
   #msg p { margin:0; line-height:1.7; color:#c7c7cc; font-size:15px; max-width:340px; }
   #msgBtn { background:var(--yellow); color:#000; font-weight:600; padding:12px 22px; border-radius:24px; font-size:16px; }
+  .rotg { transition:transform .3s ease; }
+  #lsnote { position:absolute; inset:0; z-index:50; background:#000; display:none; align-items:center; justify-content:center;
+    text-align:center; padding:40px; font-size:15px; line-height:1.7; color:#c7c7cc; }
+  @media (orientation:landscape) and (max-height:500px) { #lsnote { display:flex; } }
   #toast { position:absolute; left:50%; top:calc(var(--st) + 100px); transform:translateX(-50%);
     background:rgba(30,30,32,.9); padding:9px 15px; border-radius:12px; font-size:14px; opacity:0;
     transition:opacity .2s; pointer-events:none; z-index:40; white-space:nowrap; }
@@ -160,7 +164,7 @@
     <button class="glassbtn" id="saveAll">すべて保存</button>
   </div>
   <div id="lib"></div>
-  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.14</div>
+  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.15</div>
 </div>
 
 <div class="sheet" id="viewer">
@@ -185,12 +189,13 @@
   <p id="msgText"></p>
   <button id="msgBtn"></button>
 </div>
+<div id="lsnote">画面が横向きに回転しています。<br>コントロールセンターで「画面縦向きのロック」をオンにすると、<br>純正カメラと同じように横向きで撮影できます。</div>
 <div id="toast"></div>
 
 <script>
 (() => {
   // 新しい版が公開されていたら自動で読み込み直す（ホーム画面アプリは古い版を長く覚えているため）
-  const VERSION = '14';
+  const VERSION = '15';
   try {
     fetch(location.pathname + '?check=' + Date.now(), {cache:'no-store'})
       .then(r => r.ok ? r.text() : '')
@@ -290,7 +295,12 @@
     if(facing==='user'){ ctx.translate(outW,0); ctx.scale(-1,1); }
     ctx.drawImage(video,sx,sy,cw,ch,0,0,outW,outH);
     $('blink').classList.add('on'); setTimeout(()=>$('blink').classList.remove('on'),60);
-    c.toBlob(blob=>{ if(blob){ items.push({blob,url:URL.createObjectURL(blob),kind:'photo'}); updateThumb(); } },'image/jpeg',0.92);
+    let out=c;
+    if(rot!==0){ // 横向きで撮ったら横向きの写真にする
+      out=document.createElement('canvas'); out.width=outH; out.height=outW;
+      const o=out.getContext('2d'); o.translate(outH/2,outW/2); o.rotate(-rot*Math.PI/180); o.drawImage(c,-outW/2,-outH/2);
+    }
+    out.toBlob(blob=>{ if(blob){ items.push({blob,url:URL.createObjectURL(blob),kind:'photo'}); updateThumb(); } },'image/jpeg',0.92);
   }
 
   // ---------- video ----------
@@ -443,6 +453,34 @@
   fitHeight();
   window.addEventListener('resize', fitHeight);
   window.addEventListener('orientationchange', ()=>setTimeout(fitHeight,300));
+
+  // ---------- 本体の向き（縦向きロックのまま、傾きでボタンの向きと写真の向きを変える） ----------
+  let rot=0, motionAsked=false, sign=0;
+  function applyRot(){
+    const sel='#tools button svg, #zooms button, #thumb, #flip svg';
+    document.querySelectorAll(sel).forEach(el=>{ el.classList.add('rotg'); el.style.transform = rot ? 'rotate('+rot+'deg)' : ''; });
+  }
+  function onMotion(e){
+    const g=e.accelerationIncludingGravity; if(!g||g.x==null) return;
+    // 機種によって符号が逆なので、最初に縦に持っているときの値で向きを覚える
+    if (sign===0 && Math.abs(g.y)>8 && Math.abs(g.x)<3) sign = g.y<0 ? 1 : -1;
+    const k = sign||1, ax=g.x*k, ay=g.y*k; let r=rot;
+    if (Math.abs(ax)>6 && Math.abs(ax)>Math.abs(ay)+2) r = ax<0 ? -90 : 90;
+    else if (ay<-6 && Math.abs(ay)>Math.abs(ax)+2) r = 0;
+    if (r!==rot){ rot=r; applyRot(); }
+  }
+  function enableMotion(){
+    if (motionAsked) return; motionAsked=true;
+    const D=window.DeviceMotionEvent;
+    if (D && typeof D.requestPermission==='function'){
+      D.requestPermission().then(st=>{ if(st==='granted') window.addEventListener('devicemotion',onMotion); }).catch(()=>{});
+    } else if (D) window.addEventListener('devicemotion',onMotion);
+  }
+  // iPhoneでは傾きセンサーの許可にタップが必要なので、最初のタップで許可を求める
+  document.addEventListener('touchend', enableMotion, {once:true});
+  document.addEventListener('click', enableMotion, {once:true});
+  // ズームボタンは作り直されるので向きを再適用
+  new MutationObserver(applyRot).observe(document.getElementById('zooms'),{childList:true});
 
   // ページ全体が動かないように（写真一覧のスクロールは許可）
   document.addEventListener('touchmove', e=>{ if(!e.target.closest('#lib')) e.preventDefault(); }, {passive:false});
