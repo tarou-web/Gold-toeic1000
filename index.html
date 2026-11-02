@@ -574,6 +574,15 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .toast strong{display:block;font-family:var(--f-jp);font-weight:800;font-size:1rem}
 .toast span{font-size:.8rem;color:var(--muted);font-weight:700}
 @media (prefers-reduced-motion:reduce){.bv{transition:none}.toast{transition:none}}
+/* compact home top so the card gets more room */
+.wrap{gap:12px}
+header{gap:6px}
+.stats{font-size:.95rem}
+.stat svg{width:20px;height:20px}
+.stat.pts img{width:38px;height:38px}
+.goalbox{padding:7px 12px;gap:4px;border-radius:14px}
+.tabs button{padding:7px 6px;font-size:.88rem;border-radius:12px}
+.pill{padding:4px 12px}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -1468,7 +1477,7 @@ function faceHTML(d,lang,isBack){
 function buildCard(){
   const v=$('v-card');
   if(!P.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。<br>下の「出題」や「範囲」を変えてみてください。</div>';return}
-  v.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
+  v.innerHTML=`<div style="display:flex;flex-direction:column;gap:10px">
    <div class="meta"><span id="pos"></span><span style="display:flex;gap:10px;align-items:center"><span id="st"></span><button class="pill" id="shuf">⇄ シャッフル</button></span></div>
    <div class="scene" id="scene" tabindex="0" role="button" aria-label="カードを回転させる">
      <div class="flip" id="flip"><div class="face front" id="front"></div><div class="face back" id="back"></div></div>
