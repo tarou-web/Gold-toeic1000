@@ -50,7 +50,7 @@
   #blink.on { opacity:1; transition:none; }
   #countdown { position:absolute; inset:0; display:grid; place-items:center; font-size:120px; font-weight:200;
     pointer-events:none; text-shadow:0 2px 12px rgba(0,0,0,.5); }
-  #zooms { position:absolute; left:50%; bottom:17px; display:flex; gap:2px; align-items:center; }
+  #zooms { position:absolute; left:50%; bottom:5px; padding:12px 30px; margin-left:-30px; display:flex; gap:2px; align-items:center; }
   #zooms button { width:33px; height:33px; border-radius:50%; font-size:12px; font-weight:600;
     display:grid; place-items:center; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5); }
   #zooms button.on { background:rgba(30,30,32,.55); color:var(--yellow);
@@ -164,7 +164,7 @@
     <button class="glassbtn" id="saveAll">すべて保存</button>
   </div>
   <div id="lib"></div>
-  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.17</div>
+  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.18</div>
 </div>
 
 <div class="sheet" id="viewer">
@@ -195,7 +195,7 @@
 <script>
 (() => {
   // 新しい版が公開されていたら自動で読み込み直す（ホーム画面アプリは古い版を長く覚えているため）
-  const VERSION = '17';
+  const VERSION = '18';
   try {
     fetch(location.pathname + '?check=' + Date.now(), {cache:'no-store'})
       .then(r => r.ok ? r.text() : '')
@@ -386,6 +386,20 @@
   }
   $('mVideo').onclick=()=>setMode('video'); $('mPhoto').onclick=()=>setMode('photo');
   // 左右スワイプでも切り替え
+  // ズーム倍率の数字の上を横にスライドしてズーム（左へで拡大、右へで縮小）
+  let zs=null, zDragged=false;
+  const zEl=$('zooms');
+  zEl.addEventListener('touchstart',e=>{ e.stopPropagation(); if(e.touches.length===1){ zs={x:e.touches[0].clientX, z:zoom}; zDragged=false; } },{passive:true});
+  zEl.addEventListener('touchmove',e=>{
+    e.stopPropagation(); if(!zs || facing==='user') return;
+    const dx=e.touches[0].clientX-zs.x;
+    if (Math.abs(dx)>6) zDragged=true;
+    if (zDragged){ e.preventDefault(); setZoom(zs.z * Math.pow(2, -dx/70)); }
+  },{passive:false});
+  zEl.addEventListener('touchend',e=>{ e.stopPropagation(); zs=null; },{passive:true});
+  // スライドした直後はボタンのタップ扱いにしない
+  zEl.addEventListener('click',e=>{ if(zDragged){ e.stopPropagation(); e.preventDefault(); zDragged=false; } },true);
+
   let sx0=null, pinch=null;
   const dist=t=>Math.hypot(t[0].clientX-t[1].clientX, t[0].clientY-t[1].clientY);
   $('stage').addEventListener('touchstart',e=>{
