@@ -193,7 +193,7 @@
     <button class="glassbtn" id="saveAll">すべて保存</button>
   </div>
   <div id="lib"></div>
-  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.22</div>
+  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.23</div>
 </div>
 
 <div class="sheet" id="viewer">
@@ -249,14 +249,19 @@
 <script>
 (() => {
   // 新しい版が公開されていたら自動で読み込み直す（ホーム画面アプリは古い版を長く覚えているため）
-  const VERSION = '22';
-  try {
-    fetch(location.pathname + '?check=' + Date.now(), {cache:'no-store'})
-      .then(r => r.ok ? r.text() : '')
-      .then(t => { const m = t.match(/const VERSION = '(\d+)'/);
-        if (m && m[1] !== VERSION) location.replace(location.pathname + '?v=' + m[1]); })
-      .catch(()=>{});
-  } catch(_){}
+  const VERSION = '23';
+  function checkUpdate(){
+    try {
+      fetch(location.pathname + '?check=' + Date.now(), {cache:'no-store'})
+        .then(r => r.ok ? r.text() : '')
+        .then(t => { const m = t.match(/const VERSION = '(\d+)'/);
+          if (m && +m[1] > +VERSION) location.replace(location.pathname + '?v=' + m[1]); })
+        .catch(()=>{});
+    } catch(_){}
+  }
+  checkUpdate();
+  // アプリに戻ってきたときも確認する（完全に終了しなくても更新される）
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') checkUpdate(); });
   const $ = id => document.getElementById(id);
   const video = $('video'), body = document.body;
   let stream = null, audioStream = null, facing = 'environment', mode = 'photo';
