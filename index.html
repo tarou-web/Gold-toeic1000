@@ -575,6 +575,10 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .toast span{font-size:.8rem;color:var(--muted);font-weight:700}
 @media (prefers-reduced-motion:reduce){.bv{transition:none}.toast{transition:none}}
 /* compact home top so the card gets more room */
+.mascot{width:54px;top:-14px;right:4px}
+.gzone .goalbox{margin-right:66px}
+.hanger{top:40px;right:-6px;width:28px;height:28px}
+.mbub{right:66px;max-width:calc(100% - 78px)}
 .wrap{gap:12px}
 header{gap:6px}
 .stats{font-size:.95rem}
@@ -1614,7 +1618,7 @@ function fitCard(){
   f.style.height='';f.style.minHeight=''; const full=f.getBoundingClientRect().height;
   const top=f.getBoundingClientRect().top+scrollY, below=y.getBoundingClientRect().bottom-f.getBoundingClientRect().bottom;
   const room=innerHeight-nav.getBoundingClientRect().height-top-below-12;
-  if(room<full){f.style.minHeight='0';f.style.height=Math.max(200,Math.round(room))+'px'}
+  f.style.minHeight='0';f.style.height=Math.max(200,Math.min(460,Math.round(room)))+'px'
 }
 addEventListener('resize',()=>requestAnimationFrame(fitCard));
 addEventListener('load',()=>setTimeout(fitCard,50));
