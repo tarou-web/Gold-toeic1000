@@ -228,7 +228,8 @@
   });
   window.addEventListener('beforeunload', e=>{ if(photos.length){ e.preventDefault(); e.returnValue=''; } });
 
-  showMsg('しずかメラ','シャッター音の鳴らないカメラです。撮った写真は「保存」で写真アプリに入れられます。','カメラを起動', start);
+  // 開いたらすぐカメラを起動（失敗したときだけボタンを表示）
+  start();
 })();
 </script>
 </body>
