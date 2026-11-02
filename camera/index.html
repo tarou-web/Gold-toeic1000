@@ -6,41 +6,42 @@
 <title>しずかメラ</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="しずかメラ">
 <meta name="theme-color" content="#000000">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAEF0lEQVR42u3dP27UQBQHYGe0XSoQBU2qiDaXySG4AYfgBjkEl6FFVPR09BSRIqSwG9vr+fPefL82u96s37cz9tieuXn34eMi8r8Uu0DgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA4BA6BQ+AQOETgEDgEDoFD4BA45Jr8/vIJDjU++65KPuAYSMbWGv/7+ho+bjLNQ/rr5/d6G7+7f2jTZrz/+mN3S7PyvXPhqMqiKpF9Nb7QThzoo5DR8bPO1fhyH3HNX+fC0VLGsZ+4r8Zv1l7L0U3GgZ+7o+9oKcPZSuds8tFYRmwcvZqNYz99pY/2MrQc8dqPZjLgCOOjvQw4wvuoJwOO2D6qyoAjsI/aMuCI6qOBDDiWoNfu693DAUeGuzoa+Bjiqmzf4axxcvv0ONTZSk8cTFwpo7aPPjiwOEpGthFSMrbK+PP5W5fjj0JGCBldfBQyorQZ7X0UMgL1Jo19FDJ65XKlz/21pY9CxoA+9rmJdw8pGYf3HRde4x7SzD7WyDj3ymD3kGo2NlV6vYzXPmqMg9UdIR0fx5tPsI3/FW6fHiuNkM6IY/cjjcm+Tk8cA+7KQ/Zj1u/1OqcZevRj993L1tIfURUyBtzyIDlhcf1HZG1CChmakLlwtK9WSh+FDD5mwdG3Qsl8FDL4yI9jnKqk8XEio8bMfHf3DwnObzMMn++TsemOqX1K4k6AOdHw+fU30j2/pc3jy445uv1orrnFcut7ox98FDL4cJvgYbdlt5n+AI6oi5JM4qPM0KfUqOX6bcbtWYo2Q/uRDcfKn2Pt+q3cftDGw3MrMiWONs1+4s5FyyG5cETswiP+z0WfomfRrQgcAofAIXAIHAKHwCFwLPOttzjyZ8Gx5JuHLuL/rFuRKXG0ae0TP8yi5ZB0OFZ24bV/1iu3H/S52WKZVh1KQhzrf441qrh+m3Efty+WedZmOCA9rKLzPGsfG8fWFvv6um7dQugpXMK3HC19TCVjmXPylucaN5jZZzHt0wi/m9HmBAv09adYUmOoB0NyfPc8ZyvjdPBp5slPdSo7QlUyraCQbZyjb22Sra2RcBCsV4XyrbqSc4S0fZ1SrseTdvi8ZbWyrtSUeRDsuWZVT3FzrwGY/8JbvfqlXx1yiuHzlypmXVcWjv4dzTwsFmvZ51jLvt5B1YxXZWduDByQSgQc6Rf0zj1JoZZD+uHQeMTdt8X8rGR07lb4iLg/i/mdyRjigJSPWPuwmB+ejIFOZfmIst/qXltZDF1H/jn1xEHJ4E3sEDhkceFN4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQwQOgUPgEDgEDoFD4BA4BA6BQ+AQgUPgkAPyFyAGt8ZecoEyAAAAAElFTkSuQmCC">
 <style>
-  :root { --appH:100svh; --yellow:#ffd60a; --glass:rgba(40,40,42,.82); --glass2:rgba(28,28,30,.9); }
+  :root { --appH:100svh; --st:env(safe-area-inset-top); --sb:max(env(safe-area-inset-bottom), 12px); --yellow:#ffd60a; --glass:rgba(40,40,42,.82); --glass2:rgba(28,28,30,.9); }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  html,body { margin:0; height:100%; background:#000; color:#fff;
+  html,body { margin:0; height:var(--appH); position:relative; background:#000; color:#fff;
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Hiragino Sans",sans-serif;
     overflow:hidden; overscroll-behavior:none; -webkit-user-select:none; user-select:none; touch-action:manipulation; }
   button { color:inherit; font:inherit; cursor:pointer; border:none; background:none; padding:0; }
   svg { display:block; }
 
-  #bgv { position:fixed; left:-40px; top:-40px; width:calc(100% + 80px); height:calc(var(--appH) + 80px); object-fit:cover;
+  #bgv { position:absolute; left:-40px; top:-40px; width:calc(100% + 80px); height:calc(var(--appH) + 80px); object-fit:cover;
     filter:blur(30px) brightness(.55) saturate(1.2); -webkit-filter:blur(30px) brightness(.55) saturate(1.2); pointer-events:none; }
   #bgv.mirror { transform:scaleX(-1); }
-  #app { position:fixed; left:0; right:0; top:0; height:100vh; height:var(--appH); display:flex; flex-direction:column; }
+  #app { position:absolute; left:0; top:0; width:100%; height:var(--appH); }
 
   /* ---- top ---- */
-  #top { flex:none; height:calc(env(safe-area-inset-top) + 66px); position:relative; }
-  #tools { position:absolute; right:16px; top:calc(env(safe-area-inset-top) + 17px); height:35px; padding:0 8px; border-radius:18px;
+  #top { position:absolute; left:0; top:0; width:100%; height:calc(var(--st) + 66px); }
+  #tools { position:absolute; right:16px; top:calc(var(--st) + 16px); height:35px; padding:0 3px; border-radius:18px;
     background:var(--glass); display:flex; align-items:center; gap:0;
     box-shadow:inset 0 0 0 .5px rgba(255,255,255,.12); }
-  #tools button { width:34px; height:35px; display:grid; place-items:center; position:relative; }
+  #tools button { width:35px; height:35px; display:grid; place-items:center; position:relative; }
   #tools button.on { color:var(--yellow); }
   #tools .lbl { position:absolute; right:0; bottom:3px; font-size:9px; font-weight:700; }
-  #rec { position:absolute; left:50%; top:calc(env(safe-area-inset-top) + 20px); transform:translateX(-50%); background:#ff3b30;
+  #rec { position:absolute; left:50%; top:calc(var(--st) + 20px); transform:translateX(-50%); background:#ff3b30;
     padding:3px 8px; border-radius:6px; font-size:15px; font-variant-numeric:tabular-nums; display:none; }
   #rec.on { display:block; }
   body.recording #tools { display:none; }
 
   /* ---- preview ---- */
-  #stage { flex:none; position:relative; width:100%; height:min(133.333vw, calc(var(--appH) - env(safe-area-inset-top) - 66px - 175px - max(env(safe-area-inset-bottom), 14px))); overflow:hidden; background:#111; }
+  #stage { position:absolute; left:0; top:calc(var(--st) + 66px); width:100%;
+    height:min(133.333vw, calc(var(--appH) - var(--st) - var(--sb) - 242px)); overflow:hidden; background:#111; }
   video#video { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform-origin:center; }
   #grid { position:absolute; inset:0; pointer-events:none; display:none;
     background:
@@ -51,41 +52,41 @@
   #blink.on { opacity:1; transition:none; }
   #countdown { position:absolute; inset:0; display:grid; place-items:center; font-size:120px; font-weight:200;
     pointer-events:none; text-shadow:0 2px 12px rgba(0,0,0,.5); }
-  #zooms { position:absolute; left:50%; bottom:17px; transform:translateX(-50%); display:flex; gap:2px; align-items:center; }
-  #zooms button { width:36px; height:36px; border-radius:50%; font-size:13px; font-weight:600;
+  #zooms { position:absolute; left:50%; bottom:17px; display:flex; gap:2px; align-items:center; }
+  #zooms button { width:37px; height:37px; border-radius:50%; font-size:13px; font-weight:600;
     display:grid; place-items:center; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.5); }
   #zooms button.on { background:rgba(30,30,32,.55); color:var(--yellow);
     backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); text-shadow:none; }
 
   /* ---- bottom ---- */
-  #bottom { flex:1; display:flex; flex-direction:column; justify-content:space-between; align-items:center;
-    padding:16px 0 max(calc(env(safe-area-inset-bottom) - 4px), 14px); }
-  #shutter { flex:none; width:78px; height:78px; border-radius:50%; border:3px solid rgba(255,255,255,.3);
-    display:grid; place-items:center; }
-  #shutter i { display:block; width:66px; height:66px; border-radius:50%; background:#fff;
+  #bottom { position:absolute; left:0; bottom:0; width:100%; height:0; }
+  #shutter { position:absolute; left:50%; bottom:calc(var(--sb) + 80.5px); transform:translateX(-50%);
+    width:79px; height:79px; border-radius:50%; border:3px solid rgba(255,255,255,.3); display:grid; place-items:center; }
+  #shutter i { display:block; width:68px; height:68px; border-radius:50%; background:#fff;
     transition:transform .1s, width .2s, height .2s, border-radius .2s, background .2s; }
   #shutter:active i { transform:scale(.9); }
   body.video #shutter i { background:#ff3b30; }
   body.recording #shutter i { width:30px; height:30px; border-radius:7px; }
-  #row { flex:none; width:100%; display:flex; align-items:center; justify-content:space-between; padding:0 33px 0 33px; }
-  #thumb { width:47px; height:47px; border-radius:50%; overflow:hidden; background:#1c1c1e center/cover no-repeat;
+  #row { position:absolute; left:0; bottom:var(--sb); width:100%; height:48px; display:flex; align-items:center;
+    justify-content:space-between; padding:0 34px; }
+  #thumb { width:48px; height:48px; border-radius:50%; overflow:hidden; background:#1c1c1e center/cover no-repeat;
     box-shadow:0 0 0 .5px rgba(255,255,255,.15); }
-  #modes { height:46px; padding:3px; border-radius:23px; background:var(--glass2); display:flex; position:relative;
+  #modes { height:47px; padding:3px; border-radius:23.5px; background:var(--glass2); display:flex; position:relative;
     box-shadow:inset 0 0 0 .5px rgba(255,255,255,.1); }
-  #modes button { width:78px; height:40px; border-radius:20px; font-size:16px; font-weight:500; position:relative; z-index:1;
+  #modes button { width:80px; height:41px; border-radius:20.5px; font-size:14.5px; font-weight:500; position:relative; z-index:1;
     transition:color .2s; }
   #modes button.on { color:var(--yellow); }
-  #pillbg { position:absolute; top:3px; width:78px; height:40px; border-radius:20px; background:#000;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.14); transition:left .25s cubic-bezier(.3,.7,.3,1); left:81px; }
+  #pillbg { position:absolute; top:3px; width:80px; height:41px; border-radius:20.5px; background:#000;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.14); transition:left .25s cubic-bezier(.3,.7,.3,1); left:83px; }
   body.video #pillbg { left:3px; }
-  #flip { width:47px; height:47px; border-radius:50%; background:var(--glass2); display:grid; place-items:center;
+  #flip { width:48px; height:48px; border-radius:50%; background:var(--glass2); display:grid; place-items:center;
     transition:transform .4s; }
 
   /* ---- library ---- */
-  .sheet { position:fixed; inset:0; background:#000; display:none; flex-direction:column; z-index:10; }
+  .sheet { position:absolute; left:0; top:0; width:100%; height:var(--appH); background:#000; display:none; flex-direction:column; z-index:10; }
   .sheet.open { display:flex; }
   .head { display:flex; justify-content:space-between; align-items:center;
-    padding:calc(env(safe-area-inset-top) + 8px) 16px 8px; }
+    padding:calc(var(--st) + 8px) 16px 8px; }
   .head h2 { margin:0; font-size:17px; font-weight:600; }
   .glassbtn { height:40px; padding:0 16px; border-radius:20px; background:var(--glass); font-size:16px; font-weight:500; }
   .glassbtn.round { width:40px; padding:0; display:grid; place-items:center; }
@@ -99,13 +100,13 @@
   #vbar { display:flex; justify-content:space-between; align-items:center; padding:10px 16px calc(env(safe-area-inset-bottom) + 12px); }
 
   /* ---- messages ---- */
-  #msg { position:fixed; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center;
+  #msg { position:absolute; left:0; top:0; width:100%; height:var(--appH); display:none; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding:32px; gap:16px; background:#000; z-index:30; }
   #msg.open { display:flex; }
   #msg h1 { margin:0; font-size:21px; }
   #msg p { margin:0; line-height:1.7; color:#c7c7cc; font-size:15px; max-width:340px; }
   #msgBtn { background:var(--yellow); color:#000; font-weight:600; padding:12px 22px; border-radius:24px; font-size:16px; }
-  #toast { position:fixed; left:50%; top:calc(env(safe-area-inset-top) + 100px); transform:translateX(-50%);
+  #toast { position:absolute; left:50%; top:calc(var(--st) + 100px); transform:translateX(-50%);
     background:rgba(30,30,32,.9); padding:9px 15px; border-radius:12px; font-size:14px; opacity:0;
     transition:opacity .2s; pointer-events:none; z-index:40; white-space:nowrap; }
   #toast.on { opacity:1; }
@@ -247,6 +248,13 @@
       b.onclick=()=>setZoom(l); z.appendChild(b);
     });
     setZoom(zoom);
+    centerOne();
+  }
+  function centerOne(){
+    const z=$('zooms'), one=[...z.children].find(b=>+b.dataset.z===1)||z.children[0];
+    if(!one){ return; }
+    const idx=[...z.children].indexOf(one);
+    z.style.transform='translateX('+(-(idx*39+18.5))+'px)';
   }
   function fmtZ(l, on){ const s = l<1 ? '.'+String(l).split('.')[1] : String(l); return on ? s+'×' : s; }
   async function setZoom(l){
@@ -417,11 +425,21 @@
   });
   window.addEventListener('beforeunload',e=>{ if(items.length){ e.preventDefault(); e.returnValue=''; } });
 
-  // 表示できる高さに合わせる（iOS 26 のホーム画面アプリは不透明ステータスバーにして下の黒帯を回避）
-  function fitHeight(){ document.documentElement.style.setProperty('--appH', window.innerHeight+'px'); }
+  // iOS 26 のホーム画面アプリは表示範囲が画面より短く報告され下に黒帯が出るため、実際の画面の高さで描く
+  function fitHeight(){
+    const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+    let h = window.innerHeight;
+    if (standalone && window.innerHeight >= window.innerWidth) h = Math.max(h, screen.height, screen.width);
+    document.documentElement.style.setProperty('--appH', h+'px');
+    window.scrollTo(0,0);
+  }
   fitHeight();
   window.addEventListener('resize', fitHeight);
   window.addEventListener('orientationchange', ()=>setTimeout(fitHeight,300));
+
+  // ページ全体が動かないように（写真一覧のスクロールは許可）
+  document.addEventListener('touchmove', e=>{ if(!e.target.closest('#lib')) e.preventDefault(); }, {passive:false});
+  window.addEventListener('scroll', ()=>{ if(window.scrollY) window.scrollTo(0,0); });
 
   start();
 })();
