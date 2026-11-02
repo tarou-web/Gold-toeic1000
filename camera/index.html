@@ -164,7 +164,7 @@
     <button class="glassbtn" id="saveAll">すべて保存</button>
   </div>
   <div id="lib"></div>
-  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.16</div>
+  <div class="note">このアプリを閉じると消えます。残したいものは「保存」で写真アプリへ。<br>大学カメラ ver.17</div>
 </div>
 
 <div class="sheet" id="viewer">
@@ -195,7 +195,7 @@
 <script>
 (() => {
   // 新しい版が公開されていたら自動で読み込み直す（ホーム画面アプリは古い版を長く覚えているため）
-  const VERSION = '16';
+  const VERSION = '17';
   try {
     fetch(location.pathname + '?check=' + Date.now(), {cache:'no-store'})
       .then(r => r.ok ? r.text() : '')
@@ -493,16 +493,26 @@
     else if (ay<-6 && Math.abs(ay)>Math.abs(ax)+2) r = 0;
     if (r!==rot){ rot=r; applyRot(); }
   }
-  function enableMotion(){
-    if (motionAsked) return; motionAsked=true;
-    const D=window.DeviceMotionEvent;
-    if (D && typeof D.requestPermission==='function'){
-      D.requestPermission().then(st=>{ if(st==='granted') window.addEventListener('devicemotion',onMotion); }).catch(()=>{});
-    } else if (D) window.addEventListener('devicemotion',onMotion);
+  let motionOn=false, gotMotion=false, deniedShown=false;
+  function listen(){
+    if (motionOn) return; motionOn=true;
+    window.addEventListener('devicemotion', e=>{ gotMotion=true; onMotion(e); });
+    setTimeout(()=>{ if(!gotMotion) toast('傾きセンサーの値を取得できません'); }, 2500);
   }
-  // iPhoneでは傾きセンサーの許可にタップが必要なので、最初のタップで許可を求める
-  document.addEventListener('touchend', enableMotion, {once:true});
-  document.addEventListener('click', enableMotion, {once:true});
+  function enableMotion(){
+    if (motionOn) return;
+    const D=window.DeviceMotionEvent;
+    if (!D){ return; }
+    if (typeof D.requestPermission==='function'){
+      D.requestPermission().then(st=>{
+        if (st==='granted') listen();
+        else if (!deniedShown){ deniedShown=true; toast('「動作と方向」が許可されていないため横向きにできません'); }
+      }).catch(()=>{});
+    } else listen();
+  }
+  // iPhoneでは傾きセンサーの許可にタップが必要。許可されるまで、タップのたびに求める
+  document.addEventListener('touchend', enableMotion);
+  document.addEventListener('click', enableMotion);
   // ズームボタンは作り直されるので向きを再適用
   new MutationObserver(applyRot).observe(document.getElementById('zooms'),{childList:true});
 
