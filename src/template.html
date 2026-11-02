@@ -1598,15 +1598,17 @@ function fitCard(){
   const fr=f.getBoundingClientRect(), below=y.getBoundingClientRect().bottom-fr.bottom;
   const room=nav.getBoundingClientRect().top-(fr.top+scrollY)-below-12;
   f.style.minHeight='0';f.style.height=Math.max(200,Math.min(460,Math.round(room)))+'px';
-  const over=y.getBoundingClientRect().bottom+scrollY-(nav.getBoundingClientRect().top+scrollY)+12; if(over>0&&!scrollY)f.style.height=Math.max(200,f.getBoundingClientRect().height-over)+'px'
+  const over=y.getBoundingClientRect().bottom+scrollY-(nav.getBoundingClientRect().top+scrollY)+12; if(over>0)f.style.height=Math.max(200,f.getBoundingClientRect().height-over)+'px'
 }
 {const _b=buildCard;buildCard=function(){const r=_b.apply(this,arguments);fitCard();return r}}
 addEventListener('resize',()=>requestAnimationFrame(fitCard));
-addEventListener('pageshow',()=>setTimeout(fitCard,100));
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(fitCard,150)});
+// right after the app opens, iPhone settles the screen size a little later without telling us, so fit again a few times
+const fitSoon=()=>{for(const ms of [100,400,900,1600,3000])setTimeout(fitCard,ms)};
+fitSoon(); addEventListener('pageshow',fitSoon);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)fitSoon()});
 window.visualViewport&&visualViewport.addEventListener('resize',()=>requestAnimationFrame(fitCard));
 // re-fit when anything above the card changes height (mascot image, hats, numbers)
-if(window.ResizeObserver){const ro=new ResizeObserver(()=>requestAnimationFrame(fitCard));addEventListener('DOMContentLoaded',()=>{for(const el of document.querySelectorAll('header,.gzone,.tabs,.bnav'))ro.observe(el)});for(const el of document.querySelectorAll('header,.gzone,.tabs,.bnav'))ro.observe(el)}
+if(window.ResizeObserver){const ro=new ResizeObserver(()=>requestAnimationFrame(fitCard));addEventListener('DOMContentLoaded',()=>{for(const el of document.querySelectorAll('header,.gzone,.tabs,.bnav,body'))ro.observe(el,{box:'border-box'})});for(const el of document.querySelectorAll('header,.gzone,.tabs,.bnav,body'))ro.observe(el,{box:'border-box'})}
 addEventListener('load',()=>setTimeout(fitCard,50));
 document.fonts&&document.fonts.ready.then(()=>setTimeout(fitCard,30));
 function setTab(t){
