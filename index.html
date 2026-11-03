@@ -1176,8 +1176,13 @@ function renderAiStats(){
   const a=S.ai||{n:0,by:{},days:{}}, t=a.days[today()]||0;
   const el=$('aiCnt'); if(el)el.textContent=`今日 ${t}回 ・ 合計 ${a.n}回`;
   const box=$('aiStats'); if(!box)return;
-  const since=Object.keys(a.days).sort((x,y)=>new Date(x)-new Date(y))[0];
-  box.innerHTML=`<div class="ais-row"><b>${a.n}</b><span>合計</span></div><div class="ais-row"><b>${t}</b><span>今日</span></div>`+
+  const since=Object.keys(a.days).filter(x=>/^\d+-\d+-\d+$/.test(x)).sort((x,y)=>{const f=z=>{const [Y,M,D]=z.split('-').map(Number);return new Date(Y,M-1,D)};return f(x)-f(y)})[0];
+  // average per day: total ÷ days from the first day asked to today (days with 0 questions count too)
+  const dk=x=>{const [y,m,d]=x.split('-').map(Number);return new Date(y,m-1,d)};
+  const ks=Object.keys(a.days).filter(x=>/^\d+-\d+-\d+$/.test(x)).sort((x,y)=>dk(x)-dk(y));
+  const nd=ks.length?Math.max(1,Math.round((dk(today())-dk(ks[0]))/864e5)+1):0;
+  const avg=nd?a.n/nd:0, avgTxt=avg>=10?Math.round(avg):Math.round(avg*10)/10;
+  box.innerHTML=`<div class="ais-row"><b>${a.n}</b><span>合計</span></div><div class="ais-row"><b>${t}</b><span>今日</span></div><div class="ais-row"><b>${avgTxt}</b><span>1日の平均${nd?`（${nd}日間）`:''}</span></div>`+
     `<div class="ais-by">${Object.entries(a.by).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`<span>${AI_NAME[k]||esc(k)} ${v}回</span>`).join('')||'<span>まだ質問していません</span>'}</div>`+
     (since?`<p class="ais-note">${since.replace(/-/g,'/')} から数えています</p>`:'');
 }
