@@ -579,8 +579,7 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .knum{line-height:1.1}.knum small{font-size:.72em;color:var(--muted);font-weight:800}
 .kbar{display:block;height:5px;border-radius:99px;background:var(--line);overflow:hidden}
 .kbar i{display:block;height:100%;width:0;background:var(--green);border-radius:99px;transition:width .5s cubic-bezier(.3,1.3,.5,1)}
-.face .cpos{position:absolute;top:14px;left:0;right:0;text-align:center;font-size:.8rem;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;pointer-events:none}
-.back .cpos{color:rgba(255,255,255,.8)}
+.cpos{text-align:center;font-size:.8rem;font-weight:800;line-height:1;color:var(--muted);font-variant-numeric:tabular-nums;margin:-2px 0 -4px}
 .face .tr{position:absolute;top:12px;right:16px;display:flex;align-items:center;gap:6px}
 .face .tr .side{position:static}
 .face .tr .chip{font-size:.68rem;padding:2px 8px}
@@ -1481,7 +1480,6 @@ let P=[],ci=0,turned=false,flipAnim=null,flipTimer=null;
 function faceHTML(d,lang,isBack){
   const t=lang==='en'?d.en:d.jp;
   return `<span class="corner">No.${d.no||d.id}</span>
-    <span class="cpos">${ci+1} / ${P.length}</span>
     <span class="tr"><span class="stchip">${chip(d)}</span><span class="side">${lang==='en'?'ENGLISH':'日本語'}</span></span>
     <button class="shufb" data-shuf aria-label="シャッフル" title="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
     <div class="txt ${lang}">${esc(t)}</div>
@@ -1494,6 +1492,7 @@ function buildCard(){
   const v=$('v-card');
   if(!P.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。<br>下の「出題」や「範囲」を変えてみてください。</div>';return}
   v.innerHTML=`<div style="display:flex;flex-direction:column;gap:10px">
+   <div class="cpos" id="pos"></div>
    <div class="scene" id="scene" tabindex="0" role="button" aria-label="カードを回転させる">
      <div class="flip" id="flip"><div class="face front" id="front"></div><div class="face back" id="back"></div></div>
    </div>
@@ -1517,6 +1516,7 @@ function fillCard(){
   $('front').innerHTML=faceHTML(d,je?'jp':'en',false);
   $('back').innerHTML=faceHTML(d,je?'en':'jp',true);
   void f.offsetWidth; f.classList.remove('instant');
+  $('pos').textContent=`${ci+1} / ${P.length}`;
   $('prev').disabled=ci===0; $('next').disabled=ci>=P.length-1;
 }
 function reshuffle(){$('order').value='shuf'; savePrefs(); P=pool(); ci=0; fillCard()}
