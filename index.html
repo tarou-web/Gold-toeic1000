@@ -1629,8 +1629,8 @@ function fitCard(){
   f.style.height='';f.style.minHeight=''; const full=f.getBoundingClientRect().height;
   // measure against the menu bar itself (iPhone home-screen apps can report a wrong window height)
   const fr=f.getBoundingClientRect(), below=y.getBoundingClientRect().bottom-fr.bottom;
-  const room=nav.getBoundingClientRect().top-(fr.top+scrollY)-below-12-36; // leave a little air under the buttons
-  f.style.minHeight='0';f.style.height=Math.max(200,Math.min(430,Math.round(room)))+'px';
+  const room=nav.getBoundingClientRect().top-(fr.top+scrollY)-below-12;
+  f.style.minHeight='0';f.style.height=Math.max(200,Math.min(460,Math.round(room)))+'px';
   const over=y.getBoundingClientRect().bottom+scrollY-(nav.getBoundingClientRect().top+scrollY)+12; if(over>0)f.style.height=Math.max(200,f.getBoundingClientRect().height-over)+'px'
 }
 {const _b=buildCard;buildCard=function(){const r=_b.apply(this,arguments);fitCard();return r}}
