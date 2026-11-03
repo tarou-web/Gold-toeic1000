@@ -563,6 +563,9 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .face .tr{position:absolute;top:12px;right:16px;display:flex;align-items:center;gap:6px}
 .face .tr .side{position:static}
 .face .tr .chip{font-size:.68rem;padding:2px 8px}
+.back .tr .chip{background:rgba(255,255,255,.2);color:#fff;border-color:transparent}
+.stats{justify-content:space-between;padding-inline:4px;font-size:1.05rem}
+.stats .stat svg{width:22px;height:22px}
 .face .shufb{position:absolute;right:12px;bottom:10px;width:40px;height:40px;border-radius:12px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--blue);display:grid;place-items:center;padding:0;cursor:pointer;z-index:2}
 .face .shufb svg{width:20px;height:20px}
 .back .shufb{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);color:#fff}
@@ -1604,8 +1607,8 @@ function fitCard(){
   f.style.height='';f.style.minHeight=''; const full=f.getBoundingClientRect().height;
   // measure against the menu bar itself (iPhone home-screen apps can report a wrong window height)
   const fr=f.getBoundingClientRect(), below=y.getBoundingClientRect().bottom-fr.bottom;
-  const room=nav.getBoundingClientRect().top-(fr.top+scrollY)-below-12;
-  f.style.minHeight='0';f.style.height=Math.max(200,Math.min(460,Math.round(room)))+'px';
+  const room=nav.getBoundingClientRect().top-(fr.top+scrollY)-below-12-36; // leave a little air under the buttons
+  f.style.minHeight='0';f.style.height=Math.max(200,Math.min(430,Math.round(room)))+'px';
   const over=y.getBoundingClientRect().bottom+scrollY-(nav.getBoundingClientRect().top+scrollY)+12; if(over>0)f.style.height=Math.max(200,f.getBoundingClientRect().height-over)+'px'
 }
 {const _b=buildCard;buildCard=function(){const r=_b.apply(this,arguments);fitCard();return r}}
