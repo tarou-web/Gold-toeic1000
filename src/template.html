@@ -573,7 +573,7 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .gzone .goalbox{margin-right:66px}
 .hanger{top:40px;right:-6px;width:28px;height:28px}
 .mbub{right:66px;max-width:calc(100% - 78px)}
-.wrap{gap:12px}
+.wrap{gap:20px}
 header{gap:6px}
 .stats{font-size:.95rem}
 .stat svg{width:20px;height:20px}
@@ -1472,7 +1472,7 @@ function faceHTML(d,lang,isBack){
 function buildCard(){
   const v=$('v-card');
   if(!P.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。<br>下の「出題」や「範囲」を変えてみてください。</div>';return}
-  v.innerHTML=`<div style="display:flex;flex-direction:column;gap:10px">
+  v.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
    <div class="cpos" id="pos"></div>
    <div class="scene" id="scene" tabindex="0" role="button" aria-label="カードを回転させる">
      <div class="flip" id="flip"><div class="face front" id="front"></div><div class="face back" id="back"></div></div>
