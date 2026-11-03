@@ -3,8 +3,13 @@
 // 1. Gemini → 2. Groq → 3. Cloudflare Workers AI の順に聞き、答えが返ってきたところで止めます。
 // 鍵はこのコードには書きません。Cloudflare の設定に保存します：
 //   シークレット GEMINI_API_KEY（Gemini） / シークレット GROQ_API_KEY（Groq） / バインディング AI（Workers AI）
+//   （なくても動く）KV バインディング KV … 答えの保存と、1日の回数の上限に使います
 
 const ORIGIN = "https://tarou-web.github.io"; // このアプリ以外からは使えないようにする
+// 1日に使える回数（同じネットにつながっている人ごと）。保存した答えを返したときは数えない
+const LIMIT_ASK = 30;
+const LIMIT_PHOTO = 10;
+const ANSWER_DAYS = 60; // 保存した答えを使う日数
 
 export default {
   async fetch(req, env) {
@@ -37,12 +42,16 @@ export default {
     let body;
     try { body = await req.json(); } catch { return json({ error: "bad request" }, 400); }
 
+    const ip = req.headers.get("CF-Connecting-IP") || "?";
+
     // 写真から単語帳のカードを読み取る
     if (body.type === "photo") {
+      if (await overLimit(env, "photo", ip, LIMIT_PHOTO)) return json({ error: `写真の読み取りは1日${LIMIT_PHOTO}回までです。明日また使ってね`, limit: true }, 429);
       const image = String(body.image || "");
       if (!image || image.length > 6_000_000) return json({ error: "写真が大きすぎるか、ありません" }, 400);
       const mime = /^image\/(jpeg|png|webp)$/.test(body.mime) ? body.mime : "image/jpeg";
       const r = await photoCards(env, image, mime, Date.now() + 45000);
+      if (r.ok) await countUse(env, "photo", ip);
       return r.ok ? json({ cards: r.cards, provider: r.provider, model: r.model }) : json({ error: r.error }, r.status || 500);
     }
 
@@ -61,6 +70,20 @@ export default {
       "スマホの小さな吹き出しに表示するので、表（|で区切る形）やHTMLタグは使わず、短い見出しと「- 」の箇条書きで書きます。絵文字は使いすぎません。" +
       `今学習しているカード → 英語：「${clip(card.en)}」 日本語：「${clip(card.jp)}」 単語メモ：「${clip(card.g)}」`;
 
+    // 最初の質問（会話の続きでないもの）は、前にだれかが同じカードで聞いた答えを返す
+    const single = msgs.length === 1;
+    const aKey = single ? "ans:" + (await sha(`${card.en || ""}\n${card.jp || ""}\n${msgs[0].text.trim()}`)) : null;
+    if (aKey && env.KV) {
+      const hit = await env.KV.get(aKey, "json").catch(() => null);
+      if (hit && hit.text) return json({ ...hit, cached: true, tried: [] });
+    }
+    if (await overLimit(env, "ask", ip, LIMIT_ASK)) return json({ error: `AIに聞けるのは1日${LIMIT_ASK}回までです。明日また聞いてね`, limit: true }, 429);
+    const done = async (out) => {
+      await countUse(env, "ask", ip);
+      if (aKey && env.KV) await env.KV.put(aKey, JSON.stringify({ text: out.text, provider: out.provider, model: out.model }), { expirationTtl: ANSWER_DAYS * 86400 }).catch(() => {});
+      return json(out);
+    };
+
     // 全体で 30 秒以内に答えを返す
     const deadline = Date.now() + 30000;
     const tried = [];
@@ -70,21 +93,21 @@ export default {
     // Gemini を先に聞き、5秒たっても返事がなければ Groq にも同時に聞いて、先に答えたほうを使う
     const pG = gemini(env, system, msgs, deadline).then((r) => ({ name: "gemini", r }));
     let first = await Promise.race([pG, sleep(5000).then(() => null)]);
-    if (first && ok(first.r)) return json({ text: first.r.text, provider: "gemini", model: first.r.model, tried });
+    if (first && ok(first.r)) return done({ text: first.r.text, provider: "gemini", model: first.r.model, tried });
     if (first) note("gemini", first.r);
 
     const pQ = groq(env, system, msgs, deadline).then((r) => ({ name: "groq", r }));
     const pending = first ? [pQ] : [pG, pQ];
     while (pending.length) {
-      const done = await Promise.race(pending.map((p, i) => p.then((v) => ({ v, i }))));
-      pending.splice(done.i, 1);
-      if (ok(done.v.r)) return json({ text: done.v.r.text, provider: done.v.name, model: done.v.r.model, tried });
-      note(done.v.name, done.v.r);
+      const fin = await Promise.race(pending.map((p, i) => p.then((v) => ({ v, i }))));
+      pending.splice(fin.i, 1);
+      if (ok(fin.v.r)) return done({ text: fin.v.r.text, provider: fin.v.name, model: fin.v.r.model, tried });
+      note(fin.v.name, fin.v.r);
     }
 
     // どちらもだめなら Workers AI
     const w = await workersAI(env, system, msgs, deadline);
-    if (ok(w)) return json({ text: w.text, provider: "workersAI", model: w.model, tried });
+    if (ok(w)) return done({ text: w.text, provider: "workersAI", model: w.model, tried });
     note("workersAI", w);
     const last = w.skip ? { error: "答えられる AI がありませんでした", status: 503 } : w;
     return json({ error: last.error, tried }, last.status || 500);
@@ -243,6 +266,28 @@ async function photoCards(env, image, mime, deadline) {
     }
   }
   return last;
+}
+
+// ---------- 1日の回数（KV があるときだけ） ----------
+// 日本時間の日付で数え、2日たったら自動で消える
+const dayJST = () => new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+async function useKey(kind, ip) { return `use:${dayJST()}:${kind}:${(await sha(ip)).slice(0, 16)}`; }
+async function overLimit(env, kind, ip, max) {
+  if (!env.KV) return false;
+  const n = +(await env.KV.get(await useKey(kind, ip)).catch(() => 0)) || 0;
+  return n >= max;
+}
+async function countUse(env, kind, ip) {
+  if (!env.KV) return;
+  try {
+    const k = await useKey(kind, ip);
+    const n = +(await env.KV.get(k)) || 0;
+    await env.KV.put(k, String(n + 1), { expirationTtl: 2 * 86400 });
+  } catch {}
+}
+async function sha(t) {
+  const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t));
+  return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
 }
 
 // ---------- 共通の部品 ----------
