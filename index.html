@@ -419,7 +419,8 @@ body.has-hat .tracklabel{padding-right:80px}
 .bnav button.on{color:var(--accent-ink);background:var(--accent-s);box-shadow:inset 0 0 0 2px var(--accent-d)}
 .bnav button:active{transform:scale(.92)}
 .bv.navv{bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:57}
-.bv.deckv{z-index:62}
+.bv.deckv{z-index:57;bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+.deckv .sv-bar{grid-template-columns:44px 1fr 44px}
 .libv .bv-hero{background:var(--hero-lib)}
 .setv .bv-hero{background:var(--hero-set)}
 .navv .sv-bar{grid-template-columns:44px 1fr 44px}
@@ -459,10 +460,10 @@ body.has-hat .tracklabel{padding-right:80px}
 .deckbtn:active{transform:translateY(2px);border-bottom-width:2px}
 .deckbtn[hidden]{display:none}
 .deckv .bv-hero{background:var(--hero-lib)}
-.dk-name{display:flex;align-items:center;gap:10px;padding-block:0 18px}
+.dk-name{display:flex;align-items:center;gap:10px}
 .dk-name input{flex:1;min-width:0;font:inherit;font-family:var(--f-jp);font-weight:800;font-size:1.15rem;padding:10px 12px;border-radius:12px;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.14);color:#fff}
 .dk-name input::placeholder{color:rgba(255,255,255,.7)}
-.dk-name span{font-weight:800;font-size:.85rem;opacity:.9;white-space:nowrap}
+.dk-name span{font-weight:800;font-size:.85rem;color:var(--muted);white-space:nowrap}
 .dk-add{display:flex;flex-direction:column;gap:8px}
 .dk-add h3,.deckv h3{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1.05rem}
 .dk-add input,.dk-bulk textarea,.dk-row input{font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--fg);width:100%;box-sizing:border-box}
@@ -619,8 +620,8 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .shop .bv-num{text-shadow:4px 4px 0 rgba(40,45,50,.12)!important}
 .shop-bag{color:var(--on-accent)}
 .lib-sel{background:rgba(255,255,255,.4)}
-.dk-name input{color:var(--on-accent);border-color:rgba(40,45,50,.3);background:rgba(255,255,255,.4)}
-.dk-name input::placeholder{color:rgba(40,45,50,.5)}
+.dk-name input{color:var(--fg);border-color:var(--line);background:var(--surface)}
+.dk-name input::placeholder{color:var(--muted)}
 /* compact home top so the card gets more room */
 .kwrap{display:flex;flex-direction:column;gap:3px;align-items:stretch}
 .knum{line-height:1.1}.knum small{font-size:.72em;color:var(--muted);font-weight:800}
@@ -754,10 +755,10 @@ header{gap:6px}
   </section>
   <section class="bv deckv" id="deckv" role="dialog" aria-modal="true" aria-labelledby="deckTitle" aria-hidden="true">
     <div class="bv-hero"><div class="sv-in">
-      <div class="sv-bar"><button class="sv-x" id="deckClose" aria-label="閉じる">✕</button><h2 id="deckTitle">単語帳</h2><span></span></div>
-      <div class="dk-name"><input id="dkName" placeholder="単語帳の名前（例：TOEIC 頻出）" maxlength="40" autocomplete="off"><span id="dkCount"></span></div>
+      <div class="sv-bar"><span></span><h2 id="deckTitle">単語帳</h2><span></span></div>
     </div></div>
     <div class="sv-in bv-body">
+      <div class="dk-name"><input id="dkName" placeholder="単語帳の名前（例：TOEIC 頻出）" maxlength="40" autocomplete="off"><span id="dkCount"></span></div>
       <div class="dk-photo">
         <div class="dk-two">
         <label class="btn photo-btn" id="dkPhotoBtn"><input type="file" id="dkPhotoIn" accept="image/*" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 4.5 7.6 6.5H5A2.5 2.5 0 0 0 2.5 9v9A2.5 2.5 0 0 0 5 20.5h14a2.5 2.5 0 0 0 2.5-2.5V9A2.5 2.5 0 0 0 19 6.5h-2.6L15 4.5zM12 9a4.25 4.25 0 1 1 0 8.5A4.25 4.25 0 0 1 12 9zm0 2a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5z"/></svg>写真から追加</label>
@@ -1196,6 +1197,7 @@ function commitDraft(){
   if(d.name&&d.cards.length){S.decks.push(d);dkDraft=null;save();selectDeck(d.id,true);save();renderDeckBar()}
 }
 function openDeckEdit(id){
+  closeNavViews(); navOn('navNew');
   if(id==='new'){dkDraft={id:'d'+Date.now().toString(36),name:'',cards:[]};id=dkDraft.id}else dkDraft=null;
   dkId=id; const dk=edDeck(); if(!dk)return;
   closePhoto(); toggleGen(false); renderPhotoLeft(); $('dkName').value=dk.name||''; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
@@ -1209,8 +1211,9 @@ function closeDeckEdit(){
     if(d.cards.length||$('dkName').value.trim())toast('<div><strong>単語帳は作られませんでした</strong><span>名前とカード1枚以上が必要です</span></div>')}
   else{const dk=deckOf(dkId); if(dk){dk.name=$('dkName').value.trim()||dk.name||'新しい単語帳'; save(); selectDeck(dk.id)}}
   const v=$('deckv'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); dkId=null;
-  if($('libv').classList.contains('open'))renderLib(); else document.body.classList.remove('sv-lock');
+  document.body.classList.remove('sv-lock');
 }
+const deckOpen=()=>$('deckv').classList.contains('open');
 function renderDeckEdit(){
   const dk=edDeck(); if(!dk)return; const cs=dk.cards||[];
   $('dkCount').textContent=`${cs.length}枚`; $('dkListTitle').textContent=`カード（${cs.length}枚）`;
@@ -1318,8 +1321,8 @@ function parseBulk(t){
 // ---- bottom navigation, library, settings, study options
 function navOn(id){for(const b of document.querySelectorAll('.bnav button'))b.classList.toggle('on',b.id===id)}
 function closeNavViews(){libSel=null;libArm=false;for(const id of ['libv','setv']){const v=$(id);v.classList.remove('open');v.setAttribute('aria-hidden','true')} document.body.classList.remove('sv-lock')}
-function openNavView(id){closeNavViews();closeOpt();const v=$(id);v.classList.add('open');v.setAttribute('aria-hidden','false');v.scrollTop=0;document.body.classList.add('sv-lock')}
-function goHome(){closeNavViews();closeOpt();navOn('navHome');scrollTo({top:0,behavior:'smooth'})}
+function openNavView(id){if(deckOpen())closeDeckEdit();closeNavViews();closeOpt();const v=$(id);v.classList.add('open');v.setAttribute('aria-hidden','false');v.scrollTop=0;document.body.classList.add('sv-lock')}
+function goHome(){if(deckOpen())closeDeckEdit();closeNavViews();closeOpt();navOn('navHome');scrollTo({top:0,behavior:'smooth'})}
 function setLibSel(on){libSel=on?new Set():null;libArm=false;renderLib()}
 function renderLib(){
   const sel=libSel; $('libSel').textContent=sel?'キャンセル':'選択'; $('libSel').hidden=!S.decks.length&&!sel;
@@ -1852,7 +1855,7 @@ for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();
 for(const x of ['card','quiz','list']) $('t-'+x).onclick=()=>setTab(x);
 $('askClose').onclick=closeAsk;
 $('navHome').onclick=goHome;
-$('navNew').onclick=()=>{closeNavViews();navOn('navHome');openDeckEdit('new')};
+$('navNew').onclick=()=>{if(deckOpen())return;openDeckEdit('new')};
 $('navLib').onclick=()=>{renderLib();openNavView('libv');navOn('navLib')};
 $('navSet').onclick=()=>{renderAiStats();openNavView('setv');navOn('navSet')};
 $('libSel').onclick=()=>setLibSel(!libSel);
@@ -1861,9 +1864,8 @@ $('libDel').onclick=()=>{if(!libSel||!libSel.size)return; if(!libArm){libArm=tru
   const n=libSel.size; for(const dk of S.decks.filter(d=>libSel.has(d.id)))for(const c of dk.cards||[]){delete S.known[c.id];delete S.miss[c.id]}
   const gone=libSel.has(S.deck); S.decks=S.decks.filter(d=>!libSel.has(d.id)); save(); if(gone)selectDeck('gold'); renderDeckBar();
   setLibSel(false); toast(`<div><strong>${n}個の単語帳を削除しました</strong></div>`)};
-$('libNew').onclick=()=>{closeNavViews();navOn('navHome');openDeckEdit('new')};
+$('libNew').onclick=()=>openDeckEdit('new');
 
-$('deckClose').onclick=closeDeckEdit;
 $('dkName').onchange=()=>{if(dkDraft&&dkDraft.id===dkId){commitDraft();return}const dk=deckOf(dkId);if(dk){dk.name=$('dkName').value.trim();save()}};
 const dkAdd=()=>{const en=$('dkEn').value.trim(),jp=$('dkJp').value.trim(); if(!en){$('dkEn').focus();return} if(!jp){$('dkJp').focus();return}
   if(addCards([[en,jp]])){$('dkEn').value='';$('dkJp').value='';$('dkEn').focus();toast('<div><strong>カードを追加しました</strong></div>')}else toast('<div><strong>同じカードがもうあります</strong></div>')};
@@ -1880,7 +1882,7 @@ $('dkBulkBtn').onclick=()=>{const {out,bad}=parseBulk($('dkBulk').value); const 
 let dkArm=false;
 $('dkDelete').onclick=()=>{ if(!dkArm){dkArm=true;$('dkDelete').textContent='もう一度押すと削除';return}
   const dk=deckOf(dkId); dkDraft=null; if(dk){for(const c of dk.cards||[]){delete S.known[c.id];delete S.miss[c.id]} S.decks=S.decks.filter(x=>x!==dk)}
-  dkArm=false;$('dkDelete').textContent='削除する'; const v=$('deckv'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); document.body.classList.remove('sv-lock'); dkId=null; selectDeck('gold'); toast('<div><strong>単語帳を削除しました</strong></div>')};
+  dkArm=false;$('dkDelete').textContent='削除する'; const v=$('deckv'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); document.body.classList.remove('sv-lock'); dkId=null; selectDeck('gold'); navOn('navHome'); toast('<div><strong>単語帳を削除しました</strong></div>')};
 $('askEn').addEventListener('click',async e=>{
   const w=e.target.closest('.w'); if(!w)return;
   const word=w.textContent.replace(/^[^A-Za-z0-9'’-]+|[^A-Za-z0-9'’-]+$/g,''); if(!word)return;
@@ -1907,7 +1909,7 @@ $('bagBtn').onclick=openShop; $('shopClose').onclick=closeShop;
 $('hangerBtn').onclick=e=>{e.stopPropagation();$('wardrobe').hidden?openWardrobe():closeWardrobe()};
 $('wardrobe').onclick=e=>e.stopPropagation();
 document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOpt();if($('deckv').classList.contains('open'))closeDeckEdit();if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOpt();if(deckOpen()){closeDeckEdit();navOn('navHome')}if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
 applyWear(); renderAiStats();
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
 $('mascot').onclick=()=>{const d=(tab==='quiz'&&QP[qi])||P[ci]||DATA[0];if(d)openAsk(d);else openDeckEdit(S.deck==='gold'?'new':S.deck)};
