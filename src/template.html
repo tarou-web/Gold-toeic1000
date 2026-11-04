@@ -7,7 +7,7 @@
 :root{
   --bg:#ffffff; --bg2:#f7f7f7; --surface:#ffffff; --fg:#3c3c3c; --muted:#8a8a8a; --line:#e5e5e5; --line2:#cfcfcf;
   --green:#4cc21c; --green-d:#3a9a12; --green-s:#d9f7c4; --green-ink:#2f7d0c;
-  --accent:#ffc21a; --accent-d:#e0a000; --accent-s:#fff4cc; --accent-ink:#946600; --on-accent:#3d2b00;
+  --accent:#eceef1; --accent-d:#cdd2d8; --accent-s:#f1f3f5; --accent-ink:#4b5259; --on-accent:#2b3036; --accent-line:#9aa2ab;
   --red:#f04a4a; --red-d:#c73434; --red-s:#ffe0e0; --red-ink:#d13636;
   --gold:#ffb21e; --gold-d:#e08f00;
   --hero:#6a3fd6; --hero-sh:#4a28a8; --hero-shop:var(--accent); --hero-shop-sh:var(--accent-d); --hero-lib:var(--accent); --hero-set:#4b5563; --hero-ask:#2f8f5b;
@@ -19,7 +19,7 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#131f24; --bg2:#1a2a31; --surface:#1d2d35; --fg:#eef3f5; --muted:#8fa3ad; --line:#37464f; --line2:#2a3a42;
   --green:#58d22a; --green-d:#3e9e16; --green-s:#1f3a1a; --green-ink:#7ee64f;
-  --accent:#ffc83d; --accent-d:#d99a00; --accent-s:#3a3010; --accent-ink:#ffd666; --on-accent:#3d2b00;
+  --accent:#dfe3e7; --accent-d:#aab2ba; --accent-s:#2c3338; --accent-ink:#e6e9ec; --on-accent:#23282d; --accent-line:#c5ccd3;
   --red:#ff5a5a; --red-d:#c43a3a; --red-s:#3d2023; --red-ink:#ff8181;
   --gold:#ffc03d; --gold-d:#d99200;
   --streak:#d97b00; --streak-d:#a85c00; --streak-s:#5a3a10;
@@ -27,7 +27,7 @@
 :root[data-theme="dark"]{
   --bg:#131f24; --bg2:#1a2a31; --surface:#1d2d35; --fg:#eef3f5; --muted:#8fa3ad; --line:#37464f; --line2:#2a3a42;
   --green:#58d22a; --green-d:#3e9e16; --green-s:#1f3a1a; --green-ink:#7ee64f;
-  --accent:#ffc83d; --accent-d:#d99a00; --accent-s:#3a3010; --accent-ink:#ffd666; --on-accent:#3d2b00;
+  --accent:#dfe3e7; --accent-d:#aab2ba; --accent-s:#2c3338; --accent-ink:#e6e9ec; --on-accent:#23282d; --accent-line:#c5ccd3;
   --red:#ff5a5a; --red-d:#c43a3a; --red-s:#3d2023; --red-ink:#ff8181;
   --gold:#ffc03d; --gold-d:#d99200;
   --streak:#d97b00; --streak-d:#a85c00; --streak-s:#5a3a10;
@@ -52,8 +52,8 @@ h1 span{color:var(--green)}
 /* tabs as chunky segmented buttons */
 .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .tabs button{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.92rem;padding:10px 6px;border-radius:14px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--muted);cursor:pointer}
-.tabs button[aria-selected=true]{border-color:var(--accent);background:var(--accent-s);color:var(--accent-ink)}
-button:focus-visible,select:focus-visible,input:focus-visible,.scene:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.tabs button[aria-selected=true]{border-color:var(--accent-line);background:var(--accent-s);color:var(--accent-ink)}
+button:focus-visible,select:focus-visible,input:focus-visible,.scene:focus-visible{outline:3px solid var(--accent-line);outline-offset:3px}
 
 .meta{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums}
 .chip{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:99px;white-space:nowrap}
@@ -343,7 +343,7 @@ body.sv-lock{overflow:hidden}
 .wardrobe[hidden]{display:none}
 .wardrobe h4{margin:2px 4px 4px;font-family:var(--f-jp);font-weight:800;font-size:.9rem;color:var(--muted)}
 .wardrobe button{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.92rem;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;border:2px solid var(--line);background:none;color:var(--fg);cursor:pointer;text-align:left}
-.wardrobe button[aria-pressed=true]{border-color:var(--accent);background:var(--accent-s);color:var(--accent-ink)}
+.wardrobe button[aria-pressed=true]{border-color:var(--accent-line);background:var(--accent-s);color:var(--accent-ink)}
 .wthumb{position:relative;width:30px;flex:0 0 30px}
 body.has-hat .tracklabel{padding-right:80px}
 .wardrobe{max-width:calc(100vw - 32px)}
@@ -392,7 +392,7 @@ body.has-hat .tracklabel{padding-right:80px}
 .bnav{position:fixed;left:0;right:0;bottom:0;z-index:58;display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg);border-top:2px solid var(--line);padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
 .bnav button{height:50px;border:0;background:none;color:var(--muted);display:grid;place-items:center;border-radius:14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .bnav button svg{width:28px;height:28px}
-.bnav button.on{color:var(--accent-ink);background:var(--accent-s)}
+.bnav button.on{color:var(--accent-ink);background:var(--accent-s);box-shadow:inset 0 0 0 2px var(--accent-d)}
 .bnav button:active{transform:scale(.92)}
 .bv.navv{bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:57}
 .bv.deckv{z-index:62}
@@ -401,7 +401,7 @@ body.has-hat .tracklabel{padding-right:80px}
 .navv .sv-bar{grid-template-columns:44px 1fr 44px}
 .lib{display:flex;flex-direction:column;gap:10px}
 .lib-item{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-bottom-width:4px;border-radius:18px;padding:12px 14px;background:var(--surface);cursor:pointer;text-align:left;font:inherit;color:var(--fg);width:100%}
-.lib-item.cur{border-color:var(--accent)}
+.lib-item.cur{border-color:var(--accent-line)}
 .lib-item .li-main{flex:1;min-width:0}
 .lib-item b{display:block;font-family:var(--f-jp);font-weight:800;font-size:1.05rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lib-item small{display:block;color:var(--muted);font-weight:700;font-size:.8rem;margin-top:2px}
@@ -583,18 +583,19 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 @media (prefers-reduced-motion:reduce){.bv{transition:none}.toast{transition:none}}
 /* yellow surfaces (card back, my chat bubbles, shop / library / deck headers) use dark text so they stay readable */
 .back,.msg.me{color:var(--on-accent)}
-.back .corner,.back .tap{color:rgba(61,43,0,.7)}
-.back .side,.back .tr .chip{background:rgba(61,43,0,.12);color:var(--on-accent)}
+.back .corner,.back .tap{color:rgba(40,45,50,.7)}
+.back .side,.back .tr .chip{background:rgba(40,45,50,.12);color:var(--on-accent)}
 .back::before,.back::after{background:rgba(255,255,255,.22)}
-.back .say{color:var(--on-accent);border-color:rgba(61,43,0,.25);background:rgba(255,255,255,.35)}
-.back .shufb{background:rgba(255,255,255,.4);border-color:rgba(61,43,0,.22);color:var(--on-accent)}
+.back .say{color:var(--on-accent);border-color:rgba(40,45,50,.25);background:rgba(255,255,255,.35)}
+.back .shufb{background:rgba(255,255,255,.4);border-color:rgba(40,45,50,.22);color:var(--on-accent)}
 .back .gloss,.back .gloss b,.back .gloss span{color:var(--on-accent)}
 .shop .bv-hero,.libv .bv-hero,.deckv .bv-hero{color:var(--on-accent)}
 .shop .bv-hero .sv-x,.libv .bv-hero .sv-x,.deckv .bv-hero .sv-x,.lib-sel{color:var(--on-accent)}
-.shop .bv-num{text-shadow:4px 4px 0 rgba(61,43,0,.18)!important}
+.shop .bv-num{text-shadow:4px 4px 0 rgba(40,45,50,.12)!important}
+.shop-bag{color:var(--on-accent)}
 .lib-sel{background:rgba(255,255,255,.4)}
-.dk-name input{color:var(--on-accent);border-color:rgba(61,43,0,.3);background:rgba(255,255,255,.4)}
-.dk-name input::placeholder{color:rgba(61,43,0,.5)}
+.dk-name input{color:var(--on-accent);border-color:rgba(40,45,50,.3);background:rgba(255,255,255,.4)}
+.dk-name input::placeholder{color:rgba(40,45,50,.5)}
 /* compact home top so the card gets more room */
 .kwrap{display:flex;flex-direction:column;gap:3px;align-items:stretch}
 .knum{line-height:1.1}.knum small{font-size:.72em;color:var(--muted);font-weight:800}
@@ -723,7 +724,7 @@ header{gap:6px}
   <section class="bv shop" id="shopv" role="dialog" aria-modal="true" aria-labelledby="shopTitle" aria-hidden="true">
     <div class="bv-hero"><div class="sv-in">
       <div class="sv-bar"><button class="sv-x" id="shopClose" aria-label="閉じる">✕</button><h2 id="shopTitle">ショップ</h2><span></span></div>
-      <div class="bv-top"><div><div class="bv-num" id="shopNum">0</div><div class="bv-lbl">ショッピングポイント</div></div><div class="shop-bag"><svg viewBox="0 0 24 24"><path d="M8 8.5V6.8a4 4 0 0 1 8 0v1.7" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path fill="#fff" d="M5.3 8h13.4c.6 0 1 .4 1.1 1l.9 10.8A2 2 0 0 1 18.7 22H5.3a2 2 0 0 1-2-2.2L4.2 9c.1-.6.5-1 1.1-1z"/><circle cx="9" cy="11.5" r="1.1" fill="#1c8fd6"/><circle cx="15" cy="11.5" r="1.1" fill="#1c8fd6"/></svg></div></div>
+      <div class="bv-top"><div><div class="bv-num" id="shopNum">0</div><div class="bv-lbl">ショッピングポイント</div></div><div class="shop-bag"><svg viewBox="0 0 24 24"><path d="M8 8.5V6.8a4 4 0 0 1 8 0v1.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path fill="currentColor" d="M5.3 8h13.4c.6 0 1 .4 1.1 1l.9 10.8A2 2 0 0 1 18.7 22H5.3a2 2 0 0 1-2-2.2L4.2 9c.1-.6.5-1 1.1-1z"/><circle cx="9" cy="11.5" r="1.1" fill="#1c8fd6"/><circle cx="15" cy="11.5" r="1.1" fill="#1c8fd6"/></svg></div></div>
     </div></div>
     <div class="sv-in bv-body">
       <p class="bv-rule">問題に正解すると1ポイント（カードの「覚えた」も正解に数えます）。同じフレーズでもらえるのは1日1回までです。</p>
