@@ -6,11 +6,11 @@
 /* Layout: playful lesson app — stat pills on top, one chunky 3D card or quiz in the middle, settings at the bottom */
 :root{
   --bg:#ffffff; --bg2:#f7f7f7; --surface:#ffffff; --fg:#3c3c3c; --muted:#8a8a8a; --line:#e5e5e5; --line2:#cfcfcf;
-  --green:#4cc21c; --green-d:#3a9a12; --green-s:#d9f7c4; --green-ink:#2f7d0c;
+  --green:#f5c518; --green-d:#cfa200; --green-s:#fff5cc; --green-ink:#8a6800; --on-green:#3b2e00;
   --accent:#eceef1; --accent-d:#cdd2d8; --accent-s:#f1f3f5; --accent-ink:#4b5259; --on-accent:#2b3036; --accent-line:#9aa2ab;
   --red:#f04a4a; --red-d:#c73434; --red-s:#ffe0e0; --red-ink:#d13636;
   --gold:#ffb21e; --gold-d:#e08f00;
-  --hero:#6a3fd6; --hero-sh:#4a28a8; --hero-shop:var(--accent); --hero-shop-sh:var(--accent-d); --hero-lib:var(--accent); --hero-set:#4b5563; --hero-ask:#2f8f5b;
+  --hero:#6a3fd6; --hero-sh:#4a28a8; --hero-shop:var(--accent); --hero-shop-sh:var(--accent-d); --hero-lib:var(--accent); --hero-set:#4b5563; --hero-ask:var(--green);
   --streak:#f29100; --streak-d:#c96f00; --streak-s:#ffe2b3; --streak-ink:#e07d00;
   --btn-photo:#6a3fd6; --btn-photo-d:#4f2aa8; --btn-gen:#e8890c; --btn-gen-d:#b86a06; --spin:#8f6bff; --splash:#9aa3ad; --sold:#e5333f;
   --f:"Nunito","M PLUS Rounded 1c","Hiragino Maru Gothic ProN",system-ui,sans-serif;
@@ -18,7 +18,7 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#131f24; --bg2:#1a2a31; --surface:#1d2d35; --fg:#eef3f5; --muted:#8fa3ad; --line:#37464f; --line2:#2a3a42;
-  --green:#58d22a; --green-d:#3e9e16; --green-s:#1f3a1a; --green-ink:#7ee64f;
+  --green:#ffd23f; --green-d:#c99d00; --green-s:#3a3212; --green-ink:#ffe07a; --on-green:#3b2e00;
   --accent:#dfe3e7; --accent-d:#aab2ba; --accent-s:#2c3338; --accent-ink:#e6e9ec; --on-accent:#23282d; --accent-line:#c5ccd3;
   --red:#ff5a5a; --red-d:#c43a3a; --red-s:#3d2023; --red-ink:#ff8181;
   --gold:#ffc03d; --gold-d:#d99200;
@@ -26,7 +26,7 @@
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#131f24; --bg2:#1a2a31; --surface:#1d2d35; --fg:#eef3f5; --muted:#8fa3ad; --line:#37464f; --line2:#2a3a42;
-  --green:#58d22a; --green-d:#3e9e16; --green-s:#1f3a1a; --green-ink:#7ee64f;
+  --green:#ffd23f; --green-d:#c99d00; --green-s:#3a3212; --green-ink:#ffe07a; --on-green:#3b2e00;
   --accent:#dfe3e7; --accent-d:#aab2ba; --accent-s:#2c3338; --accent-ink:#e6e9ec; --on-accent:#23282d; --accent-line:#c5ccd3;
   --red:#ff5a5a; --red-d:#c43a3a; --red-s:#3d2023; --red-ink:#ff8181;
   --gold:#ffc03d; --gold-d:#d99200;
@@ -98,7 +98,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,.scene:focus-visib
 .row2{display:grid;grid-template-columns:1fr 1.4fr;gap:10px}
 .btn{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:1rem;letter-spacing:.04em;padding:13px 10px;border-radius:16px;border:2px solid var(--line);border-bottom-width:5px;background:var(--surface);color:var(--muted);cursor:pointer;transition:transform .06s}
 .btn:active:not(:disabled){transform:translateY(3px);border-bottom-width:2px;margin-bottom:3px}
-.btn.ok{background:var(--green);border-color:var(--green-d);color:#fff}
+.btn.ok{background:var(--green);border-color:var(--green-d);color:var(--on-green)}
 .btn.bad{background:var(--surface);border-color:var(--red);color:var(--red-ink)}
 .btn.blue{background:var(--surface);border-color:var(--line);color:var(--accent-ink)}
 .btn.red{background:var(--red);border-color:var(--red-d);color:#fff}
@@ -492,7 +492,8 @@ body.has-hat .tracklabel{padding-right:80px}
 .askbtn{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:10px 14px;border-radius:16px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--accent-ink);cursor:pointer}
 .askbtn img{width:26px;height:auto;margin:-6px 0}
 .askbtn:active{transform:translateY(2px);border-bottom-width:2px}
-.ask .bv-hero{background:var(--hero-ask)}
+.ask .bv-hero{background:var(--hero-ask);color:var(--on-green)}
+.ask .bv-hero .sv-x{color:var(--on-green)}
 .ask-card{display:flex;align-items:center;gap:14px;padding-block:0 14px;padding-right:78px;min-height:78px;position:relative}
 .ask-card .af{position:absolute;right:0;bottom:8px;width:62px;aspect-ratio:221/320}
 .ask-card .af img{width:100%;display:block}
