@@ -863,7 +863,7 @@ function syncStatus(err){
 }
 // ---- account (Firebase Authentication, email + password, REST) ----
 // The web API key only names the Firebase project (it is meant to be in the page); the database rules do the protecting.
-var FB_API_KEY='__FB_API_KEY__';
+var FB_API_KEY='AIzaSyCYQD5PqB84jlq2ssY7ZUK6JEXunHNtCGk';
 var AUTH_ON=/^AIza/.test(FB_API_KEY);
 var AU=null; try{AU=JSON.parse(localStorage.getItem(KEY+'-auth')||'null')}catch(e){}
 function auSave(){try{AU?localStorage.setItem(KEY+'-auth',JSON.stringify(AU)):localStorage.removeItem(KEY+'-auth')}catch(e){}}
