@@ -465,6 +465,7 @@ body.has-hat .tracklabel{padding-right:80px}
 .photo-btn.busy{opacity:.55;pointer-events:none}
 .photo-btn svg{width:24px;height:24px}
 .ph-note{margin:0;font-size:.8rem;color:var(--muted)}
+.ph-note b{margin-left:6px;color:var(--fg)}.ph-note b.zero{color:var(--red-ink)}
 .ph-box{border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px}
 .ph-box[hidden]{display:none}
 .ph-wait{display:flex;align-items:center;gap:12px;font-family:var(--f-jp);font-size:.92rem}
@@ -728,7 +729,7 @@ header{gap:6px}
     <div class="sv-in bv-body">
       <div class="dk-photo">
         <label class="btn photo-btn" id="dkPhotoBtn"><input type="file" id="dkPhotoIn" accept="image/*" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 4.5 7.6 6.5H5A2.5 2.5 0 0 0 2.5 9v9A2.5 2.5 0 0 0 5 20.5h14a2.5 2.5 0 0 0 2.5-2.5V9A2.5 2.5 0 0 0 19 6.5h-2.6L15 4.5zM12 9a4.25 4.25 0 1 1 0 8.5A4.25 4.25 0 0 1 12 9zm0 2a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5z"/></svg>写真から追加</label>
-        <p class="ph-note">単語帳やプリントを撮ると、AIが英語と日本語を読み取ります。</p>
+        <p class="ph-note">単語帳やプリントを撮ると、AIが英語と日本語を読み取ります。<b id="phLeft"></b></p>
         <div class="ph-box" id="dkPhoto" hidden></div>
       </div>
       <div class="dk-add">
@@ -1060,7 +1061,7 @@ function commitDraft(){
 function openDeckEdit(id){
   if(id==='new'){dkDraft={id:'d'+Date.now().toString(36),name:'',cards:[]};id=dkDraft.id}else dkDraft=null;
   dkId=id; const dk=edDeck(); if(!dk)return;
-  closePhoto(); $('dkName').value=dk.name||''; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
+  closePhoto(); renderPhotoLeft(); $('dkName').value=dk.name||''; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
   renderDeckEdit();
   const v=$('deckv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); document.body.classList.add('sv-lock');
   setTimeout(()=>{(dk.name?$('dkEn'):$('dkName')).focus({preventScroll:true})},350);
@@ -1103,14 +1104,17 @@ async function shrinkPhoto(file){
   }finally{URL.revokeObjectURL(url)}
 }
 async function readPhoto(file){
-  const box=$('dkPhoto'); box.hidden=false; $('dkPhotoBtn').classList.add('busy');
+  const box=$('dkPhoto'); box.hidden=false;
+  if(photoUsed()>=PHOTO_LIMIT){box.innerHTML=`<p class="ph-err">写真の読み取りは1日${PHOTO_LIMIT}回までです。明日また使ってね。</p>`;$('dkPhotoIn').value='';return} $('dkPhotoBtn').classList.add('busy');
   let shot;
   try{shot=await shrinkPhoto(file)}catch(e){box.innerHTML='<p class="ph-err">この写真は開けませんでした。別の写真で試してください。</p>';$('dkPhotoBtn').classList.remove('busy');return}
   box.innerHTML=`<div class="ph-wait"><img src="${shot.thumb}" alt=""><span class="spin"></span><span>ヨウムが写真を読んでいます…<br><small>10〜30秒ほどかかります</small></span></div>`;
   try{
     const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'photo',image:shot.data,mime:'image/jpeg'})});
     const d=await r.json().catch(()=>({}));
+    if(d.limit){box.innerHTML=`<p class="ph-err">${esc(d.error||'今日の写真の読み取りはここまでです')}</p>`;return}
     if(!r.ok||!Array.isArray(d.cards))throw new Error(d.error||('エラー '+r.status));
+    photoCount();
     if(!d.cards.length){box.innerHTML='<p class="ph-err">英語が見つかりませんでした。文字が大きく、はっきり写るように撮ってみてください。</p>';return}
     const dk=edDeck(), have=new Set((dk&&dk.cards||[]).map(c=>c.en.toLowerCase()));
     phCards=d.cards.map(c=>({en:c.en,jp:c.jp,on:!have.has(c.en.toLowerCase()),dup:have.has(c.en.toLowerCase())}));
@@ -1213,7 +1217,10 @@ function renderAsk(){
     if(q)v.scrollTop=Math.max(0,q.offsetTop-12);});
 }
 // answers to a first question are kept on this phone, so asking the same thing again is instant and free
-const AI_LIMIT=20, ANS_KEY=KEY+'-ans';
+const AI_LIMIT=10, PHOTO_LIMIT=3, ANS_KEY=KEY+'-ans';
+function photoUsed(){try{const m=JSON.parse(localStorage.getItem(KEY+'-ph')||'{}');return m[today()]||0}catch(e){return 0}}
+function photoCount(){try{localStorage.setItem(KEY+'-ph',JSON.stringify({[today()]:photoUsed()+1}))}catch(e){}renderPhotoLeft()}
+function renderPhotoLeft(){const el=$('phLeft');if(!el)return;const n=Math.max(0,PHOTO_LIMIT-photoUsed());el.textContent=`今日あと${n}回`;el.classList.toggle('zero',!n)}
 function ansLoad(){try{return JSON.parse(localStorage.getItem(ANS_KEY)||'{}')}catch(e){return {}}}
 function ansSave(k,v){try{const m=ansLoad();m[k]=v;const ks=Object.keys(m);if(ks.length>400)ks.sort((a,b)=>(m[a].t||0)-(m[b].t||0)).slice(0,ks.length-400).forEach(x=>delete m[x]);localStorage.setItem(ANS_KEY,JSON.stringify(m))}catch(e){}}
 const askToday=()=>((S.ai||{}).days||{})[today()]||0;
@@ -1697,7 +1704,7 @@ $('dkName').onchange=()=>{if(dkDraft&&dkDraft.id===dkId){commitDraft();return}co
 const dkAdd=()=>{const en=$('dkEn').value.trim(),jp=$('dkJp').value.trim(); if(!en){$('dkEn').focus();return} if(!jp){$('dkJp').focus();return}
   if(addCards([[en,jp]])){$('dkEn').value='';$('dkJp').value='';$('dkEn').focus();toast('<div><strong>カードを追加しました</strong></div>')}else toast('<div><strong>同じカードがもうあります</strong></div>')};
 $('dkAddBtn').onclick=dkAdd;
-$('dkPhotoIn').onchange=e=>{const f=e.target.files&&e.target.files[0];if(f)readPhoto(f)};
+$('dkPhotoIn').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(f)readPhoto(f)};
 $('dkEn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('dkJp').focus()}});
 $('dkJp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();dkAdd()}});
 $('dkBulkBtn').onclick=()=>{const {out,bad}=parseBulk($('dkBulk').value); const n=addCards(out); const m=$('dkBulkMsg');

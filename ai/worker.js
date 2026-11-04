@@ -7,8 +7,8 @@
 
 const ORIGIN = "https://tarou-web.github.io"; // このアプリ以外からは使えないようにする
 // 1日に使える回数（同じネットにつながっている人ごと）。保存した答えを返したときは数えない
-const LIMIT_ASK = 30;
-const LIMIT_PHOTO = 10;
+const LIMIT_ASK = 15; // アプリは1人10回。家族などで同じネットを使う人がいるので少し多め
+const LIMIT_PHOTO = 5; // アプリは1人3回
 const ANSWER_DAYS = 60; // 保存した答えを使う日数
 
 export default {
