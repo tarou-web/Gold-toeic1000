@@ -12,7 +12,7 @@
   --gold:#ffb21e; --gold-d:#e08f00;
   --hero:#6a3fd6; --hero-sh:#4a28a8; --hero-shop:var(--accent); --hero-shop-sh:var(--accent-d); --hero-lib:var(--accent); --hero-set:#52525b; --hero-ask:var(--green);
   --streak:#f29100; --streak-d:#c96f00; --streak-s:#ffe2b3; --streak-ink:#e07d00;
-  --btn-photo:#6a3fd6; --btn-photo-d:#4f2aa8; --btn-gen:#e8890c; --btn-gen-d:#b86a06; --spin:#8f6bff; --splash:#ffffff; --sold:#e5333f;
+  --btn-photo:#6a3fd6; --btn-photo-d:#4f2aa8; --btn-gen:#e8890c; --btn-gen-d:#b86a06; --spin:#8f6bff; --splash:#fbfaf6; --sold:#e5333f;
   --f:"Nunito","M PLUS Rounded 1c","Hiragino Maru Gothic ProN",system-ui,sans-serif;
   --f-jp:"M PLUS Rounded 1c","Nunito","Hiragino Maru Gothic ProN",system-ui,sans-serif;
 }
@@ -196,17 +196,15 @@ label.ctl{display:flex;flex-direction:column;gap:4px;font-size:.72rem;color:var(
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .splash{position:fixed;inset:0;z-index:100;background:var(--splash);display:flex;align-items:center;justify-content:center;transition:opacity .45s ease;padding-bottom:env(safe-area-inset-bottom,0px)}
 .splash.hide{opacity:0;pointer-events:none}
-.sp-in{display:flex;flex-direction:column;align-items:center;gap:14px}
-.sp-goat{width:min(44vw,200px);height:auto;animation:sp-pop .6s cubic-bezier(.3,1.6,.5,1) both}
-.sp-sh{width:min(28vw,130px);height:12px;border-radius:50%;background:rgba(0,0,0,.08);margin-top:-22px}
+.splash svg{width:min(66vw,282px);height:auto;display:block;margin-top:-60px;overflow:visible;animation:sp-pop .6s cubic-bezier(.3,1.6,.5,1) both}
 .splash .lids{transform-box:fill-box;transform-origin:center;animation:sp-blink 1.1s .55s ease-in-out both}
-.splash .sname{color:#2b2a26;font-family:var(--f);font-weight:900;font-size:2.8rem;line-height:1;animation:sp-up .5s .25s ease-out both}
+.splash .sname{position:absolute;left:0;right:0;bottom:calc(56px + env(safe-area-inset-bottom,0px));text-align:center;color:#2b2b2b;font-family:var(--f);font-weight:900;font-size:2.4rem;line-height:1;animation:sp-up .5s .25s ease-out both}
 .splash .sname b{color:#f5c518;font-weight:900}
 .splash .stag{color:#6b6a66;font-family:var(--f-jp);font-weight:700;font-size:.92rem;letter-spacing:.08em;animation:sp-up .5s .4s ease-out both}
 @keyframes sp-up{0%{transform:translateY(12px);opacity:0}100%{transform:none;opacity:1}}
 @keyframes sp-pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
 @keyframes sp-blink{0%,40%,60%,100%{transform:scaleY(1)}50%{transform:scaleY(.08)}}
-@media (prefers-reduced-motion:reduce){.sp-goat,.splash .sname,.splash .stag{animation:none}}
+@media (prefers-reduced-motion:reduce){.splash svg,.splash .lids,.splash .sname{animation:none}}
 .stat.fire{font:inherit;font-weight:900;background:none;border:0;padding:4px 6px;margin:-4px -6px;border-radius:10px;cursor:pointer}
 .stat.fire:active{transform:scale(.94)}
 .sv{position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform .38s cubic-bezier(.3,1.1,.4,1);visibility:hidden}
@@ -637,8 +635,18 @@ header{gap:6px}
   <small>このアプリは縦向き専用です</small>
 </div>
 <div class="splash" id="splash" aria-hidden="true">
-  <div class="sp-in"><img class="sp-goat" src="mascot.png" alt=""><span class="sp-sh"></span>
-  <div class="sname">M<b>ee</b>mory</div><div class="stag">ミーモと覚える英単語</div></div>
+  <svg class="sp-face" viewBox="-100 -110 712 790" xmlns="http://www.w3.org/2000/svg">
+  <path d="M214 92 Q206 -20 70 -96 Q60 -100 58 -90 Q150 -20 176 100Z" fill="#c9c6c0" stroke="#2b2b2b" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M298 92 Q306 -20 442 -96 Q452 -100 454 -90 Q362 -20 336 100Z" fill="#c9c6c0" stroke="#2b2b2b" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M52 113 Q14 106 -22 140 Q-50 170 -78 178 Q-98 184 -93 206 Q-87 228 -50 232 Q-8 238 32 222" fill="none" stroke="#2b2b2b" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M460 113 Q498 106 534 140 Q562 170 590 178 Q610 184 605 206 Q599 228 562 232 Q520 238 480 222" fill="none" stroke="#2b2b2b" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <g class="lids"><ellipse cx="118" cy="262" rx="66" ry="46" fill="#f5cf4a" stroke="#2b2b2b" stroke-width="11"/><rect x="74" y="250" width="88" height="24" rx="12" fill="#232323"/></g>
+  <g class="lids"><ellipse cx="394" cy="262" rx="66" ry="46" fill="#f5cf4a" stroke="#2b2b2b" stroke-width="11"/><rect x="350" y="250" width="88" height="24" rx="12" fill="#232323"/></g>
+  <path d="M230 418 L256 442 L282 418 M256 442 L256 491 M212 491 H300" fill="none" stroke="#2b2b2b" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M210 560 H302 Q310 560 309 572 Q306 616 296 652 Q284 640 276 622 Q268 642 256 656 Q244 642 236 622 Q228 640 216 652 Q206 616 203 572 Q202 560 210 560Z" fill="#fbfaf6" stroke="#2b2b2b" stroke-width="11" stroke-linejoin="round"/>
+</svg>
+  <div class="sname">M<b>ee</b>mory</div>
 </div>
 <div class="wrap">
   <header>
