@@ -20,12 +20,12 @@ html=f"""<!doctype html>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="フレーズ1000">
+<meta name="apple-mobile-web-app-title" content="Meemory">
 <meta name="theme-color" content="#18181a" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#18181a" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon-parrot.png">
-<link rel="icon" href="icon-192-parrot.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
 {reset}{headpart}</head>
 <body>
 {bodypart.replace('__DATA__',d)}
@@ -41,7 +41,7 @@ if('serviceWorker' in navigator){{
 </html>
 """
 open('index.html','w',encoding='utf-8').write(html)
-json.dump({"name":"TOEICフレーズ1000","short_name":"フレーズ1000","start_url":"./","scope":"./","display":"standalone",
+json.dump({"name":"Meemory","short_name":"Meemory","start_url":"./","scope":"./","display":"standalone",
  "background_color":"#18181a","theme_color":"#18181a","lang":"ja","orientation":"portrait",
- "icons":[{"src":"icon-192-parrot.png","sizes":"192x192","type":"image/png"},{"src":"icon-512-parrot.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]},
+ "icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]},
  open('manifest.webmanifest','w',encoding='utf-8'),ensure_ascii=False,indent=2)

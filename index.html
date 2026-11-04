@@ -6,12 +6,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="フレーズ1000">
+<meta name="apple-mobile-web-app-title" content="Meemory">
 <meta name="theme-color" content="#18181a" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#18181a" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon-parrot.png">
-<link rel="icon" href="icon-192-parrot.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html,body{overflow-x:clip;overscroll-behavior-x:none}html{background:#18181a}
@@ -19,7 +19,7 @@ body{margin:0;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transpar
 *{touch-action:manipulation}
 img{max-width:100%}[hidden]{display:none!important}
 </style>
-<title>TOEICフレーズ1000</title>
+<title>Meemory</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Nunito:wght@600;800;900&display=swap">
 <style>
@@ -32,7 +32,7 @@ img{max-width:100%}[hidden]{display:none!important}
   --gold:#ffb21e; --gold-d:#e08f00;
   --hero:#6a3fd6; --hero-sh:#4a28a8; --hero-shop:var(--accent); --hero-shop-sh:var(--accent-d); --hero-lib:var(--accent); --hero-set:#52525b; --hero-ask:var(--green);
   --streak:#f29100; --streak-d:#c96f00; --streak-s:#ffe2b3; --streak-ink:#e07d00;
-  --btn-photo:#6a3fd6; --btn-photo-d:#4f2aa8; --btn-gen:#e8890c; --btn-gen-d:#b86a06; --spin:#8f6bff; --splash:#9aa3ad; --sold:#e5333f;
+  --btn-photo:#6a3fd6; --btn-photo-d:#4f2aa8; --btn-gen:#e8890c; --btn-gen-d:#b86a06; --spin:#8f6bff; --splash:#ffffff; --sold:#e5333f;
   --f:"Nunito","M PLUS Rounded 1c","Hiragino Maru Gothic ProN",system-ui,sans-serif;
   --f-jp:"M PLUS Rounded 1c","Nunito","Hiragino Maru Gothic ProN",system-ui,sans-serif;
 }
@@ -216,13 +216,17 @@ label.ctl{display:flex;flex-direction:column;gap:4px;font-size:.72rem;color:var(
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .splash{position:fixed;inset:0;z-index:100;background:var(--splash);display:flex;align-items:center;justify-content:center;transition:opacity .45s ease;padding-bottom:env(safe-area-inset-bottom,0px)}
 .splash.hide{opacity:0;pointer-events:none}
-.splash svg{width:min(52vw,230px);height:auto;animation:sp-pop .6s cubic-bezier(.3,1.6,.5,1) both}
+.sp-in{display:flex;flex-direction:column;align-items:center;gap:14px}
+.sp-goat{width:min(44vw,200px);height:auto;animation:sp-pop .6s cubic-bezier(.3,1.6,.5,1) both}
+.sp-sh{width:min(28vw,130px);height:12px;border-radius:50%;background:rgba(0,0,0,.08);margin-top:-22px}
 .splash .lids{transform-box:fill-box;transform-origin:center;animation:sp-blink 1.1s .55s ease-in-out both}
-.splash .sname{position:absolute;left:0;right:0;bottom:calc(44px + env(safe-area-inset-bottom,0px));text-align:center;color:#fff;font-family:var(--f-jp);font-weight:800;font-size:1.9rem;letter-spacing:.04em}
-.splash .sname span{font-family:var(--f);font-weight:900}
+.splash .sname{color:#2b2a26;font-family:var(--f);font-weight:900;font-size:2.8rem;line-height:1;animation:sp-up .5s .25s ease-out both}
+.splash .sname b{color:#f5c518;font-weight:900}
+.splash .stag{color:#6b6a66;font-family:var(--f-jp);font-weight:700;font-size:.92rem;letter-spacing:.08em;animation:sp-up .5s .4s ease-out both}
+@keyframes sp-up{0%{transform:translateY(12px);opacity:0}100%{transform:none;opacity:1}}
 @keyframes sp-pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
 @keyframes sp-blink{0%,40%,60%,100%{transform:scaleY(1)}50%{transform:scaleY(.08)}}
-@media (prefers-reduced-motion:reduce){.splash svg,.splash .lids{animation:none}}
+@media (prefers-reduced-motion:reduce){.sp-goat,.splash .sname,.splash .stag{animation:none}}
 .stat.fire{font:inherit;font-weight:900;background:none;border:0;padding:4px 6px;margin:-4px -6px;border-radius:10px;cursor:pointer}
 .stat.fire:active{transform:scale(.94)}
 .sv{position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateY(100%);transition:transform .38s cubic-bezier(.3,1.1,.4,1);visibility:hidden}
@@ -632,10 +636,10 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .face .shufb{position:absolute;right:12px;bottom:10px;width:40px;height:40px;border-radius:12px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--accent-ink);display:grid;place-items:center;padding:0;cursor:pointer;z-index:2}
 .face .shufb svg{width:20px;height:20px}
 .back .shufb{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);color:#fff}
-.mascot{width:52px;top:-6px;right:4px}
-.gzone .goalbox{margin-right:66px}
-.hanger{top:40px;right:-6px;width:28px;height:28px}
-.mbub{right:66px;max-width:calc(100% - 78px)}
+.mascot{width:62px;top:-18px;right:4px}
+.gzone .goalbox{margin-right:74px}
+.hanger{top:44px;right:-6px;width:28px;height:28px}
+.mbub{right:74px;max-width:calc(100% - 86px)}
 .wrap{gap:20px}
 header{gap:6px}
 .stats{font-size:.95rem}
@@ -652,28 +656,14 @@ header{gap:6px}
   <small>このアプリは縦向き専用です</small>
 </div>
 <div class="splash" id="splash" aria-hidden="true">
-  <svg viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="62" cy="62" rx="52" ry="56" fill="#f4f6f8"/>
-    <ellipse cx="158" cy="62" rx="52" ry="56" fill="#f4f6f8"/>
-    <g class="lids">
-      <ellipse cx="66" cy="60" rx="30" ry="33" fill="#fff3c4"/>
-      <ellipse cx="154" cy="60" rx="30" ry="33" fill="#fff3c4"/>
-      <ellipse cx="72" cy="61" rx="16" ry="19" fill="#222"/>
-      <ellipse cx="148" cy="61" rx="16" ry="19" fill="#222"/>
-      <ellipse cx="66" cy="53" rx="5.5" ry="6.5" fill="#fff"/>
-      <ellipse cx="142" cy="53" rx="5.5" ry="6.5" fill="#fff"/>
-    </g>
-    <path d="M84 84 Q110 58 136 84 Q140 106 124 128 Q120 140 116 142 Q114 128 108 120 Q88 112 84 96 Z" fill="#2c2c30"/>
-    <ellipse cx="102" cy="122" rx="15" ry="11" fill="#45454d"/>
-    <path d="M92 82 Q104 70 118 74" stroke="#5c5c66" stroke-width="4" fill="none" stroke-linecap="round"/>
-  </svg>
-  <div class="sname">フレーズ<span>1000</span></div>
+  <div class="sp-in"><img class="sp-goat" src="mascot.png" alt=""><span class="sp-sh"></span>
+  <div class="sname">M<b>ee</b>mory</div><div class="stag">ミーモと覚える英単語</div></div>
 </div>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1 class="vh">フレーズ1000</h1>
+    <h1 class="vh">Meemory</h1>
     <div class="stats">
       <button class="stat bag" id="bagBtn" aria-label="ショップを開く"><svg viewBox="0 0 24 24"><path d="M8 8.5V6.8a4 4 0 0 1 8 0v1.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path fill="currentColor" d="M5.3 8h13.4c.6 0 1 .4 1.1 1l.9 10.8A2 2 0 0 1 18.7 22H5.3a2 2 0 0 1-2-2.2L4.2 9c.1-.6.5-1 1.1-1z"/><circle cx="9" cy="11.5" r="1.1" fill="#fff" opacity=".85"/><circle cx="15" cy="11.5" r="1.1" fill="#fff" opacity=".85"/></svg><span id="coins">0</span></button>
       <button class="stat fire" id="fireBtn" aria-label="連続記録を見る"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.4 1.1-4 2.3-5.2.2 1.7 1 2.7 2 3.1C11 8 10.6 5 12 2z"/></svg><span id="streak">0</span></button>
@@ -682,7 +672,7 @@ header{gap:6px}
     </div>
   </header>
   <div class="gzone">
-  <button class="mascot" id="mascot" aria-label="ヨウムに聞く"><span class="msparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="mfig"><img src="mascot.png" alt=""></span></button>
+  <button class="mascot" id="mascot" aria-label="ミーモに聞く"><span class="msparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="mfig"><img src="mascot.png" alt=""></span></button>
   <button class="hanger" id="hangerBtn" aria-label="着せ替え" aria-expanded="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5a2.3 2.3 0 1 1 2.3-2.3c0 1.3-1 1.7-2.3 2.6L3 14.6c-1 .8-.4 2.4.9 2.4h16.2c1.3 0 1.9-1.6.9-2.4L12 8.1"/></svg></button>
   <div class="wardrobe" id="wardrobe" role="dialog" aria-label="着せ替え" hidden></div>
   <div class="mbub" id="mbub" aria-live="polite"></div>
@@ -751,13 +741,13 @@ header{gap:6px}
     </div></div>
     <div class="sv-in bv-body">
       <p class="bv-rule">問題に正解すると1ポイント（カードの「覚えた」も正解に数えます）。同じフレーズでもらえるのは1日1回までです。</p>
-      <h3>ヨウムの着せ替え</h3>
+      <h3>ミーモの着せ替え</h3>
       <div class="sgrid" id="sgrid"></div>
     </div>
   </section>
   <section class="bv ask" id="askv" role="dialog" aria-modal="true" aria-labelledby="askTitle" aria-hidden="true">
     <div class="bv-hero"><div class="sv-in">
-      <div class="sv-bar"><button class="sv-x" id="askClose" aria-label="閉じる">✕</button><h2 id="askTitle">ヨウムに聞く</h2><span></span></div>
+      <div class="sv-bar"><button class="sv-x" id="askClose" aria-label="閉じる">✕</button><h2 id="askTitle">ミーモに聞く</h2><span></span></div>
       <div class="ask-card"><div class="af" id="askFig" aria-hidden="true"></div><div><div class="en" id="askEn"></div><div class="jp" id="askJp"></div></div></div>
     </div></div>
     <div class="sv-in ask-body" id="askLog"></div>
@@ -839,7 +829,7 @@ header{gap:6px}
     </div>
   </section>
   <section class="sync aisec" aria-labelledby="aiTitle">
-    <h2 id="aiTitle">ヨウム（AI）に質問した回数</h2>
+    <h2 id="aiTitle">ミーモ（AI）に質問した回数</h2>
     <div class="aistats" id="aiStats"></div>
   </section>
   <section class="sync acct" id="acct" aria-labelledby="acctTitle" hidden>
@@ -1039,9 +1029,9 @@ const ICON_NG='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="cur
 const CHEER=['すばらしい！','その調子！','完璧！','ナイス！','やったね！','お見事！','バッチリ！','すごい！','正解！','いいね！','さすが！','パーフェクト！'];
 // ---- mascot comments
 const SAY={
-  ok:['正解！','いいね！','その調子！','覚えてたね！','さすが！','完璧！','天才かも！','ナイス！','やるじゃん！','どんどんいこう！','すごい！','お見事！','バッチリ！','よくできました','そのとおり！','冴えてるね！','いい感じ！','パーフェクト！','完全に覚えたね','もう自分のものだね','TOEICも楽勝だね','頼もしい！','ぼくも鼻が高いよ','その勢い！','連続でいこう！','かっこいい！','ばっちり定着！','やったね！','グッジョブ！','ナイスファイト！','天才ヨウム級！','花丸あげる！','覚えるの早いね','ノリノリだね！','次もいけるよ！'],
+  ok:['正解！','いいね！','その調子！','覚えてたね！','さすが！','完璧！','天才かも！','ナイス！','やるじゃん！','どんどんいこう！','すごい！','お見事！','バッチリ！','よくできました','そのとおり！','冴えてるね！','いい感じ！','パーフェクト！','完全に覚えたね','もう自分のものだね','TOEICも楽勝だね','頼もしい！','ぼくも鼻が高いよ','その勢い！','連続でいこう！','かっこいい！','ばっちり定着！','やったね！','グッジョブ！','ナイスファイト！','天才ミーモ級！','花丸あげる！','覚えるの早いね','ノリノリだね！','次もいけるよ！'],
   ng:['おしい！','ドンマイ！','次は覚えよう','もう一回見てね','あとで復習しよう','大丈夫、大丈夫','ここで覚えれば勝ち','間違えて覚えよう','あと少し！','気にしない気にしない','ここが伸びしろ','次は取れるよ','一緒に覚えよう','声に出してみよう','焦らなくていいよ','ゆっくりいこう','まちがいは宝物','これで覚えたね','惜しかった〜','ぼくも間違えるよ','ドンマイドンマイ','次で取り返そう','ここ大事だよ','もう1回チャンス！','くじけないで！','覚えるチャンス！','いい勉強になったね','次はいける！','苦手にさよならしよう','ちょっと休憩する？'],
-  tap:['がんばってるね','今日も一緒にやろう','1枚ずつでいいよ','フレーズは声に出すといいよ','ぼくはヨウムだよ','つついた？']
+  tap:['がんばってるね','今日も一緒にやろう','1枚ずつでいいよ','フレーズは声に出すといいよ','ぼくはヤギのミーモだよ','つついた？']
 };
 let mbT=0,mLast='';
 function mascotSay(kind){
@@ -1123,7 +1113,8 @@ const ITEMS=[
   {id:'gold',type:'skin',name:'金のスキン',short:'金',price:500,img:'mascot-gold.png'},
   {id:'machogold',type:'skin',name:'ゴールドマッチョのスキン',short:'金マッチョ',price:600,img:'mascot-macho-gold.png',w:1.5023,ml:-0.314}
 ];
-const skinOf=id=>ITEMS.find(x=>x.id===id&&x.type==='skin')||{};
+const SKINS_READY=false; // turn on when the goat skins are drawn
+const skinOf=id=>SKINS_READY&&ITEMS.find(x=>x.id===id&&x.type==='skin')||{};
 const skinImg=id=>skinOf(id).img||'mascot.png';
 // some skins are drawn a little wider than the frame; stretch the image box so the body still lines up
 const skinStyle=id=>{const k=skinOf(id);return (k.w?`width:${k.w*100}%;max-width:none;margin-left:${k.ml*100}%;`:'')+(k.mt?`margin-top:${k.mt*100}%;`:'')};
@@ -1143,8 +1134,11 @@ const ACC_SVG={roundglass:`<svg class="m-acc" viewBox="0 0 221 320" aria-hidden=
   headphone:`<svg class="m-acc" viewBox="0 0 221 320" aria-hidden="true"><path d="M14 92Q8 -18 100 -16Q192 -18 186 92" stroke="#2c2f38" stroke-width="13" fill="none" stroke-linecap="round"/><path d="M22 70Q20 -6 100 -6Q180 -6 178 70" stroke="#4a4f5c" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/><rect x="0" y="70" width="28" height="56" rx="13" fill="#ff5a5f"/><rect x="172" y="70" width="28" height="56" rx="13" fill="#e8474c"/><rect x="18" y="76" width="12" height="44" rx="6" fill="#2c2f38"/><rect x="170" y="76" width="12" height="44" rx="6" fill="#2c2f38"/><rect x="5" y="78" width="6" height="24" rx="3" fill="#fff" opacity=".45"/></svg>`,
   wizard:`<svg class="m-acc" viewBox="0 0 221 320" aria-hidden="true"><g transform="rotate(-6 100 20)"><ellipse cx="100" cy="18" rx="98" ry="18" fill="#4b2a8f"/><path d="M42 18Q60 -40 92 -76Q110 -96 150 -88Q124 -80 118 -60Q130 -20 158 18Z" fill="#6a3fc4"/><path d="M118 -60Q130 -20 158 18H130Q118 -20 112 -56Z" fill="#5532a8"/><path d="M48 12Q100 26 152 12V20Q100 34 48 20Z" fill="#ffcc33"/><path d="M80 -30l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#ffe27a"/><circle cx="110" cy="-8" r="3" fill="#ffe27a"/><circle cx="66" cy="-4" r="2.2" fill="#fff"/><circle cx="104" cy="-48" r="2" fill="#fff"/><circle cx="150" cy="-88" r="6" fill="#ffcc33"/></g></svg>`};
 const itemOf=id=>ITEMS.find(x=>x.id===id)||{};
-function fig(skin,face,hat,neck){return `<img src="${skinImg(skin)}" style="${skinStyle(skin)}" alt="">${neck?ACC_SVG[neck]||'':''}${face?ACC_SVG[face]||'':''}${hat?ACC_SVG[hat]||'':''}`}
-const cur=()=>({skin:S.skin&&S.owned[S.skin]?S.skin:'',face:S.wear&&S.owned[S.wear]?S.wear:'',hat:S.hat&&S.owned[S.hat]?S.hat:'',neck:S.neck&&S.owned[S.neck]?S.neck:''});
+// the accessories were drawn for the parrot; move/scale them onto Meemo the goat (same 221x320 frame)
+const GOAT_FIT={face:'rotate(3 82 125) translate(-5.3 53) scale(.9)',head:'rotate(-4 100 52) translate(16.7 44) scale(.85)',neck:'translate(33 102.5) scale(.75)'};
+function fitAcc(id,slot){const v=ACC_SVG[id];if(!v)return '';const i=v.indexOf('>')+1;return v.slice(0,i)+`<g transform="${GOAT_FIT[slot]}">`+v.slice(i,v.lastIndexOf('</svg>'))+'</g></svg>'}
+function fig(skin,face,hat,neck){return `<img src="${skinImg(skin)}" style="${skinStyle(skin)}" alt="">${neck?fitAcc(neck,'neck'):''}${face?fitAcc(face,'face'):''}${hat?fitAcc(hat,'head'):''}`}
+const cur=()=>({skin:SKINS_READY&&S.skin&&S.owned[S.skin]?S.skin:'',face:S.wear&&S.owned[S.wear]?S.wear:'',hat:S.hat&&S.owned[S.hat]?S.hat:'',neck:S.neck&&S.owned[S.neck]?S.neck:''});
 function applyWear(){
   const m=$('mascot'); m.className=m.className.replace(/\b(w|s)-\S+/g,'').trim();
   const c=cur(); const sk=c.skin;
@@ -1157,7 +1151,7 @@ function applyWear(){
 function renderShop(){
   $('shopNum').textContent=S.coins||0;
   const bag=$('bagBtn').querySelector('svg').outerHTML;
-  $('sgrid').innerHTML=ITEMS.map(it=>{const own=S.owned[it.id], can=(S.coins||0)>=it.price;
+  $('sgrid').innerHTML=ITEMS.filter(it=>SKINS_READY||it.type!=='skin').map(it=>{const own=S.owned[it.id], can=(S.coins||0)>=it.price;
     const prev=it.type==='skin'?fig(it.id,'',''):it.slot==='head'?fig('','',it.id):it.slot==='neck'?fig('','','',it.id):fig('',it.id,'');
     return `<div class="sitem ${it.type==='skin'?'sk-'+it.id:''} ${own?'sold':''}">${own?'<span class="soldtape" aria-hidden="true">SOLD</span>':''}<div class="prev">${prev}${(['silver','gold','galaxy','machosilver','machogold','ice','sakura','lava'].includes(it.id))?'<i class="pk"></i><i class="pk"></i><i class="pk"></i>':''}</div><b>${it.name}</b>
       <span class="price">${bag}${it.price}</span>
@@ -1166,7 +1160,7 @@ function renderShop(){
     const it=ITEMS.find(x=>x.id===b.dataset.buy); if(!it||S.owned[it.id]||S.coins<it.price)return;
     S.coins-=it.price; S.owned[it.id]=1; if(it.type==='skin')S.skin=it.id; else if(it.slot==='head')S.hat=it.id; else if(it.slot==='neck')S.neck=it.id; else S.wear=it.id;
     save(); header(); applyWear(); renderShop(); fanfare&&fanfare();
-    toast(`${it.name}を買いました！ヨウムの右下のハンガーから着せ替えできます`);
+    toast(`${it.name}を買いました！ミーモの右下のハンガーから着せ替えできます`);
   });
 }
 function openShop(){renderShop();const v=$('shopv');v.classList.add('open');v.setAttribute('aria-hidden','false');document.body.classList.add('sv-lock');setTimeout(()=>$('shopClose').focus({preventScroll:true}),50)}
@@ -1174,7 +1168,7 @@ function closeShop(){const v=$('shopv');v.classList.remove('open');v.setAttribut
 function renderWardrobe(){
   const c=cur(), own=it=>S.owned[it.id];
   const groups=[
-    ['スキン','skin',[{id:'',name:'ふつう'},...ITEMS.filter(it=>it.type==='skin'&&own(it))],id=>fig(id,'',''),c.skin],
+    ['スキン','skin',[{id:'',name:'ふつう'},...ITEMS.filter(it=>SKINS_READY&&it.type==='skin'&&own(it))],id=>fig(id,'',''),c.skin],
     ['顔','face',[{id:'',name:'なし'},...ITEMS.filter(it=>it.slot==='face'&&own(it))],id=>fig('',id,''),c.face],
     ['頭','hat',[{id:'',name:'なし'},...ITEMS.filter(it=>it.slot==='head'&&own(it))],id=>fig('','',id),c.hat],
     ['首','neck',[{id:'',name:'なし'},...ITEMS.filter(it=>it.slot==='neck'&&own(it))],id=>fig('','','',id),c.neck]];
@@ -1251,7 +1245,7 @@ async function readPhoto(file){
   if(photoUsed()>=PHOTO_LIMIT){box.innerHTML=`<p class="ph-err">写真の読み取りは1日${PHOTO_LIMIT}回までです。明日また使ってね。</p>`;$('dkPhotoIn').value='';return} $('dkPhotoBtn').classList.add('busy');
   let shot;
   try{shot=await shrinkPhoto(file)}catch(e){box.innerHTML='<p class="ph-err">この写真は開けませんでした。別の写真で試してください。</p>';$('dkPhotoBtn').classList.remove('busy');return}
-  box.innerHTML=`<div class="ph-wait"><img src="${shot.thumb}" alt=""><span class="spin"></span><span>ヨウムが写真を読んでいます…<br><small>10〜30秒ほどかかります</small></span></div>`;
+  box.innerHTML=`<div class="ph-wait"><img src="${shot.thumb}" alt=""><span class="spin"></span><span>ミーモが写真を読んでいます…<br><small>10〜30秒ほどかかります</small></span></div>`;
   try{
     const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'photo',image:shot.data,mime:'image/jpeg'})});
     const d=await r.json().catch(()=>({}));
@@ -1297,7 +1291,7 @@ async function makeDeck(preset,label){
   if(free&&!text){$('genIn').focus();return}
   if(free&&genUsed()>=GEN_LIMIT){const b=$('dkPhoto');b.hidden=false;b.innerHTML=`<p class="ph-err">自由に頼めるのは1日${GEN_LIMIT}回までです。上のおすすめのボタンなら、いつでも使えます。</p>`;return}
   const box=$('dkPhoto'); box.hidden=false; toggleGen(false); $('dkGenBtn').classList.add('busy');
-  box.innerHTML=`<div class="ph-wait"><span class="spin"></span><span>ヨウムが単語帳を作っています…<br><small>${esc(label||text)} ・ 20〜40秒ほどかかります</small></span></div>`;
+  box.innerHTML=`<div class="ph-wait"><span class="spin"></span><span>ミーモが単語帳を作っています…<br><small>${esc(label||text)} ・ 20〜40秒ほどかかります</small></span></div>`;
   const dk=edDeck(), mine=(dk&&dk.cards||[]).map(c=>c.en);
   try{
     const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(free?{type:'gen',prompt:text,count:30,exclude:mine.slice(-300)}:{type:'gen',preset})});
