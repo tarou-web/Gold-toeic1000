@@ -9,6 +9,7 @@ const ORIGIN = "https://tarou-web.github.io"; // このアプリ以外からは�
 // 1日に使える回数（同じネットにつながっている人ごと）。保存した答えを返したときは数えない
 const LIMIT_ASK = 15; // アプリは1人10回。家族などで同じネットを使う人がいるので少し多め
 const LIMIT_PHOTO = 5; // アプリは1人3回
+const LIMIT_GEN = 3; // 自由に頼む単語帳づくり（アプリは1人2回）。おすすめの単語帳は一度作ったら保存して使い回すので数えない
 const ANSWER_DAYS = 60; // 保存した答えを使う日数
 
 export default {
@@ -43,6 +44,27 @@ export default {
     try { body = await req.json(); } catch { return json({ error: "bad request" }, 400); }
 
     const ip = req.headers.get("CF-Connecting-IP") || "?";
+
+    // AIに単語帳を作ってもらう
+    if (body.type === "gen") {
+      const preset = GEN_PRESETS[body.preset] ? body.preset : null;
+      const ask = preset ? GEN_PRESETS[preset].ask : String(body.prompt || "").trim().slice(0, 300);
+      if (!ask) return json({ error: "どんな単語帳がほしいか書いてください" }, 400);
+      const count = Math.max(5, Math.min(50, +body.count || 30));
+      const exclude = (Array.isArray(body.exclude) ? body.exclude : []).map((x) => String(x).slice(0, 60)).slice(0, 300);
+      const pKey = preset && !exclude.length ? `gen:${preset}:v1` : null;
+      if (pKey && env.KV) {
+        const hit = await env.KV.get(pKey, "json").catch(() => null);
+        if (hit && hit.cards && hit.cards.length) return json({ ...hit, cached: true });
+      }
+      if (!preset && (await overLimit(env, "gen", ip, LIMIT_GEN))) return json({ error: `AIに単語帳を作ってもらうのは1日${LIMIT_GEN}回までです。明日また頼んでね`, limit: true }, 429);
+      const r = await genCards(env, ask, preset ? GEN_PRESETS[preset].n : count, exclude, Date.now() + 50000);
+      if (!r.ok) return json({ error: r.error }, r.status || 500);
+      if (!preset) await countUse(env, "gen", ip);
+      const out = { title: r.title, cards: r.cards, provider: r.provider, model: r.model };
+      if (pKey && env.KV && r.cards.length >= 10) await env.KV.put(pKey, JSON.stringify(out)).catch(() => {});
+      return json(out);
+    }
 
     // 写真から単語帳のカードを読み取る
     if (body.type === "photo") {
@@ -189,6 +211,89 @@ async function workersAI(env, system, msgs, deadline) {
       last = { error: "Workers AI の答えが空でした", status: 502, model };
     } catch (e) {
       last = { error: String(e.message || e), status: 502, model };
+    }
+  }
+  return last;
+}
+
+// ---------- AIに単語帳を作ってもらう ----------
+// おすすめの単語帳（一度作ったら KV に保存して、みんなで同じものを使う）
+const GEN_PRESETS = {
+  toeic600: { n: 50, ask: "TOEIC 600点をめざす人がまず覚えるべき、TOEICに頻出の基本的な単語とフレーズ" },
+  toeic730: { n: 50, ask: "TOEIC 730点をめざす人向けの、TOEICに頻出の中級の単語とフレーズ" },
+  toeic860: { n: 50, ask: "TOEIC 860点以上をめざす人向けの、TOEICに出る上級の単語とフレーズ" },
+  bizmail: { n: 40, ask: "ビジネスメールでよく使う英語の決まった言い回し" },
+  meeting: { n: 40, ask: "会議や打ち合わせでよく使う英語のフレーズ" },
+  eiken2: { n: 50, ask: "英検2級によく出る単語" },
+  eikenp1: { n: 50, ask: "英検準1級によく出る単語" },
+  travel: { n: 40, ask: "海外旅行（空港・ホテル・レストラン・買い物）でよく使う英語のフレーズ" },
+};
+const genPrompt = (ask, n, exclude) =>
+  "あなたは日本人向けの英語教材を作る先生です。次の希望に合う、英語の単語帳を作ってください。\n" +
+  `希望：「${ask}」\n` +
+  `- ${n}枚。1枚は英語（単語・フレーズ・短い文のどれか）と、その日本語の意味の組です。\n` +
+  "- 英語はよく使われる自然な表現にし、日本語は短く正確に（よく使う意味を1〜2個）。\n" +
+  "- 本や問題集の内容を写さず、あなたが自分で選んだオリジナルの組み合わせにします。\n" +
+  "- 同じ英語を2回入れません。易しいものから順に並べます。\n" +
+  (exclude.length ? `- 次の英語はもう持っているので入れません：${exclude.join(" / ")}\n` : "") +
+  "- 希望が英語の学習と関係ない場合や、不適切な場合は、cards を空にします。\n" +
+  '答えは JSON だけで、形は {"title":"単語帳の名前（20文字以内）","cards":[{"en":"英語","jp":"日本語"}]} です。';
+
+function tidyCards(list, max) {
+  const seen = new Set(), out = [];
+  for (const c of Array.isArray(list) ? list : []) {
+    const en = String((c && c.en) || "").trim().slice(0, 200), jp = String((c && c.jp) || "").trim().slice(0, 200);
+    const k = en.toLowerCase();
+    if (!en || !jp || seen.has(k)) continue;
+    seen.add(k); out.push({ en, jp });
+    if (out.length >= max) break;
+  }
+  return out;
+}
+function parseJSON(t) {
+  t = String(t || "").replace(/^```(json)?|```$/gm, "").trim();
+  const i = t.indexOf("{"), j = t.lastIndexOf("}");
+  try { return JSON.parse(i >= 0 ? t.slice(i, j + 1) : t); } catch { return null; }
+}
+
+async function genCards(env, ask, n, exclude, deadline) {
+  const prompt = genPrompt(ask, n, exclude);
+  const done = (d, provider, model) => {
+    const cards = d && tidyCards(d.cards, n);
+    if (!cards) return null;
+    if (!cards.length) return { ok: false, error: "その内容では単語帳を作れませんでした。英語の学習に関係することを頼んでね", status: 422 };
+    return { ok: true, title: String(d.title || "").trim().slice(0, 30) || "AIの単語帳", cards, provider, model };
+  };
+  let last = { error: "単語帳を作れる AI がありませんでした", status: 503 };
+  if (env.GEMINI_API_KEY) {
+    for (const model of ["gemini-flash-lite-latest", "gemini-flash-latest"]) {
+      if (cooling(model)) continue;
+      const r = await post(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        { "x-goog-api-key": env.GEMINI_API_KEY },
+        { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 8000, responseMimeType: "application/json", thinkingConfig: { thinkingLevel: "low" } } },
+        timeLeft(deadline, 30000),
+      );
+      cool(model, r);
+      if (r.ok) {
+        const parts = (r.data.candidates && r.data.candidates[0] && r.data.candidates[0].content && r.data.candidates[0].content.parts) || [];
+        const out = done(parseJSON(parts.map((p) => p.text || "").join("")), "gemini", model);
+        if (out) return out;
+        last = { error: "作った結果の形がおかしかったです", status: 502 };
+      } else last = r;
+      if (r.status === 401 || r.status === 403) break;
+      if (Date.now() > deadline - 15000) break;
+    }
+  }
+  if (env.GROQ_API_KEY && Date.now() < deadline - 5000) {
+    for (const model of ["openai/gpt-oss-120b", "llama-3.3-70b-versatile"]) {
+      if (cooling(model) || Date.now() > deadline - 5000) continue;
+      const body = { model, max_tokens: 6000, temperature: 0.5, response_format: { type: "json_object" }, messages: [{ role: "user", content: prompt }] };
+      if (model.startsWith("openai/")) body.reasoning_effort = "low";
+      const r = await post("https://api.groq.com/openai/v1/chat/completions", { Authorization: `Bearer ${env.GROQ_API_KEY}` }, body, timeLeft(deadline, 25000));
+      cool(model, r);
+      if (r.ok) { const out = done(parseJSON(chatText(r.data)), "groq", model); if (out) return out; }
+      else last = r;
     }
   }
   return last;

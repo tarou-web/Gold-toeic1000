@@ -470,10 +470,24 @@ body.has-hat .tracklabel{padding-right:80px}
 .dk-row button{width:40px;height:40px;border-radius:12px;border:2px solid var(--line);background:none;color:var(--red-ink);font-size:1.1rem;cursor:pointer}
 .dk-photo{display:flex;flex-direction:column;gap:8px}
 .photo-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#6a3fd6;border-color:#4f2aa8;color:#fff}
+.dk-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dk-two .btn{padding:12px 6px;font-size:.92rem}
+.gen-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:#e8890c;border-color:#b86a06;color:#fff}
+.gen-btn[aria-expanded=true]{filter:brightness(1.1)}
+.gen-btn.busy{opacity:.55;pointer-events:none}
+.gen-box{border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.gen-box[hidden]{display:none}
+.gen-h{margin:0;font-family:var(--f-jp);font-weight:800;font-size:.95rem}
+.gen-chips{display:flex;flex-wrap:wrap;gap:6px}
+.gen-chips button{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.82rem;padding:7px 12px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.gen-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+.gen-row input{font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--fg);min-width:0}
+.gen-row .btn{padding:10px 16px}
 .photo-btn.busy{opacity:.55;pointer-events:none}
 .photo-btn svg{width:24px;height:24px}
 .ph-note{margin:0;font-size:.8rem;color:var(--muted)}
-.ph-note b{margin-left:6px;color:var(--fg)}.ph-note b.zero{color:var(--red-ink)}
+.ph-note b{margin-left:6px;color:var(--fg)}.ph-note b.zero,#genLeft.zero{color:var(--red-ink)}
+#genLeft{margin-left:0}
 .ph-box{border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px}
 .ph-box[hidden]{display:none}
 .ph-wait{display:flex;align-items:center;gap:12px;font-family:var(--f-jp);font-size:.92rem}
@@ -736,7 +750,16 @@ header{gap:6px}
     </div></div>
     <div class="sv-in bv-body">
       <div class="dk-photo">
+        <div class="dk-two">
         <label class="btn photo-btn" id="dkPhotoBtn"><input type="file" id="dkPhotoIn" accept="image/*" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 4.5 7.6 6.5H5A2.5 2.5 0 0 0 2.5 9v9A2.5 2.5 0 0 0 5 20.5h14a2.5 2.5 0 0 0 2.5-2.5V9A2.5 2.5 0 0 0 19 6.5h-2.6L15 4.5zM12 9a4.25 4.25 0 1 1 0 8.5A4.25 4.25 0 0 1 12 9zm0 2a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5z"/></svg>写真から追加</label>
+        <button class="btn gen-btn" id="dkGenBtn" aria-expanded="false"><span aria-hidden="true">✨</span>AIに作ってもらう</button>
+        </div>
+        <div class="gen-box" id="dkGen" hidden>
+          <p class="gen-h">どんな単語帳がほしい？</p>
+          <div class="gen-chips" id="genChips"></div>
+          <div class="gen-row"><input id="genIn" placeholder="例：ホテルの受付で使う英語を30個" maxlength="300" autocomplete="off" enterkeyhint="go"><button class="btn ok" id="genGo">作る</button></div>
+          <p class="ph-note">上のボタンはいつでも使えます。自由に頼めるのは<b id="genLeft"></b>。</p>
+        </div>
         <p class="ph-note">単語帳やプリントを撮ると、AIが英語と日本語を読み取ります。<b id="phLeft"></b></p>
         <div class="ph-box" id="dkPhoto" hidden></div>
       </div>
@@ -1162,7 +1185,7 @@ function commitDraft(){
 function openDeckEdit(id){
   if(id==='new'){dkDraft={id:'d'+Date.now().toString(36),name:'',cards:[]};id=dkDraft.id}else dkDraft=null;
   dkId=id; const dk=edDeck(); if(!dk)return;
-  closePhoto(); renderPhotoLeft(); $('dkName').value=dk.name||''; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
+  closePhoto(); toggleGen(false); renderPhotoLeft(); $('dkName').value=dk.name||''; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
   renderDeckEdit();
   const v=$('deckv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); document.body.classList.add('sv-lock');
   setTimeout(()=>{(dk.name?$('dkEn'):$('dkName')).focus({preventScroll:true})},350);
@@ -1193,7 +1216,7 @@ function addCards(pairs){
   if(n){commitDraft();save();renderDeckEdit()} return n;
 }
 // ---- photo → cards (read by the AI server)
-let phCards=[];
+let phCards=[], phMade=false, phTitle='';
 async function shrinkPhoto(file){
   const url=URL.createObjectURL(file);
   try{
@@ -1219,13 +1242,13 @@ async function readPhoto(file){
     if(!d.cards.length){box.innerHTML='<p class="ph-err">英語が見つかりませんでした。文字が大きく、はっきり写るように撮ってみてください。</p>';return}
     const dk=edDeck(), have=new Set((dk&&dk.cards||[]).map(c=>c.en.toLowerCase()));
     phCards=d.cards.map(c=>({en:c.en,jp:c.jp,on:!have.has(c.en.toLowerCase()),dup:have.has(c.en.toLowerCase())}));
-    renderPhoto();
+    phMade=false; renderPhoto();
   }catch(e){box.innerHTML=`<p class="ph-err">読み取れませんでした（${esc(String(e.message||e))}）。少し待ってからもう一度試してください。</p>`}
   finally{$('dkPhotoBtn').classList.remove('busy')}
 }
 function renderPhoto(){
   const box=$('dkPhoto'), n=phCards.filter(c=>c.on).length;
-  box.innerHTML=`<div class="ph-head"><span>${phCards.length}組 見つかりました${phCards.some(c=>c.dup)?'（もう入っているものは外しています）':''}</span><button id="phAll">${n===phCards.length?'すべて外す':'すべて選ぶ'}</button></div>`+
+  box.innerHTML=`<div class="ph-head"><span>${phCards.length}組 ${phMade?'作りました':'見つかりました'}${phCards.some(c=>c.dup)?'（もう入っているものは外しています）':''}</span><button id="phAll">${n===phCards.length?'すべて外す':'すべて選ぶ'}</button></div>`+
     phCards.map((c,i)=>`<div class="ph-row ${c.on?'':'off'}" data-i="${i}"><input type="checkbox" ${c.on?'checked':''} aria-label="追加する"><input type="text" class="en" value="${esc(c.en)}" aria-label="英語" autocapitalize="off" spellcheck="false"><input type="text" class="jp" value="${esc(c.jp)}" aria-label="日本語"></div>`).join('')+
     `<div class="ph-acts"><button class="btn" id="phCancel">やめる</button><button class="btn ok" id="phAdd" ${n?'':'disabled'}>${n}枚 追加する</button></div>`;
   box.querySelectorAll('.ph-row').forEach(r=>{const c=phCards[+r.dataset.i];
@@ -1236,12 +1259,39 @@ function renderPhoto(){
   $('phCancel').onclick=closePhoto;
   $('phAdd').onclick=()=>{
     const pick=phCards.filter(c=>c.on).map(c=>[c.en.trim(),c.jp.trim()]).filter(([e,j])=>e&&j);
+    if(phTitle&&!$('dkName').value.trim())$('dkName').value=phTitle;
     const n=addCards(pick); closePhoto();
     toast(`<div><strong>${n}枚追加しました</strong>${!$('dkName').value.trim()?'<span>単語帳の名前を入れると保存されます</span>':''}</div>`);
     if(!$('dkName').value.trim())setTimeout(()=>$('dkName').focus(),300);
   };
 }
-function closePhoto(){phCards=[];const b=$('dkPhoto');b.hidden=true;b.innerHTML='';$('dkPhotoIn').value=''}
+function closePhoto(){phCards=[];phTitle='';const b=$('dkPhoto');b.hidden=true;b.innerHTML='';$('dkPhotoIn').value=''}
+// ---- AI makes a deck
+const GEN_LIMIT=2;
+const GEN_CHIPS=[['toeic600','TOEIC 600点'],['toeic730','TOEIC 730点'],['toeic860','TOEIC 860点'],['bizmail','ビジネスメール'],['meeting','会議の英語'],['eiken2','英検2級'],['eikenp1','英検準1級'],['travel','海外旅行']];
+function genUsed(){try{const m=JSON.parse(localStorage.getItem(KEY+'-gen')||'{}');return m[today()]||0}catch(e){return 0}}
+function genCount(){try{localStorage.setItem(KEY+'-gen',JSON.stringify({[today()]:genUsed()+1}))}catch(e){}renderGenLeft()}
+function renderGenLeft(){const el=$('genLeft');if(el){const n=Math.max(0,GEN_LIMIT-genUsed());el.textContent=`今日あと${n}回`;el.classList.toggle('zero',!n)}}
+function toggleGen(open){const b=$('dkGen');open=open??b.hidden;b.hidden=!open;$('dkGenBtn').setAttribute('aria-expanded',open);if(open){renderGenLeft();$('genChips').innerHTML=GEN_CHIPS.map(([id,l])=>`<button data-gp="${id}">${l}</button>`).join('');$('genChips').querySelectorAll('[data-gp]').forEach(x=>x.onclick=()=>makeDeck(x.dataset.gp,x.textContent))}}
+async function makeDeck(preset,label){
+  const free=!preset, text=free?$('genIn').value.trim():'';
+  if(free&&!text){$('genIn').focus();return}
+  if(free&&genUsed()>=GEN_LIMIT){const b=$('dkPhoto');b.hidden=false;b.innerHTML=`<p class="ph-err">自由に頼めるのは1日${GEN_LIMIT}回までです。上のおすすめのボタンなら、いつでも使えます。</p>`;return}
+  const box=$('dkPhoto'); box.hidden=false; toggleGen(false); $('dkGenBtn').classList.add('busy');
+  box.innerHTML=`<div class="ph-wait"><span class="spin"></span><span>ヨウムが単語帳を作っています…<br><small>${esc(label||text)} ・ 20〜40秒ほどかかります</small></span></div>`;
+  const dk=edDeck(), mine=(dk&&dk.cards||[]).map(c=>c.en);
+  try{
+    const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(free?{type:'gen',prompt:text,count:30,exclude:mine.slice(-300)}:{type:'gen',preset})});
+    const d=await r.json().catch(()=>({}));
+    if(d.limit){box.innerHTML=`<p class="ph-err">${esc(d.error||'今日はここまでです')}</p>`;return}
+    if(!r.ok||!Array.isArray(d.cards))throw new Error(d.error||('エラー '+r.status));
+    if(free&&!d.cached)genCount();
+    const have=new Set(mine.map(x=>x.toLowerCase()));
+    phCards=d.cards.map(c=>({en:c.en,jp:c.jp,on:!have.has(c.en.toLowerCase()),dup:have.has(c.en.toLowerCase())}));
+    phMade=true; phTitle=d.title||label||''; renderPhoto(); if(free)$('genIn').value='';
+  }catch(e){box.innerHTML=`<p class="ph-err">作れませんでした（${esc(String(e.message||e))}）。少し待ってからもう一度試してください。</p>`}
+  finally{$('dkGenBtn').classList.remove('busy')}
+}
 function parseBulk(t){
   const out=[],bad=[];
   for(let line of t.split(/\r?\n/)){
@@ -1805,6 +1855,9 @@ $('dkName').onchange=()=>{if(dkDraft&&dkDraft.id===dkId){commitDraft();return}co
 const dkAdd=()=>{const en=$('dkEn').value.trim(),jp=$('dkJp').value.trim(); if(!en){$('dkEn').focus();return} if(!jp){$('dkJp').focus();return}
   if(addCards([[en,jp]])){$('dkEn').value='';$('dkJp').value='';$('dkEn').focus();toast('<div><strong>カードを追加しました</strong></div>')}else toast('<div><strong>同じカードがもうあります</strong></div>')};
 $('dkAddBtn').onclick=dkAdd;
+$('dkGenBtn').onclick=()=>toggleGen();
+$('genGo').onclick=()=>makeDeck(null);
+$('genIn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();makeDeck(null)}});
 $('dkPhotoIn').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(f)readPhoto(f)};
 $('dkEn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('dkJp').focus()}});
 $('dkJp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();dkAdd()}});
