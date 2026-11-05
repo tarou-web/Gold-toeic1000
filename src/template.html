@@ -185,6 +185,10 @@ input[type=search],select{font:inherit;font-weight:700;font-size:.92rem;color:va
 .item .t{min-width:0;display:flex;flex-direction:column;gap:1px}
 .item .e{font-weight:900}
 .item .j{font-family:var(--f-jp);font-weight:500;font-size:.88rem;color:var(--muted)}
+.item .t[data-ed]{cursor:pointer}
+.item .acts{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.item .led{width:34px;height:30px;display:grid;place-items:center;border-radius:10px!important;border:2px solid var(--line)!important;color:var(--muted)}
+.item .led svg{width:16px;height:16px}
 .item .f{font-size:.7rem;color:var(--red-ink)}
 .item button{background:none;border:0;cursor:pointer;padding:2px}
 .more{text-align:center;padding:10px}
@@ -643,6 +647,8 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .cebox h3{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1.1rem}
 .cebox label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;font-weight:800;color:var(--muted)}
 .cebox input{font:inherit;font-size:16px;font-weight:700;color:var(--fg);background:var(--bg2);border:2px solid var(--line);border-radius:12px;padding:10px 12px}
+.cedel{display:block;width:100%;margin:2px 0 6px;padding:10px;border-radius:12px;border:2px dashed var(--line);background:none;color:var(--red-ink);font:inherit;font-weight:800;font-size:.9rem;cursor:pointer}
+.cedel.arm{border-style:solid;border-color:var(--red-ink);background:rgba(255,80,80,.12)}
 .ceacts{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:4px}
 /* list: search + sort */
 .lsearch{position:relative;display:grid;grid-template-columns:1fr 48px;gap:8px}
@@ -847,6 +853,7 @@ header{gap:6px}
     <label>英語<input id="ceEn" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
     <label>日本語<input id="ceJp" autocomplete="off"></label>
     <label>メモ（1行）<input id="ceMemo" maxlength="120" placeholder="例：resume は「履歴書」と「再開する」の2つの意味" autocomplete="off"></label>
+    <button class="cedel" id="ceDel">🗑 このカードを消す</button>
     <div class="ceacts"><button class="btn" id="ceCancel">やめる</button><button class="btn ok" id="ceSave">保存する</button></div>
   </div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1228,15 +1235,16 @@ function renderWardrobe(){
   $('wardrobe').querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{const v=b.dataset.skin??b.dataset.wear;const k=b.dataset.slot;if(k==='skin')S.skin=v;else if(k==='face')S.wear=v;else if(k==='neck')S.neck=v;else S.hat=v;save();applyWear();renderWardrobe();setTimeout(closeWardrobe,250);mascotSay('tap')});
 }
 // ---- your own decks
+function goldCards(){return BUILTIN.filter(d=>!(S.edits[d.id]||{}).del)}
 function deckOf(id){return S.decks.find(x=>x.id===id)}
 function deckCards(dk){return (dk.cards||[]).map((c,i)=>({...c,no:i+1}))}
 function selectDeck(id,quiet){
-  const dk=id!=='gold'&&deckOf(id); S.deck=dk?id:'gold'; if(!dk)applyEdits(); DATA=dk?deckCards(dk):BUILTIN;
+  const dk=id!=='gold'&&deckOf(id); S.deck=dk?id:'gold'; if(!dk)applyEdits(); DATA=dk?deckCards(dk):goldCards();
   buildRange(); if(!quiet){save();P=[];QP=[];hideSheet&&hideSheet();refresh(true);header()}
 }
 function renderDeckBar(){
   const sel=$('deck'); if(!sel)return;
-  sel.innerHTML=`<option value="gold">金のフレーズ（${BUILTIN.length}）</option>`+S.decks.map(d=>`<option value="${d.id}">${esc(d.name||'名前なし')}（${(d.cards||[]).length}）</option>`).join('');
+  sel.innerHTML=`<option value="gold">金のフレーズ（${goldCards().length}）</option>`+S.decks.map(d=>`<option value="${d.id}">${esc(d.name||'名前なし')}（${(d.cards||[]).length}）</option>`).join('');
   sel.value=S.deck; $('deckEdit').hidden=S.deck==='gold';
 }
 
@@ -1305,10 +1313,12 @@ function cardImg(c,btn){
     finally{btn.classList.remove('busy')}};
   inp.click();
 }
+const normEn=t=>String(t||'').trim().toLowerCase().replace(/\s+/g,' ');
+function dupCard(en){const dk=edDeck();return dk&&(dk.cards||[]).find(c=>normEn(c.en)===normEn(en))}
 function addCards(pairs){
   const dk=edDeck(); if(!dk)return 0; dk.cards=dk.cards||[];
-  const have=new Set(dk.cards.map(c=>c.en.toLowerCase()+'\t'+c.jp)); let n=0;
-  for(const [en,jp,memo] of pairs){const k=en.toLowerCase()+'\t'+jp; if(!en||!jp||have.has(k))continue; have.add(k); {const c={id:S.nid++,en:en.slice(0,200),jp:jp.slice(0,200)}; const m=(memo||'').trim(); if(m)c.memo=m.slice(0,120); dk.cards.push(c)} n++}
+  const have=new Set(dk.cards.map(c=>normEn(c.en))); let n=0;
+  for(const [en,jp,memo] of pairs){const k=normEn(en); if(!en||!jp||have.has(k))continue; have.add(k); {const c={id:S.nid++,en:en.slice(0,200),jp:jp.slice(0,200)}; const m=(memo||'').trim(); if(m)c.memo=m.slice(0,120); dk.cards.push(c)} n++}
   if(n){commitDraft();save();renderDeckEdit()} return n;
 }
 // ---- photo → cards (read by the AI server)
@@ -1408,7 +1418,7 @@ function renderLib(){
   const sel=libSel; $('libSel').textContent=sel?'キャンセル':'選択'; $('libSel').hidden=!S.decks.length&&!sel;
   $('libNew').hidden=!!sel; $('libSelBar').hidden=!sel; $('libv').classList.toggle('selmode',!!sel);
   if(sel){$('libDel').disabled=!sel.size;$('libDel').textContent=libArm?`もう一度押すと${sel.size}個削除`:`削除（${sel.size}）`;$('libAll').textContent=sel.size===S.decks.length?'選択をはずす':'すべて選択'}
-  const all=[{id:'gold',name:'金のフレーズ',cards:BUILTIN,builtin:1},...S.decks.map(d=>({...d,cards:d.cards||[]}))];
+  const all=[{id:'gold',name:'金のフレーズ',cards:goldCards(),builtin:1},...S.decks.map(d=>({...d,cards:d.cards||[]}))];
   $('libList').innerHTML=all.map(d=>{const n=d.cards.length,k=d.cards.reduce((a,c)=>a+(S.known[c.id]?1:0),0),cur=S.deck===d.id;
     if(sel)return `<div class="lib-item ${d.builtin?'nosel':''} ${sel.has(d.id)?'picked':''}" role="checkbox" aria-checked="${sel.has(d.id)}" tabindex="0" data-pick="${d.builtin?'':d.id}"><span class="li-check" aria-hidden="true"></span><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚${d.builtin?' ・ 消せません':''}</small></div></div>`;
     return `<div class="lib-item ${cur?'cur':''}" role="button" tabindex="0" data-deck="${d.id}"><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚 ・ 覚えた ${k}枚${d.builtin?' ・ 最初から入っている単語帳':''}</small><div class="li-bar"><i style="width:${n?k/n*100:0}%"></i></div></div>${cur?'<span class="li-cur">勉強中</span>':''}${d.builtin?'':`<button class="li-edit" data-edit="${d.id}">編集</button>`}</div>`}).join('');
@@ -1771,15 +1781,31 @@ function setBigCard(on){
 // ---- fix a card or add a memo, right from the card
 function applyEdits(){for(const d of BUILTIN){const e=S.edits[d.id];if(!e){if(d._orig){d.en=d._orig.en;d.jp=d._orig.jp;d.memo=''}continue}if(!d._orig)d._orig={en:d.en,jp:d.jp};d.en=e.en??d._orig.en;d.jp=e.jp??d._orig.jp;d.memo=e.memo||''}}
 let ceCard=null;
-function openCardEdit(d){if(!d)return;ceCard=d;$('ceEn').value=d.en;$('ceJp').value=d.jp;$('ceMemo').value=d.memo||'';$('cedit').hidden=false;setTimeout(()=>$('ceMemo').focus({preventScroll:true}),80)}
+let ceFrom='card', ceArm=false;
+function openCardEdit(d,from){if(!d)return;ceCard=d;ceFrom=from||'card';ceArm=false;{const b=$('ceDel');b.classList.remove('arm');b.textContent='🗑 このカードを消す'}$('ceEn').value=d.en;$('ceJp').value=d.jp;$('ceMemo').value=d.memo||'';$('cedit').hidden=false;setTimeout(()=>$('ceMemo').focus({preventScroll:true}),80)}
 function closeCardEdit(){$('cedit').hidden=true;ceCard=null}
+// after a card was changed or removed: rebuild the deck's cards but keep the study order
+function refreshData(){
+  selectDeck(S.deck,true); const m=new Map(DATA.map(d=>[d.id,d]));
+  P=P.map(d=>m.get(d.id)).filter(Boolean); QP=[]; if(ci>=P.length)ci=Math.max(0,P.length-1);
+  header(); renderDeckBar&&renderDeckBar(); if(tab==='list')renderList(); else if(tab==='card'){try{fillCard()}catch(e){}}
+}
+function deleteCardEdit(){
+  const d=ceCard;if(!d)return; const b=$('ceDel');
+  if(!ceArm){ceArm=true;b.classList.add('arm');b.textContent='もう一度押すと消えます';return}
+  const dk=S.deck!=='gold'&&deckOf(S.deck);
+  if(dk){const i=(dk.cards||[]).findIndex(x=>x.id===d.id);if(i>=0){const c=dk.cards[i];dk.cards.splice(i,1);dropImg(c)}}
+  else S.edits[d.id]={...(S.edits[d.id]||{}),del:1};
+  delete S.known[d.id];delete S.miss[d.id]; save(); closeCardEdit(); refreshData();
+  toast(`<div><strong>「${esc(d.en).slice(0,30)}」を消しました</strong></div>`);
+}
 function saveCardEdit(){
   const d=ceCard;if(!d)return;const en=$('ceEn').value.trim(),jp=$('ceJp').value.trim(),memo=$('ceMemo').value.trim().slice(0,120);
   if(!en||!jp){toast('<div><strong>英語と日本語は空にできません</strong></div>');return}
   const dk=S.deck!=='gold'&&deckOf(S.deck);
   if(dk){const c=(dk.cards||[]).find(x=>x.id===d.id);if(c){c.en=en;c.jp=jp;if(memo)c.memo=memo;else delete c.memo}}
-  else{const o=d._orig||{en:d.en,jp:d.jp};const e={};if(en!==o.en)e.en=en;if(jp!==o.jp)e.jp=jp;if(memo)e.memo=memo;if(Object.keys(e).length)S.edits[d.id]=e;else delete S.edits[d.id];if(!d._orig)d._orig=o}
-  d.en=en;d.jp=jp;d.memo=memo; save(); closeCardEdit(); fillCard(); const f=$('flip'); if(!f.classList.contains('turned'))flip();
+  else{const o=d._orig||{en:d.en,jp:d.jp};const e={};if((S.edits[d.id]||{}).del)e.del=1;if(en!==o.en)e.en=en;if(jp!==o.jp)e.jp=jp;if(memo)e.memo=memo;if(Object.keys(e).length)S.edits[d.id]=e;else delete S.edits[d.id];if(!d._orig)d._orig=o}
+  d.en=en;d.jp=jp;d.memo=memo; save(); const from=ceFrom; closeCardEdit(); refreshData(); if(from==='card'){const f=$('flip'); if(!f.classList.contains('turned'))flip()}
   toast('<div><strong>カードを保存しました</strong></div>');
 }
 function faceHTML(d,lang,isBack){
@@ -1943,8 +1969,9 @@ function renderList(){
   const q=$('q').value.trim().toLowerCase();
   const [a,b]=$('range').value.split('-').map(Number);
   const rows=sortRows((q?DATA:DATA.slice(a,b)).filter(d=>!q||d.en.toLowerCase().includes(q)||d.jp.includes(q)));
-  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.memo?`<span class="j">📝 ${esc(d.memo)}</span>`:''}${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):'<div class="empty" style="border:0">見つかりませんでした。</div>';
+  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t" data-ed="${d.id}"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.memo?`<span class="j">📝 ${esc(d.memo)}</span>`:''}${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><div class="acts"><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button><button class="led" data-ed="${d.id}" aria-label="直す・消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):'<div class="empty" style="border:0">見つかりませんでした。</div>';
   $('listbox').querySelectorAll('button[data-id]').forEach(b=>b.onclick=()=>{const id=+b.dataset.id;if(S.known[id])delete S.known[id];else S.known[id]=1;save();header();b.innerHTML=chip(DATA.find(x=>x.id===id))});
+  $('listbox').querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{const id=+b.dataset.ed;openCardEdit(DATA.find(x=>x.id===id),'list')});
   const m=$('more'); if(m) m.onclick=()=>{LIM+=300;renderList()};
 }
 
@@ -1989,7 +2016,7 @@ function refresh(reset=true){
 $('lsortBtn').onclick=e=>{e.stopPropagation();toggleLsMenu()};
 document.addEventListener('click',e=>{const m=$('lsMenu');if(m&&!m.hidden&&!e.target.closest('.lsearch'))toggleLsMenu(false)});
 $('lsortBtn').classList.toggle('on',lsort!=='no');
-$('ceCancel').onclick=closeCardEdit;$('ceSave').onclick=saveCardEdit;
+$('ceCancel').onclick=closeCardEdit;$('ceSave').onclick=saveCardEdit;$('ceDel').onclick=deleteCardEdit;
 $('cedit').onclick=e=>{if(e.target.id==='cedit')closeCardEdit()};
 ['ceEn','ceJp','ceMemo'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();saveCardEdit()}}));
 $('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
@@ -2011,6 +2038,7 @@ $('libNew').onclick=()=>openDeckEdit('new');
 
 $('dkName').onchange=()=>{if(dkDraft&&dkDraft.id===dkId){commitDraft();return}const dk=deckOf(dkId);if(dk){dk.name=$('dkName').value.trim();save()}};
 const dkAdd=()=>{const en=$('dkEn').value.trim(),jp=$('dkJp').value.trim(); if(!en){$('dkEn').focus();return} if(!jp){$('dkJp').focus();return}
+  {const old=dupCard(en); if(old){toast(`<div><strong>以前同じ単語を入力しました</strong><span>${esc(old.en)}＝${esc(old.jp)}</span></div>`);$('dkEn').select();return}}
   if(addCards([[en,jp,$('dkMemo').value]])){$('dkEn').value='';$('dkJp').value='';$('dkMemo').value='';$('dkEn').focus();toast('<div><strong>カードを追加しました</strong></div>')}else toast('<div><strong>同じカードがもうあります</strong></div>')};
 $('dkAddBtn').onclick=dkAdd;
 $('dkGenBtn').onclick=()=>toggleGen();
@@ -2021,7 +2049,7 @@ $('dkEn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.p
 $('dkJp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('dkMemo').focus()}});
 $('dkMemo').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();dkAdd()}});
 $('dkBulkBtn').onclick=()=>{const {out,bad}=parseBulk($('dkBulk').value); const n=addCards(out); const m=$('dkBulkMsg');
-  m.className='sync-msg'+(n?'':' bad'); m.textContent=n?`${n}枚追加しました。`+(bad.length?` 区切りが見つからなかった${bad.length}行は追加していません。`:''):(bad.length?'区切り（タブ・=・,・：）が見つかりませんでした。':'追加するカードがありませんでした（同じカードは追加しません）。');
+  m.className='sync-msg'+(n?'':' bad'); m.textContent=n?`${n}枚追加しました。`+(out.length>n?` 以前入力した単語${out.length-n}個は追加していません。`:'')+(bad.length?` 区切りが見つからなかった${bad.length}行は追加していません。`:''):(bad.length?'区切り（タブ・=・,・：）が見つかりませんでした。':'追加するカードがありませんでした（以前入力した単語は追加しません）。');
   if(n){$('dkBulk').value=bad.join('\n')}};
 let dkArm=false;
 $('dkDelete').onclick=()=>{ if(!dkArm){dkArm=true;$('dkDelete').textContent='もう一度押すと削除';return}
