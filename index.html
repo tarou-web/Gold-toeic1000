@@ -711,6 +711,7 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .qrev-r .e{font-weight:900}.qrev-r .j{font-family:var(--f-jp);font-weight:700;color:var(--muted);font-size:.92rem}
 .qkind{display:flex;gap:6px;justify-content:center;font-size:.72rem;font-weight:800}
 .qkind span{padding:3px 10px;border-radius:99px;border:2px solid var(--line);color:var(--muted)}
+.qkind span.rvtag{border-color:var(--accent-line);color:var(--accent-ink)}
 .qkind span.on{background:var(--green);border-color:var(--green);color:var(--on-green)}
 .qskip{align-self:center;background:none;border:0;color:var(--muted);font:inherit;font-weight:800;font-size:.9rem;text-decoration:underline;padding:6px 10px;cursor:pointer}
 .ordans{min-height:58px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;padding:10px;border:2px dashed var(--line);border-radius:16px}
@@ -1039,7 +1040,7 @@ var syncTimer=null,syncBusy=false,syncDirty=false;
 function syncPayload(){
   const td=todayState();
   return {points:S.points||0,goal:S.goal||10,todayKey:td.d,todayDone:Object.keys(td.done).length,todayPts:td.pts,todayDoneMap:td.done,streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},days:S.days||{},
-    decks:S.decks||[],edits:S.edits||{},deck:S.deck||'gold',nid:S.nid||100001,ai:S.ai||{n:0,by:{},days:{}},coins:S.coins||0,bcoin:S.bcoin||{},bcoinInit:S.bcoinInit||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',hat:S.hat||'',neck:S.neck||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:S.updatedAt||Date.now(),tz:-new Date().getTimezoneOffset()};
+    decks:S.decks||[],edits:S.edits||{},rv:S.rv||{},deck:S.deck||'gold',nid:S.nid||100001,ai:S.ai||{n:0,by:{},days:{}},coins:S.coins||0,bcoin:S.bcoin||{},bcoinInit:S.bcoinInit||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',hat:S.hat||'',neck:S.neck||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:S.updatedAt||Date.now(),tz:-new Date().getTimezoneOffset()};
 }
 function scheduleSync(){ if(!FB_ON||(!S.syncKey&&!AU))return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
 async function pushSync(keepalive){
@@ -1133,7 +1134,7 @@ function initAcct(){
 function applyCloud(d){
   // the database may return numbered maps as arrays with gaps; turn them back into plain maps
   const obj=x=>{const o={};if(x)for(const k of Object.keys(x))if(x[k]!=null)o[k]=x[k];return o};
-  Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},edits:obj(d.edits),decks:Array.isArray(d.decks)?d.decks.filter(Boolean).map(x=>({...x,cards:(x.cards||[]).filter(Boolean)})):(S.decks||[]),deck:d.deck||'gold',nid:d.nid||S.nid||100001,ai:d.ai&&d.ai.n?{n:d.ai.n,by:obj(d.ai.by),days:obj(d.ai.days)}:(S.ai||{n:0,by:{},days:{}}),coins:d.coins||0,bcoin:obj(d.bcoin),bcoinInit:d.bcoinInit||1,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',hat:d.hat||'',neck:d.neck||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}}});
+  Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},edits:obj(d.edits),rv:obj(d.rv),decks:Array.isArray(d.decks)?d.decks.filter(Boolean).map(x=>({...x,cards:(x.cards||[]).filter(Boolean)})):(S.decks||[]),deck:d.deck||'gold',nid:d.nid||S.nid||100001,ai:d.ai&&d.ai.n?{n:d.ai.n,by:obj(d.ai.by),days:obj(d.ai.days)}:(S.ai||{n:0,by:{},days:{}}),coins:d.coins||0,bcoin:obj(d.bcoin),bcoinInit:d.bcoinInit||1,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',hat:d.hat||'',neck:d.neck||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}}});
   S.updatedAt=d.updatedAt||Date.now();
   $('goal').value=String(S.goal);
   applyWear(); renderAiStats(); selectDeck(S.deck);
@@ -1369,7 +1370,7 @@ function renderDeckEdit(){
     r.querySelector('.en').onchange=e=>{c.en=e.target.value.trim()||c.en;save()};
     r.querySelector('.jp').onchange=e=>{c.jp=e.target.value.trim()||c.jp;save()};
     r.querySelector('.memo').onchange=e=>{const m=e.target.value.trim().slice(0,120); if(m)c.memo=m; else delete c.memo; save()};
-    r.querySelector('.delb').onclick=()=>{cs.splice(+r.dataset.i,1);dropImg(c);delete S.known[c.id];delete S.miss[c.id];save();renderDeckEdit()};
+    r.querySelector('.delb').onclick=()=>{cs.splice(+r.dataset.i,1);dropImg(c);delete S.known[c.id];delete S.miss[c.id];S.rv&&delete S.rv[c.id];save();renderDeckEdit()};
     r.querySelector('.imgb').onclick=()=>cardImg(c,r.querySelector('.imgb'));
   });
 }
@@ -1891,7 +1892,7 @@ function removeCard(d){
   const dk=S.deck!=='gold'&&deckOf(S.deck);
   if(dk){const i=(dk.cards||[]).findIndex(x=>x.id===d.id);if(i>=0){const c=dk.cards[i];dk.cards.splice(i,1);dropImg(c)}}
   else S.edits[d.id]={...(S.edits[d.id]||{}),del:1};
-  delete S.known[d.id];delete S.miss[d.id]; save(); refreshData();
+  delete S.known[d.id];delete S.miss[d.id];S.rv&&delete S.rv[d.id]; save(); refreshData();
   toast(`<div><strong>「${esc(d.en).slice(0,30)}」を消しました</strong></div>`);
 }
 function saveCardEdit(){
@@ -1972,7 +1973,7 @@ function go(n){const c=Math.max(0,Math.min(P.length-1,ci+n));if(c!==ci){ci=c;fil
 let judging=false;
 function mark(ok){
   const d=P[ci]; if(!d||judging) return;
-  if(ok){S.known[d.id]=1;studied(5);credit(d.id,true);earnCoin(d.id)} else {delete S.known[d.id]; S.miss[d.id]=(S.miss[d.id]||0)+1}
+  review(d.id,ok); if(ok){S.known[d.id]=1;studied(5);credit(d.id,true);earnCoin(d.id)} else {delete S.known[d.id]; S.miss[d.id]=(S.miss[d.id]||0)+1}
   sfx(ok); buzz(ok); save();header(); document.querySelectorAll('.stchip').forEach(x=>x.innerHTML=chip(d)); mascotSay(ok?'ok':'ng');
   const sc=$('scene'); judging=true;
   sc.classList.add(ok?'judge-ok':'judge-ng');
@@ -2025,13 +2026,34 @@ function trickyOpts(d,je){
   for(const [,o] of scored){if(out.length>=3)break;const t=show(o);if(!seen.has(t)){seen.add(t);out.push(o)}}
   return out;
 }
+// ---- 復習の予定（間隔反復）: S.rv[id]=[最後に答えた日, 次までの日数]
+const RV_STEPS=[1,3,7,14,30,60,120];
+const dayNo=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
+function review(id,ok){
+  const rv=S.rv||(S.rv={}), cur=rv[id], today=dayNo();
+  if(!ok){rv[id]=[today,0];return}           // wrong: due again right away
+  if(cur&&cur[0]===today&&cur[1]>0)return;   // already moved forward today
+  const prev=cur?cur[1]:0, k=RV_STEPS.findIndex(x=>x>prev);
+  let ivl=RV_STEPS[k<0?RV_STEPS.length-1:k];
+  const m=S.miss[id]||0; if(m)ivl=Math.max(1,Math.round(ivl*Math.max(.4,1-.15*m))); // often missed: come back sooner
+  rv[id]=[today,ivl];
+}
+// how much a card should come up in 学習 now
+function lrPriority(d){
+  const rv=(S.rv||{})[d.id], m=S.miss[d.id]||0, today=dayNo();
+  if(rv){const over=today-(rv[0]+rv[1]); if(over>=0)return 100+Math.min(over,60)*2+m*3; // its review day has come
+    if(rv[0]===today)return -50+Math.random();}                                          // answered today and not due: leave it
+  if(m&&!S.known[d.id])return 50+m*5;                                                     // often missed
+  if(!S.known[d.id])return 20+Math.random()*10;                                           // not learned yet
+  return Math.random()*10;
+}
+const isDue=d=>{const rv=(S.rv||{})[d.id];return !!rv&&dayNo()>=rv[0]+rv[1]};
 // ---- 学習: each card goes 4択 → 並べ替え (phrases) or 書く (words); both right = 覚えた
 const ROUND=7, MASTER=2;
 let LR=null; // {st:{id:stage}, q:[ids still to ask, in order], miss:{id:1}, step}
 function startQuiz(){
-  const p=pool().slice(); for(let i=p.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[p[i],p[j]]=[p[j],p[i]]}
-  QP=[...p.filter(d=>!S.known[d.id]),...p.filter(d=>S.known[d.id])].slice(0,ROUND); qi=0; qOpts=null;
-  LR={st:{},q:QP.map(d=>d.id),miss:{},step:0}; if(DATA.length<4)for(const d of QP)LR.st[d.id]=1;
+  QP=shuf(pool()).map(d=>[lrPriority(d)+Math.random()*3,d]).sort((a,b)=>b[0]-a[0]).slice(0,ROUND).map(x=>x[1]); qi=0; qOpts=null;
+  LR={st:{},q:QP.map(d=>d.id),miss:{},step:0,due:Object.fromEntries(QP.filter(isDue).map(d=>[d.id,1]))}; if(DATA.length<4)for(const d of QP)LR.st[d.id]=1;
 }
 const lrCard=()=>LR&&LR.q.length?QP.find(d=>d.id===LR.q[0]):null;
 const enTiles=en=>String(en).trim().split(/\s+/);
@@ -2071,7 +2093,7 @@ function renderQuiz(){
     fanfare(); mascotSay&&mascotSay('ok'); $('again').onclick=()=>{startQuiz();renderQuiz()};return}
   const kind=qKind(d), je=$('dir').value==='je';
   const head=`<div class="qhead"><div class="track"><i style="width:${done/QP.length*100}%"></i></div><span class="score">${done} / ${QP.length}</span></div>
-   <div class="qkind"><span class="${kind==='mc'?'on':''}">4択</span><span class="${kind!=='mc'?'on':''}">${enTiles(d.en).length>=3?'並べ替え':'穴埋め'}</span></div>`;
+   <div class="qkind">${LR.due&&LR.due[d.id]?'<span class="rvtag">復習</span>':''}<span class="${kind==='mc'?'on':''}">4択</span><span class="${kind!=='mc'?'on':''}">${enTiles(d.en).length>=3?'並べ替え':'穴埋め'}</span></div>`;
   const bubble=(t,cls)=>`<div class="bubble"><div class="dot"><svg viewBox="0 0 24 24"><path fill="var(--green)" d="M4 5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-6l-5 4v-4a2 2 0 0 1-2-2z"/></svg></div><div class="say-box"><div class="txt ${cls}" style="font-size:1.12rem">${esc(t)}</div></div></div>`;
   const cache=qOpts&&qOpts.step===LR.step&&qOpts.id===d.id?qOpts:null;
   answered=false;
@@ -2129,10 +2151,10 @@ function lrJudge(d,ok,sub){
   let title;
   if(ok){
     const st=(LR.st[d.id]||0)+1; LR.st[d.id]=st; studied(5);
-    if(st>=MASTER){S.known[d.id]=1;studied(5);credit(d.id,false);earnCoin(d.id);title='覚えた！'}
+    if(st>=MASTER){if(LR.miss[d.id])(S.rv||(S.rv={}))[d.id]=[dayNo(),1];else review(d.id,true);S.known[d.id]=1;studied(5);credit(d.id,false);earnCoin(d.id);title='覚えた！'}
     else{later(d.id,2);title=CHEER[Math.random()*CHEER.length|0]}
   }else{
-    LR.miss[d.id]=1; S.miss[d.id]=(S.miss[d.id]||0)+1; delete S.known[d.id]; later(d.id,3); title='不正解';
+    LR.miss[d.id]=1; S.miss[d.id]=(S.miss[d.id]||0)+1; delete S.known[d.id]; review(d.id,false); later(d.id,3); title='不正解';
     sub=(sub||'')+'<br><small>あとでもう一度出ます</small>';
   }
   sfx(ok); buzz(ok); save(); header(); mascotSay(ok?'ok':'ng');
@@ -2181,7 +2203,7 @@ function renderMc(){
 function mcAnswer(b,d,je){
   if(manswered)return; manswered=true;
   const v=$('v-mc'); const ok=+b.dataset.id===d.id; ms.n++; ms.res[d.id]=ok;
-  if(ok){ms.r++;S.known[d.id]=1;studied(10);credit(d.id,false);earnCoin(d.id)}else{b.classList.add('wrong');S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}
+  review(d.id,ok); if(ok){ms.r++;S.known[d.id]=1;studied(10);credit(d.id,false);earnCoin(d.id)}else{b.classList.add('wrong');S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}
   v.querySelector(`.opt[data-id="${d.id}"]`).classList.add('right');
   v.querySelectorAll('.opt').forEach(x=>x.disabled=true);
   sfx(ok); buzz(ok); save(); header(); mascotSay(ok?'ok':'ng');
@@ -2272,7 +2294,7 @@ function renderTest(){
     const left=TT.qs.filter((q,i)=>{const a=TT.ans[i];return a==null||a===''||(Array.isArray(a)&&!a.length)}).length;
     const b=$('tGrade'); if(left&&!b.dataset.arm){b.dataset.arm=1;b.textContent=`まだ${left}問 答えていません。このまま採点する`;return}
     TT.graded=true; let okN=0;
-    for(const q of TT.qs){const d=q.d;if(testOk(q)){okN++;studied(3)}else{S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}}
+    for(const q of TT.qs){const d=q.d;review(d.id,testOk(q));if(testOk(q)){okN++;studied(3)}else{S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}}
     save(); header(); const ok=okN/TT.qs.length>=.8; sfx(ok); mascotSay(ok?'ok':'ng'); if(ok)fanfare();
     renderTest(); scrollTo({top:0,behavior:'smooth'});
   };
@@ -2368,7 +2390,7 @@ $('navSet').onclick=()=>{renderAiStats();openNavView('setv');navOn('navSet')};
 $('libSel').onclick=()=>setLibSel(!libSel);
 $('libAll').onclick=()=>{if(libSel.size===S.decks.length)libSel.clear();else S.decks.forEach(d=>libSel.add(d.id));libArm=false;renderLib()};
 $('libDel').onclick=()=>{if(!libSel||!libSel.size)return; if(!libArm){libArm=true;renderLib();return}
-  const n=libSel.size; for(const dk of S.decks.filter(d=>libSel.has(d.id)))for(const c of dk.cards||[]){dropImg(c);delete S.known[c.id];delete S.miss[c.id]}
+  const n=libSel.size; for(const dk of S.decks.filter(d=>libSel.has(d.id)))for(const c of dk.cards||[]){dropImg(c);delete S.known[c.id];delete S.miss[c.id];S.rv&&delete S.rv[c.id]}
   const gone=libSel.has(S.deck); S.decks=S.decks.filter(d=>!libSel.has(d.id)); save(); if(gone)selectDeck('gold'); renderDeckBar();
   setLibSel(false); toast(`<div><strong>${n}個の単語帳を削除しました</strong></div>`)};
 $('libNew').onclick=()=>openDeckEdit('new');
@@ -2390,7 +2412,7 @@ $('dkBulkBtn').onclick=()=>{const {out,bad}=parseBulk($('dkBulk').value); const 
   if(n){$('dkBulk').value=bad.join('\n')}};
 let dkArm=false;
 $('dkDelete').onclick=()=>{ if(!dkArm){dkArm=true;$('dkDelete').textContent='もう一度押すと削除';return}
-  const dk=deckOf(dkId); dkDraft=null; if(dk){for(const c of dk.cards||[]){dropImg(c);delete S.known[c.id];delete S.miss[c.id]} S.decks=S.decks.filter(x=>x!==dk)}
+  const dk=deckOf(dkId); dkDraft=null; if(dk){for(const c of dk.cards||[]){dropImg(c);delete S.known[c.id];delete S.miss[c.id];S.rv&&delete S.rv[c.id]} S.decks=S.decks.filter(x=>x!==dk)}
   dkArm=false;$('dkDelete').textContent='削除する'; const v=$('deckv'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); document.body.classList.remove('sv-lock'); dkId=null; selectDeck('gold'); navOn('navHome'); toast('<div><strong>単語帳を削除しました</strong></div>')};
 $('askEn').addEventListener('click',async e=>{
   const w=e.target.closest('.w'); if(!w)return;
