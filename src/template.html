@@ -647,6 +647,10 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .ttest{display:flex;flex-direction:column;gap:12px}
 .tq{border:2px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
 .tq.ok{border-color:var(--green)}.tq.ng{border-color:var(--red-ink)}
+.tq .qno{font-size:1.15rem;font-weight:900;color:var(--fg);margin-right:8px}
+.tq .qn span{display:flex;align-items:baseline}
+.tnav{display:grid;grid-template-columns:64px 1fr 64px;align-items:center;gap:8px;text-align:center;font-weight:900;color:var(--muted);font-variant-numeric:tabular-nums}
+.tnav .btn{height:52px;padding:0;display:grid;place-items:center}.tnav svg{width:24px;height:24px}.tnav .btn[disabled]{opacity:.35}
 .tq .qn{display:flex;justify-content:space-between;font-size:.75rem;font-weight:800;color:var(--muted)}
 .tq.ok .qn b{color:var(--green-ink)}.tq.ng .qn b{color:var(--red-ink)}
 .tq .tp{margin:0;font-weight:900;font-size:1.05rem}.tq .tp.jp{font-family:var(--f-jp);font-weight:700}
@@ -2133,7 +2137,7 @@ function startTest(){
     if(k==='order')q.tiles=makeTiles(d);
     qs.push(q);
   }
-  TT={graded:false,ans:{},qs};
+  TT={graded:false,ans:{},qs,cur:0};
 }
 const TKIND={mc:'4択',tf:'○×',write:'書く',order:'並べ替え'};
 function testOk(q){
@@ -2171,8 +2175,8 @@ function renderTest(){
     if(q.k==='tf')body=`<p class="tp">${esc(d.en)}</p><p class="tp jp">＝ ${esc(q.shown)}</p><div class="tf"><button class="opt ${a===true?'sel':''}" data-q="${i}" data-tf="1" ${g?'disabled':''}>○ 合っている</button><button class="opt ${a===false?'sel':''}" data-q="${i}" data-tf="0" ${g?'disabled':''}>× 違う</button></div>`;
     if(q.k==='write')body=`<p class="tp jp">${esc(d.jp)}</p><input class="qin" data-q="${i}" value="${esc(a||'')}" ${g?'disabled':''} autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next" placeholder="ヒント：${esc((d.en.replace(/^[^A-Za-z]+/,'')[0])||'')} で始まる英語">`;
     if(q.k==='order')body=`<p class="tp jp">${esc(d.jp)}</p><div class="ordans" data-ans="${i}"></div><div class="ordpool" data-pool="${i}">${q.tiles.map((w,t)=>`<button class="tile" data-q="${i}" data-t="${t}" ${g?'disabled':''}>${esc(w)}</button>`).join('')}</div>`;
-    return `<div class="tq ${g?(ok?'ok':'ng'):''}" id="tq${i}"><div class="qn"><span>${i+1}. ${TKIND[q.k]}</span>${g?`<b>${ok?'○ 正解':'× 不正解'}</b>`:''}</div>${body}${g&&!ok?`<p class="corr">正解：${esc(q.k==='mc'&&!q.je?d.jp:q.k==='tf'?(q.truth?'○ 合っている':'× 違う（'+d.jp+'）'):d.en)}</p>`:''}</div>`}).join('')}
-    ${g?'':`<button class="btn ok" id="tGrade" style="width:100%">採点する</button>`}</div>`;
+    return `<div class="tq ${g?(ok?'ok':'ng'):''}" id="tq${i}" ${!g&&i!==TT.cur?'hidden':''}><div class="qn"><span><b class="qno">問${i+1}</b>${TKIND[q.k]}</span>${g?`<b>${ok?'○ 正解':'× 不正解'}</b>`:''}</div>${body}${g&&!ok?`<p class="corr">正解：${esc(q.k==='mc'&&!q.je?d.jp:q.k==='tf'?(q.truth?'○ 合っている':'× 違う（'+d.jp+'）'):d.en)}</p>`:''}</div>`}).join('')}
+    ${g?'':`<div class="tnav"><button class="btn" id="tPrev" aria-label="前の問題"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><span id="tPos"></span><button class="btn" id="tNext" aria-label="次の問題"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div><button class="btn ok" id="tGrade" style="width:100%">採点する</button>`}</div>`;
   const count=()=>{const c=$('tCount');if(c)c.textContent=`回答 ${TT.qs.filter((q,i)=>{const a=TT.ans[i];return a!=null&&a!==''&&!(Array.isArray(a)&&!a.length)}).length} / ${n}`};
   const drawOrd=i=>{const q=TT.qs[i],a=TT.ans[i]||[],box=v.querySelector(`[data-ans="${i}"]`);
     box.innerHTML=a.map((t,k)=>`<button class="tile" data-k="${k}" ${g?'disabled':''}>${esc(q.tiles[t])}</button>`).join('');
@@ -2185,10 +2189,14 @@ function renderTest(){
     const l=$('tLearn'); if(l)l.onclick=()=>{const w=TT.qs.filter(q=>!testOk(q)).map(q=>q.d);QP=w.slice(0,ROUND*3);qi=0;qOpts=null;LR={st:{},q:QP.map(d=>d.id),miss:{},step:0};if(DATA.length<4)for(const d of QP)LR.st[d.id]=1;setTab('quiz');scrollTo(0,0)};
     return}
   count();
+  const go=k=>{TT.cur=Math.max(0,Math.min(n-1,k));v.querySelectorAll('.tq').forEach((x,i)=>x.hidden=i!==TT.cur);
+    $('tPos').textContent=`${TT.cur+1} / ${n}`;$('tPrev').disabled=TT.cur===0;$('tNext').disabled=TT.cur===n-1;
+    const a=document.activeElement;if(a&&a.classList&&a.classList.contains('qin'))a.blur()};
+  go(TT.cur); $('tPrev').onclick=()=>go(TT.cur-1); $('tNext').onclick=()=>go(TT.cur+1);
   v.querySelectorAll('.opt[data-o]').forEach(b=>b.onclick=()=>{const i=+b.dataset.q;TT.ans[i]=+b.dataset.o;v.querySelectorAll(`.opt[data-q="${i}"]`).forEach(x=>x.classList.toggle('sel',x===b));count()});
   v.querySelectorAll('.opt[data-tf]').forEach(b=>b.onclick=()=>{const i=+b.dataset.q;TT.ans[i]=b.dataset.tf==='1';v.querySelectorAll(`.opt[data-q="${i}"]`).forEach(x=>x.classList.toggle('sel',x===b));count()});
   v.querySelectorAll('.qin').forEach(inp=>{inp.oninput=()=>{TT.ans[+inp.dataset.q]=inp.value;count()};
-    inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();const all=[...v.querySelectorAll('.qin')],k=all.indexOf(inp);if(all[k+1])all[k+1].focus();else inp.blur()}})});
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();inp.blur();if(TT.cur<n-1)go(TT.cur+1)}})});
   v.querySelectorAll('.ordpool .tile').forEach(b=>b.onclick=()=>{const i=+b.dataset.q,t=+b.dataset.t,a=TT.ans[i]||[];if(a.includes(t))return;a.push(t);TT.ans[i]=a;drawOrd(i);count()});
   $('tQuit').onclick=()=>{TT=null;renderTest();scrollTo(0,0)};
   $('tGrade').onclick=()=>{
