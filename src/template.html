@@ -621,6 +621,7 @@ body.cardbig .face .cimg{max-height:50%}
 body.cardbig header,body.cardbig .tabs,body.cardbig .controls{display:none!important}
 body.cardbig .bnav{visibility:hidden;pointer-events:none}
 body.cardbig .wrap{padding-bottom:16px!important}
+html.noscroll,html.noscroll body{overflow:hidden;overscroll-behavior:none}
 .dk-row .imgb{color:var(--accent-ink);padding:0;overflow:hidden;display:grid;place-items:center}
 .dk-row .imgb img{width:100%;height:100%;object-fit:cover;display:block}
 .dk-row .imgb svg{width:20px;height:20px}
@@ -1719,7 +1720,7 @@ let P=[],ci=0,turned=false,flipAnim=null,flipTimer=null;
 var bigCard=false;
 function setBigCard(on){
   bigCard=!!on&&tab==='card'; document.body.classList.toggle('cardbig',bigCard);
-  hideSheet&&hideSheet(); scrollTo(0,0); fillCard(); requestAnimationFrame(fitCard);
+  hideSheet&&hideSheet(); document.documentElement.classList.toggle('noscroll',bigCard); scrollTo(0,0); fillCard(); fitCard();
 }
 function faceHTML(d,lang,isBack){
   const t=lang==='en'?d.en:d.jp;
@@ -1873,14 +1874,14 @@ function renderList(){
 function setBnavH(){const n=document.querySelector('.bnav');if(n)document.documentElement.style.setProperty('--bnavh',n.getBoundingClientRect().height+'px')}
 function fitCard(){setBnavH();
   const f=$('flip'), y=$('yes'), nav=document.querySelector('.bnav'); if(!f||!y||!nav||!f.offsetParent)return;
-  f.style.height='';f.style.minHeight=''; const full=f.getBoundingClientRect().height;
   // measure against the menu bar itself (iPhone home-screen apps can report a wrong window height)
   const fr=f.getBoundingClientRect(), below=y.getBoundingClientRect().bottom-fr.bottom;
   const nb=nav.getBoundingClientRect(), safe=parseFloat(getComputedStyle(nav).paddingBottom)||0;
   const limit=bigCard?nb.bottom-Math.max(16,safe):nb.top;
-  const room=limit-(fr.top+scrollY)-below-12;
-  f.style.minHeight='0';f.style.height=Math.max(200,Math.min(bigCard?1200:460,Math.round(room)))+'px';
-  const over=y.getBoundingClientRect().bottom+scrollY-(limit+scrollY)+12; if(over>0)f.style.height=Math.max(200,f.getBoundingClientRect().height-over)+'px'
+  const room=limit-(fr.top+scrollY)-below-12; // as if the page is at the top
+  // set the height once (no reset in between), so the page does not jump and the size does not creep frame by frame
+  const h=Math.max(200,Math.min(bigCard?1200:460,Math.round(room)));
+  if(Math.abs(fr.height-h)>1){f.style.minHeight='0';f.style.height=h+'px'}
 }
 {const _b=buildCard;buildCard=function(){const r=_b.apply(this,arguments);fitCard();return r}}
 addEventListener('resize',()=>requestAnimationFrame(fitCard));
@@ -1894,7 +1895,7 @@ if(window.ResizeObserver){const ro=new ResizeObserver(()=>requestAnimationFrame(
 addEventListener('load',()=>setTimeout(fitCard,50));
 document.fonts&&document.fonts.ready.then(()=>setTimeout(fitCard,30));
 function setTab(t){
-  if(t!=='card'&&bigCard){bigCard=false;document.body.classList.remove('cardbig')}
+  if(t!=='card'&&bigCard){bigCard=false;document.body.classList.remove('cardbig');document.documentElement.classList.remove('noscroll')}
   tab=t; hideSheet();
   for(const x of ['card','quiz','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
   savePrefs(); refresh(false); requestAnimationFrame(fitCard);
