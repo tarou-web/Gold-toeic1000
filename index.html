@@ -652,6 +652,17 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .dk-row .imgb svg{width:20px;height:20px}
 .dk-row .imgb.busy{opacity:.5;pointer-events:none}
 .dk-imgnote{margin:0;font-size:.8rem;color:var(--muted)}
+/* edit a card / memo */
+.face .editb{position:absolute;left:62px;bottom:10px;width:40px;height:40px;border-radius:12px;border:2px solid rgba(40,45,50,.25);border-bottom-width:4px;background:rgba(255,255,255,.55);color:var(--on-accent);display:grid;place-items:center;padding:0;cursor:pointer;z-index:2}
+.face .editb svg{width:19px;height:19px}
+.face .memo{position:relative;z-index:1;max-width:88%;font-family:var(--f-jp);font-size:.85rem;font-weight:700;line-height:1.45;padding:6px 12px;border-radius:12px;background:rgba(255,255,255,.4);color:var(--on-accent)}
+.cedit{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 40px) 16px 16px}
+.cedit[hidden]{display:none}
+.cebox{width:100%;max-width:440px;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 14px 40px rgba(0,0,0,.35)}
+.cebox h3{margin:0;font-family:var(--f-jp);font-weight:800;font-size:1.1rem}
+.cebox label{display:flex;flex-direction:column;gap:4px;font-size:.8rem;font-weight:800;color:var(--muted)}
+.cebox input{font:inherit;font-size:16px;font-weight:700;color:var(--fg);background:var(--bg2);border:2px solid var(--line);border-radius:12px;padding:10px 12px}
+.ceacts{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:4px}
 /* list: search + sort */
 .lsearch{position:relative;display:grid;grid-template-columns:1fr 48px;gap:8px}
 .lsort{width:48px;height:100%;min-height:44px;border-radius:14px;border:2px solid var(--line);background:var(--bg2);color:var(--fg);display:grid;place-items:center;padding:0;cursor:pointer}
@@ -851,6 +862,13 @@ header{gap:6px}
     <form id="askForm"><input id="askIn" placeholder="このフレーズについて質問する" autocomplete="off" enterkeyhint="send"><button class="btn ok" id="askSend">送る</button></form>
     <small>AIの回答です。まちがうこともあります。<span id="askLeft"></span></small>
   </div></div>
+  <div class="cedit" id="cedit" role="dialog" aria-modal="true" aria-labelledby="ceTitle" hidden><div class="cebox">
+    <h3 id="ceTitle">カードを直す</h3>
+    <label>英語<input id="ceEn" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
+    <label>日本語<input id="ceJp" autocomplete="off"></label>
+    <label>メモ（1行）<input id="ceMemo" maxlength="120" placeholder="例：resume は「履歴書」と「再開する」の2つの意味" autocomplete="off"></label>
+    <div class="ceacts"><button class="btn" id="ceCancel">やめる</button><button class="btn ok" id="ceSave">保存する</button></div>
+  </div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sheet" id="sheet" role="status" aria-live="polite"><div class="in" id="sheetin"></div></div>
 
@@ -928,6 +946,7 @@ const KEY='toeic1000-v1';
 let S={known:{},miss:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}catch(e){}
 S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}}; S.coins=S.coins||0; S.owned=S.owned||{}; S.wear=S.wear||''; S.skin=S.skin||''; S.hat=S.hat||''; S.neck=S.neck||''; S.cpd=S.cpd||{d:'',ids:{}};
+S.edits=S.edits&&typeof S.edits==='object'?S.edits:{};
 S.decks=(Array.isArray(S.decks)?S.decks:[]).filter(d=>d&&(d.cards||[]).length); S.deck=S.deck||'gold'; if(S.deck!=='gold'&&!S.decks.some(d=>d.id===S.deck))S.deck='gold';
 var dkId=null, dkDraft=null, libSel=null, libArm=false; S.nid=S.nid||100001;
 if(!S.bcoin){S.bcoin={};}
@@ -947,7 +966,7 @@ var syncTimer=null,syncBusy=false,syncDirty=false;
 function syncPayload(){
   const td=todayState();
   return {points:S.points||0,goal:S.goal||10,todayKey:td.d,todayDone:Object.keys(td.done).length,todayPts:td.pts,todayDoneMap:td.done,streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},days:S.days||{},
-    decks:S.decks||[],deck:S.deck||'gold',nid:S.nid||100001,ai:S.ai||{n:0,by:{},days:{}},coins:S.coins||0,bcoin:S.bcoin||{},bcoinInit:S.bcoinInit||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',hat:S.hat||'',neck:S.neck||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:S.updatedAt||Date.now(),tz:-new Date().getTimezoneOffset()};
+    decks:S.decks||[],edits:S.edits||{},deck:S.deck||'gold',nid:S.nid||100001,ai:S.ai||{n:0,by:{},days:{}},coins:S.coins||0,bcoin:S.bcoin||{},bcoinInit:S.bcoinInit||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',hat:S.hat||'',neck:S.neck||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:S.updatedAt||Date.now(),tz:-new Date().getTimezoneOffset()};
 }
 function scheduleSync(){ if(!FB_ON||(!S.syncKey&&!AU))return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
 async function pushSync(keepalive){
@@ -1041,7 +1060,7 @@ function initAcct(){
 function applyCloud(d){
   // the database may return numbered maps as arrays with gaps; turn them back into plain maps
   const obj=x=>{const o={};if(x)for(const k of Object.keys(x))if(x[k]!=null)o[k]=x[k];return o};
-  Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},decks:Array.isArray(d.decks)?d.decks.filter(Boolean).map(x=>({...x,cards:(x.cards||[]).filter(Boolean)})):(S.decks||[]),deck:d.deck||'gold',nid:d.nid||S.nid||100001,ai:d.ai&&d.ai.n?{n:d.ai.n,by:obj(d.ai.by),days:obj(d.ai.days)}:(S.ai||{n:0,by:{},days:{}}),coins:d.coins||0,bcoin:obj(d.bcoin),bcoinInit:d.bcoinInit||1,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',hat:d.hat||'',neck:d.neck||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}}});
+  Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},edits:obj(d.edits),decks:Array.isArray(d.decks)?d.decks.filter(Boolean).map(x=>({...x,cards:(x.cards||[]).filter(Boolean)})):(S.decks||[]),deck:d.deck||'gold',nid:d.nid||S.nid||100001,ai:d.ai&&d.ai.n?{n:d.ai.n,by:obj(d.ai.by),days:obj(d.ai.days)}:(S.ai||{n:0,by:{},days:{}}),coins:d.coins||0,bcoin:obj(d.bcoin),bcoinInit:d.bcoinInit||1,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',hat:d.hat||'',neck:d.neck||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}}});
   S.updatedAt=d.updatedAt||Date.now();
   $('goal').value=String(S.goal);
   applyWear(); renderAiStats(); selectDeck(S.deck);
@@ -1232,7 +1251,7 @@ function renderWardrobe(){
 function deckOf(id){return S.decks.find(x=>x.id===id)}
 function deckCards(dk){return (dk.cards||[]).map((c,i)=>({...c,no:i+1}))}
 function selectDeck(id,quiet){
-  const dk=id!=='gold'&&deckOf(id); S.deck=dk?id:'gold'; DATA=dk?deckCards(dk):BUILTIN;
+  const dk=id!=='gold'&&deckOf(id); S.deck=dk?id:'gold'; if(!dk)applyEdits(); DATA=dk?deckCards(dk):BUILTIN;
   buildRange(); if(!quiet){save();P=[];QP=[];hideSheet&&hideSheet();refresh(true);header()}
 }
 function renderDeckBar(){
@@ -1768,6 +1787,20 @@ function setBigCard(on){
   bigCard=!!on&&tab==='card'; document.body.classList.toggle('cardbig',bigCard);
   hideSheet&&hideSheet(); document.documentElement.classList.toggle('noscroll',bigCard); scrollTo(0,0); fillCard(); fitCard();
 }
+// ---- fix a card or add a memo, right from the card
+function applyEdits(){for(const d of BUILTIN){const e=S.edits[d.id];if(!e){if(d._orig){d.en=d._orig.en;d.jp=d._orig.jp;d.memo=''}continue}if(!d._orig)d._orig={en:d.en,jp:d.jp};d.en=e.en??d._orig.en;d.jp=e.jp??d._orig.jp;d.memo=e.memo||''}}
+let ceCard=null;
+function openCardEdit(d){if(!d)return;ceCard=d;$('ceEn').value=d.en;$('ceJp').value=d.jp;$('ceMemo').value=d.memo||'';$('cedit').hidden=false;setTimeout(()=>$('ceMemo').focus({preventScroll:true}),80)}
+function closeCardEdit(){$('cedit').hidden=true;ceCard=null}
+function saveCardEdit(){
+  const d=ceCard;if(!d)return;const en=$('ceEn').value.trim(),jp=$('ceJp').value.trim(),memo=$('ceMemo').value.trim().slice(0,120);
+  if(!en||!jp){toast('<div><strong>英語と日本語は空にできません</strong></div>');return}
+  const dk=S.deck!=='gold'&&deckOf(S.deck);
+  if(dk){const c=(dk.cards||[]).find(x=>x.id===d.id);if(c){c.en=en;c.jp=jp;if(memo)c.memo=memo;else delete c.memo}}
+  else{const o=d._orig||{en:d.en,jp:d.jp};const e={};if(en!==o.en)e.en=en;if(jp!==o.jp)e.jp=jp;if(memo)e.memo=memo;if(Object.keys(e).length)S.edits[d.id]=e;else delete S.edits[d.id];if(!d._orig)d._orig=o}
+  d.en=en;d.jp=jp;d.memo=memo; save(); closeCardEdit(); fillCard(); const f=$('flip'); if(!f.classList.contains('turned'))flip();
+  toast('<div><strong>カードを保存しました</strong></div>');
+}
 function faceHTML(d,lang,isBack){
   const t=lang==='en'?d.en:d.jp;
   return `<span class="corner">No.${d.no||d.id}</span>
@@ -1778,6 +1811,8 @@ function faceHTML(d,lang,isBack){
     <div class="txt ${lang}">${esc(t)}</div>
     ${lang==='jp'&&d.g&&d.g.length?`<div class="gloss">${d.g.map(([w,m])=>`<div><b>${esc(w)}</b><span>${esc(m)}</span></div>`).join('')}</div>`:''}
     ${lang==='en'?`<button class="say" data-say>🔊 発音を聞く</button>`:''}
+    ${isBack&&d.memo?`<div class="memo">📝 ${esc(d.memo)}</div>`:''}
+    ${isBack?`<button class="editb" data-edit-card aria-label="このカードを直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>`:''}
     ${isBack&&d.fix?`<div class="fixnote">元の表記を修正: ${esc(d.fix)}</div>`:''}
     <span class="tap">${isBack?'タップでもう一度回転':'タップで裏返す'}</span>`;
 }
@@ -1796,7 +1831,7 @@ function buildCard(){
      <button class="btn" id="next" aria-label="次へ">→</button>
    </div>
    </div>`;
-  $('scene').onclick=e=>{if(e.target.closest('[data-exp]')){e.stopPropagation();sZoom(!bigCard);setBigCard(!bigCard);return}if(e.target.closest('[data-shuf]')){e.stopPropagation();sShuffle();reshuffle();return}const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
+  $('scene').onclick=e=>{if(e.target.closest('[data-edit-card]')){e.stopPropagation();openCardEdit(P[ci]);return}if(e.target.closest('[data-exp]')){e.stopPropagation();sZoom(!bigCard);setBigCard(!bigCard);return}if(e.target.closest('[data-shuf]')){e.stopPropagation();sShuffle();reshuffle();return}const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
   $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1);
   $('yes').onclick=()=>mark(true); $('no').onclick=()=>mark(false);
   fillCard();
@@ -1927,7 +1962,7 @@ function renderList(){
   const q=$('q').value.trim().toLowerCase();
   const [a,b]=$('range').value.split('-').map(Number);
   const rows=sortRows((q?DATA:DATA.slice(a,b)).filter(d=>!q||d.en.toLowerCase().includes(q)||d.jp.includes(q)));
-  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):'<div class="empty" style="border:0">見つかりませんでした。</div>';
+  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.memo?`<span class="j">📝 ${esc(d.memo)}</span>`:''}${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):'<div class="empty" style="border:0">見つかりませんでした。</div>';
   $('listbox').querySelectorAll('button[data-id]').forEach(b=>b.onclick=()=>{const id=+b.dataset.id;if(S.known[id])delete S.known[id];else S.known[id]=1;save();header();b.innerHTML=chip(DATA.find(x=>x.id===id))});
   const m=$('more'); if(m) m.onclick=()=>{LIM+=300;renderList()};
 }
@@ -1973,6 +2008,9 @@ function refresh(reset=true){
 $('lsortBtn').onclick=e=>{e.stopPropagation();toggleLsMenu()};
 document.addEventListener('click',e=>{const m=$('lsMenu');if(m&&!m.hidden&&!e.target.closest('.lsearch'))toggleLsMenu(false)});
 $('lsortBtn').classList.toggle('on',lsort!=='no');
+$('ceCancel').onclick=closeCardEdit;$('ceSave').onclick=saveCardEdit;
+$('cedit').onclick=e=>{if(e.target.id==='cedit')closeCardEdit()};
+['ceEn','ceJp','ceMemo'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();saveCardEdit()}}));
 $('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
 $('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
 for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];refresh(true)};
@@ -2033,7 +2071,7 @@ $('bagBtn').onclick=openShop; $('shopClose').onclick=closeShop;
 $('hangerBtn').onclick=e=>{e.stopPropagation();$('wardrobe').hidden?openWardrobe():closeWardrobe()};
 $('wardrobe').onclick=e=>e.stopPropagation();
 document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(bigCard)setBigCard(false);closeOpt();if(deckOpen()){closeDeckEdit();navOn('navHome')}if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('cedit').hidden){closeCardEdit();return}if(bigCard)setBigCard(false);closeOpt();if(deckOpen()){closeDeckEdit();navOn('navHome')}if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
 applyWear(); renderAiStats();
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
 $('mascot').onclick=()=>{const d=(tab==='quiz'&&QP[qi])||P[ci]||DATA[0];if(d)openAsk(d);else openDeckEdit(S.deck==='gold'?'new':S.deck)};
