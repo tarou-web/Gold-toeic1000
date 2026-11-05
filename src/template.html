@@ -657,7 +657,10 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .tbar .btn{padding:6px 14px;font-size:.85rem}
 .tsetup,.tscore{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:8px 0}
 .tsetup h2{margin:0}.tsetup p{margin:0;color:var(--muted);font-size:.9rem}
-.tnum{display:flex;gap:8px}.tnum button{font:inherit;font-weight:800;padding:10px 18px;border-radius:14px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--fg);cursor:pointer}
+.tnum{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.tkinds button{padding:10px 10px;font-size:.88rem}
+.tlab{font-size:.78rem;font-weight:800;color:var(--muted);margin-bottom:-4px}
+.tnote{font-size:.78rem!important}.tnum button{font:inherit;font-weight:800;padding:10px 18px;border-radius:14px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--fg);cursor:pointer}
 .tnum button[aria-pressed=true]{border-color:var(--green);background:var(--green);color:var(--on-green)}
 .tscore b{font-size:3rem;line-height:1;font-weight:900}.tscore b small{font-size:1rem;margin-left:2px}.tscore.good b{color:var(--green)}
 .tscore span{color:var(--muted);font-weight:800}.tbtns{display:grid;gap:8px;width:100%}
@@ -2114,16 +2117,22 @@ function mcAnswer(b,d,je){
 
 // ---- テスト: all questions on one page, mixed types, graded at the end
 var TT=null, testN=[10,20,30].includes(prefs.testN)?prefs.testN:10;
+var testKinds=Array.isArray(prefs.testKinds)&&prefs.testKinds.some(k=>['mc','tf','order','write'].includes(k))?prefs.testKinds.filter(k=>['mc','tf','order','write'].includes(k)):['mc','tf','order','write'];
 function startTest(){
-  const cards=shuf(pool()).slice(0,testN);
-  TT={graded:false,ans:{},qs:cards.map(d=>{
-    const long=enTiles(d.en).length>=3, x=Math.random();
-    const k=DATA.length<4?(long?'order':'write'):x<.4?'mc':x<.7?'tf':(long?'order':'write');
-    const q={d,k};
+  const qs=[];
+  for(const d of shuf(pool())){
+    if(qs.length>=testN)break;
+    const long=enTiles(d.en).length>=3;
+    let c=testKinds.filter(k=>(k!=='mc'&&k!=='tf')||DATA.length>=4).filter(k=>k!=='order'||long);
+    if(long&&c.includes('order')&&c.includes('write'))c=c.filter(k=>k!=='write'); // long phrases: tap to order rather than type
+    if(!c.length)continue;
+    const k=c[Math.random()*c.length|0], q={d,k};
     if(k==='mc'){q.je=Math.random()<.5;q.opts=shuf([d,...trickyOpts(d,q.je)])}
     if(k==='tf'){q.truth=Math.random()<.5;const o=trickyOpts(d,false)[0];if(!o)q.truth=true;q.shown=q.truth?d.jp:o.jp}
     if(k==='order')q.tiles=makeTiles(d);
-    return q})};
+    qs.push(q);
+  }
+  TT={graded:false,ans:{},qs};
 }
 const TKIND={mc:'4択',tf:'○×',write:'書く',order:'並べ替え'};
 function testOk(q){
@@ -2138,11 +2147,19 @@ function renderTest(){
   const v=$('v-test');
   if(!pool().length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
   if(!TT){
-    v.innerHTML=`<div class="tsetup"><h2>テスト</h2><p>4択・○×・並べ替え・書く問題がまざって出ます。答えは最後にまとめて採点します。</p>
+    v.innerHTML=`<div class="tsetup"><h2>テスト</h2><p>選んだ形の問題がまざって出ます。答えは最後にまとめて採点します。</p>
+      <div class="tlab">問題数</div>
       <div class="tnum">${[10,20,30].map(n=>`<button data-n="${n}" aria-pressed="${n===testN}">${n}問</button>`).join('')}</div>
+      <div class="tlab">問題の形（タップで入れる・外す）</div>
+      <div class="tnum tkinds">${['mc','tf','order','write'].map(k=>`<button data-k="${k}" aria-pressed="${testKinds.includes(k)}">${testKinds.includes(k)?'✓ ':''}${TKIND[k]}</button>`).join('')}</div>
+      ${testKinds.length===1&&testKinds[0]==='order'?'<p class="tnote">並べ替えは3語以上のフレーズだけで出ます</p>':''}
       <button class="btn ok" id="tStart" style="width:100%">テストを始める</button></div>`;
     v.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{testN=+b.dataset.n;savePrefs();renderTest()});
-    $('tStart').onclick=()=>{startTest();renderTest();scrollTo(0,0)};return}
+    v.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
+      if(testKinds.includes(k)){if(testKinds.length===1){toast('<div><strong>1つは選んでください</strong></div>');return}testKinds=testKinds.filter(x=>x!==k)}
+      else testKinds=['mc','tf','order','write'].filter(x=>x===k||testKinds.includes(x));
+      savePrefs();renderTest()});
+    $('tStart').onclick=()=>{startTest();if(!TT.qs.length){TT=null;toast('<div><strong>この形で出せる問題がありません</strong><span>ほかの形も入れてください</span></div>');return}renderTest();scrollTo(0,0)};return}
   const g=TT.graded, okN=g?TT.qs.filter(testOk).length:0, n=TT.qs.length, pct=Math.round(okN/n*100);
   const head=g?`<div class="tscore ${pct>=80?'good':''}"><b>${pct}<small>点</small></b><span>${n}問中 ${okN}問 正解</span>
       <div class="tbtns">${okN<n?`<button class="btn ok" id="tLearn">間違えた${n-okN}枚を学習する</button>`:''}<button class="btn" id="tNew">もう一度テスト</button></div></div>`
@@ -2246,7 +2263,7 @@ function setTab(t){
   for(const x of ['card','quiz','mc','test','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
   savePrefs(); refresh(false); requestAnimationFrame(fitCard);
 }
-function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({lsort:typeof lsort==='string'?lsort:'no',range:$('range').value,filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab,testN:testN||10}))}catch(e){}}
+function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({lsort:typeof lsort==='string'?lsort:'no',range:$('range').value,filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab,testN:testN||10,testKinds:typeof testKinds!=='undefined'?testKinds:undefined}))}catch(e){}}
 function refresh(reset=true){
   if(reset||!P.length){P=pool();ci=0}
   if(tab==='card')buildCard();
