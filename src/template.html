@@ -811,7 +811,7 @@ header{gap:6px}
 
   <div class="controls">
     <label class="ctl">範囲<select id="range"></select></label>
-    <label class="ctl">出題<select id="filter"><option value="all">すべて</option><option value="todo">未習得のみ</option><option value="weak">苦手のみ</option><option value="fix">修正した項目</option><option value="add">追加した語だけ</option></select></label>
+    <label class="ctl">出題<select id="filter"><option value="all">すべて</option><option value="todo">未習得のみ</option><option value="weak">苦手のみ</option></select></label>
     <label class="ctl">表面<select id="dir"><option value="je">日本語</option><option value="ej">英語</option></select></label>
     <label class="ctl">順番<select id="order"><option value="seq">番号順</option><option value="shuf">シャッフル</option></select></label>
   </div>
@@ -1171,14 +1171,14 @@ function buildRange(){
   const N=DATA.length,sets=[],gold=S.deck==='gold';
   for(let a=0;a<N;a+=100){const b=Math.min(N,a+100);sets.push(`<option value="${a}-${b}">${a+1}–${b}</option>`)}
   const keep=rs.value;
-  rs.innerHTML=`<option value="0-${Math.max(N,1)}">全部 1–${N}</option>`+(gold?`<option value="0-1000">前回の1000語</option><option value="1000-${N}">追加の${N-1000}語</option>`:'')+(N>100?sets.join(''):'');
+  rs.innerHTML=`<option value="0-${Math.max(N,1)}">全部 1–${N}</option>`+(N>100?sets.join(''):'');
   if([...rs.options].some(o=>o.value===keep))rs.value=keep;
-  const fl=$('filter'); for(const o of fl.options) if(o.value==='fix'||o.value==='add'){o.hidden=!gold;o.disabled=!gold}
-  if(!gold&&(fl.value==='fix'||fl.value==='add'))fl.value='all';
+  if($('filter').selectedIndex<0)$('filter').value='all';
 }
 const prefs=(()=>{try{return JSON.parse(localStorage.getItem(KEY+'-p')||'{}')}catch(e){return{}}})();
 selectDeck(S.deck,true);
 for(const k of ['range','filter','dir','order','sound','vib']) if(prefs[k]) $(k).value=prefs[k];
+for(const k of ['range','filter']) if($(k).selectedIndex<0) $(k).selectedIndex=0; // a saved choice that no longer exists
 let tab=prefs.tab||'card';
 
 function dkey(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
