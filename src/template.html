@@ -2151,7 +2151,7 @@ function renderTest(){
       <div class="tlab">問題数</div>
       <div class="tnum">${[10,20,30].map(n=>`<button data-n="${n}" aria-pressed="${n===testN}">${n}問</button>`).join('')}</div>
       <div class="tlab">問題の形（タップで入れる・外す）</div>
-      <div class="tnum tkinds">${['mc','tf','order','write'].map(k=>`<button data-k="${k}" aria-pressed="${testKinds.includes(k)}">${testKinds.includes(k)?'✓ ':''}${TKIND[k]}</button>`).join('')}</div>
+      <div class="tnum tkinds">${['mc','tf','order','write'].map(k=>`<button data-k="${k}" aria-pressed="${testKinds.includes(k)}">${TKIND[k]}</button>`).join('')}</div>
       ${testKinds.length===1&&testKinds[0]==='order'?'<p class="tnote">並べ替えは3語以上のフレーズだけで出ます</p>':''}
       <button class="btn ok" id="tStart" style="width:100%">テストを始める</button></div>`;
     v.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{testN=+b.dataset.n;savePrefs();renderTest()});
