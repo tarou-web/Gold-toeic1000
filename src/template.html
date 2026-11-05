@@ -662,6 +662,9 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .tbar{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:8px 2px;background:var(--bg);font-weight:800;color:var(--muted);font-size:.9rem}
 .tbar .btn{padding:6px 14px;font-size:.85rem}
 .tsetup,.tscore{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:8px 0}
+.tsetup{gap:10px;padding:0}
+.tsetup .tnum button{padding-block:8px}
+.tsetup #tStart{padding-block:12px}
 .tsetup h2{margin:0}.tsetup p{margin:0;color:var(--muted);font-size:.9rem}
 .tnum{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 .tnum.tkinds{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;width:100%}
@@ -2165,7 +2168,7 @@ function renderTest(){
   const v=$('v-test'); document.body.classList.toggle('testing',!!(TT&&!TT.graded&&TT.qs.length));
   if(!pool().length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
   if(!TT){
-    v.innerHTML=`<div class="tsetup"><h2>テスト</h2>
+    v.innerHTML=`<div class="tsetup">
       <div class="tlab">問題数</div>
       <div class="tnum">${[10,20,30].map(n=>`<button data-n="${n}" aria-pressed="${n===testN}">${n}問</button>`).join('')}</div>
       <div class="tlab">問題の形（タップで入れる・外す）</div>
