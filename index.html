@@ -470,7 +470,7 @@ body.has-hat .tracklabel{padding-right:80px}
 .dk-bulk p{font-size:.82rem;color:var(--muted);margin:8px 0}
 .dk-bulk textarea{resize:vertical;font-family:var(--f);margin-bottom:8px}
 .dk-list{display:flex;flex-direction:column;gap:8px}
-.dk-row{display:grid;grid-template-columns:32px 1fr 1fr 40px;gap:6px;align-items:center}
+.dk-row{display:grid;grid-template-columns:32px 1fr 1fr 40px 40px;gap:6px;align-items:center}
 .dk-row .n{font-family:var(--f);font-weight:800;font-size:.8rem;color:var(--muted);text-align:center}
 .dk-row input{padding:8px 10px;font-size:15px}
 .dk-row button{width:40px;height:40px;border-radius:12px;border:2px solid var(--line);background:none;color:var(--red-ink);font-size:1.1rem;cursor:pointer}
@@ -510,7 +510,7 @@ body.has-hat .tracklabel{padding-right:80px}
 .ph-acts{display:grid;grid-template-columns:1fr 2fr;gap:8px}
 .ph-err{color:var(--red-ink);font-size:.88rem;margin:0}
 .dk-empty{color:var(--muted);font-size:.9rem;padding:8px 2px}
-@media (max-width:420px){.dk-row{grid-template-columns:26px 1fr 40px}.dk-row .jp{grid-column:2}.dk-row button{grid-row:1/3;grid-column:3}}
+@media (max-width:420px){.dk-row{grid-template-columns:26px 1fr 40px 40px}.dk-row .jp{grid-column:2}.dk-row .imgb{grid-row:1/3;grid-column:3}.dk-row .delb{grid-row:1/3;grid-column:4}}
 /* ask the parrot (AI) */
 .askbtn{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:10px 14px;border-radius:16px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--accent-ink);cursor:pointer}
 .askbtn img{width:26px;height:auto;margin:-6px 0}
@@ -631,6 +631,21 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .sheet h3{font-size:1.15rem}
 .sheet .acts .btn{padding:10px}
 body.sheet-open .wrap{padding-bottom:calc(var(--bnavh,0px) + 180px)!important}
+/* big card + card images */
+.face .shufb{left:12px;right:auto}
+.face .expb{position:absolute;right:12px;bottom:10px;width:40px;height:40px;border-radius:12px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--accent-ink);display:grid;place-items:center;padding:0;cursor:pointer;z-index:2}
+.face .expb svg{width:20px;height:20px}
+.back .expb,.back .shufb{background:rgba(255,255,255,.55)!important;border-color:rgba(40,45,50,.25)!important;color:var(--on-accent)!important}
+.face .cimg{position:relative;z-index:1;max-width:86%;max-height:42%;object-fit:contain;border-radius:12px;display:block}
+body.cardbig .face .cimg{max-height:50%}
+body.cardbig header,body.cardbig .tabs,body.cardbig .controls{display:none!important}
+body.cardbig .bnav{visibility:hidden;pointer-events:none}
+body.cardbig .wrap{padding-bottom:16px!important}
+.dk-row .imgb{color:var(--accent-ink);padding:0;overflow:hidden;display:grid;place-items:center}
+.dk-row .imgb img{width:100%;height:100%;object-fit:cover;display:block}
+.dk-row .imgb svg{width:20px;height:20px}
+.dk-row .imgb.busy{opacity:.5;pointer-events:none}
+.dk-imgnote{margin:0;font-size:.8rem;color:var(--muted)}
 /* compact home top so the card gets more room */
 .kwrap{display:flex;flex-direction:column;gap:3px;align-items:stretch}
 .knum{line-height:1.1}.knum small{font-size:.72em;color:var(--muted);font-weight:800}
@@ -806,6 +821,8 @@ header{gap:6px}
         <p class="sync-msg" id="dkBulkMsg" role="status"></p>
       </details>
       <h3 id="dkListTitle">カード</h3>
+      <p class="dk-imgnote" id="dkImgNote"></p>
+      <input type="file" id="dkImgIn" accept="image/*" hidden>
       <div class="dk-list" id="dkList"></div>
       <details class="sync-more dk-danger"><summary>この単語帳を削除する</summary>
         <p>カードと、その覚えた・苦手の記録が消えます。元に戻せません。</p>
@@ -1235,14 +1252,42 @@ function closeDeckEdit(){
 const deckOpen=()=>$('deckv').classList.contains('open');
 function renderDeckEdit(){
   const dk=edDeck(); if(!dk)return; const cs=dk.cards||[];
+  {const n=cs.filter(c=>c.img).length;const el=$('dkImgNote');if(el)el.textContent=`カードの🖼で画像をつけられます。無料：この単語帳 あと${Math.max(0,IMG_PER_DECK-n)}枚 ・ 全部で あと${Math.max(0,IMG_FREE_TOTAL-imgTotal())}枚`}
   $('dkCount').textContent=`${cs.length}枚`; $('dkListTitle').textContent=`カード（${cs.length}枚）`;
-  $('dkList').innerHTML=cs.length?cs.map((c,i)=>`<div class="dk-row" data-i="${i}"><span class="n">${i+1}</span><input class="en" value="${esc(c.en)}" aria-label="英語" autocapitalize="off" spellcheck="false"><input class="jp" value="${esc(c.jp)}" aria-label="日本語"><button aria-label="このカードを消す">✕</button></div>`).reverse().join(''):'<div class="dk-empty">まだカードがありません。上から追加してください。</div>';
+  $('dkList').innerHTML=cs.length?cs.map((c,i)=>`<div class="dk-row" data-i="${i}"><span class="n">${i+1}</span><input class="en" value="${esc(c.en)}" aria-label="英語" autocapitalize="off" spellcheck="false"><input class="jp" value="${esc(c.jp)}" aria-label="日本語"><button class="imgb" data-img aria-label="${c.img?'画像を外す':'画像をつける'}">${c.img?`<img src="${esc(c.img)}" alt="">`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg>'}</button><button class="delb" aria-label="このカードを消す">✕</button></div>`).reverse().join(''):'<div class="dk-empty">まだカードがありません。上から追加してください。</div>';
   $('dkList').querySelectorAll('.dk-row').forEach(r=>{
     const c=cs[+r.dataset.i];
     r.querySelector('.en').onchange=e=>{c.en=e.target.value.trim()||c.en;save()};
     r.querySelector('.jp').onchange=e=>{c.jp=e.target.value.trim()||c.jp;save()};
-    r.querySelector('button').onclick=()=>{cs.splice(+r.dataset.i,1);delete S.known[c.id];delete S.miss[c.id];save();renderDeckEdit()};
+    r.querySelector('.delb').onclick=()=>{cs.splice(+r.dataset.i,1);dropImg(c);delete S.known[c.id];delete S.miss[c.id];save();renderDeckEdit()};
+    r.querySelector('.imgb').onclick=()=>cardImg(c,r.querySelector('.imgb'));
   });
+}
+// ---- card images (saved through the AI server into Cloudflare R2)
+const IMG_PER_DECK=5, IMG_FREE_TOTAL=30;
+function imgTotal(){let n=0;for(const d of S.decks)for(const c of d.cards||[])if(c.img)n++;if(dkDraft)for(const c of dkDraft.cards||[])if(c.img)n++;return n}
+function dropImg(c){if(c&&c.imgId){fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'imgdel',id:c.imgId})}).catch(()=>{})}if(c){delete c.img;delete c.imgId}}
+async function shrinkCardImg(file){
+  const url=URL.createObjectURL(file);
+  try{const img=await new Promise((ok,ng)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ng;i.src=url});
+    const k=Math.min(1,640/Math.max(img.naturalWidth,img.naturalHeight));const cv=document.createElement('canvas');
+    cv.width=Math.round(img.naturalWidth*k);cv.height=Math.round(img.naturalHeight*k);const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);g.drawImage(img,0,0,cv.width,cv.height);
+    let q=.78,d=cv.toDataURL('image/jpeg',q);while(d.length>160000&&q>.4){q-=.1;d=cv.toDataURL('image/jpeg',q)}return d.split(',')[1]}
+  finally{URL.revokeObjectURL(url)}
+}
+function cardImg(c,btn){
+  if(c.img){dropImg(c);save();renderDeckEdit();toast('<div><strong>画像を外しました</strong></div>');return}
+  const dk=edDeck(), inDeck=(dk.cards||[]).filter(x=>x.img).length;
+  if(inDeck>=IMG_PER_DECK||imgTotal()>=IMG_FREE_TOTAL){toast(`<div><strong>無料で付けられる画像は、1つの単語帳に${IMG_PER_DECK}枚・全部で${IMG_FREE_TOTAL}枚までです</strong><span>アプリ版では、広告を見ると3枚追加できるようにする予定です</span></div>`);return}
+  const inp=$('dkImgIn'); inp.value='';
+  inp.onchange=async()=>{const f=inp.files&&inp.files[0]; inp.value=''; if(!f)return; btn.classList.add('busy');
+    try{const data=await shrinkCardImg(f);
+      const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'img',image:data})});
+      const j=await r.json().catch(()=>({})); if(!r.ok||!j.url)throw new Error(j.error||('エラー '+r.status));
+      c.img=j.url; c.imgId=j.id; commitDraft(); save(); renderDeckEdit(); toast('<div><strong>画像をつけました</strong></div>');
+    }catch(e){toast(`<div><strong>画像をつけられませんでした</strong><span>${esc(String(e.message||e)).slice(0,80)}</span></div>`)}
+    finally{btn.classList.remove('busy')}};
+  inp.click();
 }
 function addCards(pairs){
   const dk=edDeck(); if(!dk)return 0; dk.cards=dk.cards||[];
@@ -1692,11 +1737,19 @@ function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.r
 
 // ---- cards
 let P=[],ci=0,turned=false,flipAnim=null,flipTimer=null;
+// ---- big card: hide everything but the goal, Meemo and the card
+var bigCard=false;
+function setBigCard(on){
+  bigCard=!!on&&tab==='card'; document.body.classList.toggle('cardbig',bigCard);
+  hideSheet&&hideSheet(); scrollTo(0,0); fillCard(); requestAnimationFrame(fitCard);
+}
 function faceHTML(d,lang,isBack){
   const t=lang==='en'?d.en:d.jp;
   return `<span class="corner">No.${d.no||d.id}</span>
     <span class="tr"><span class="stchip">${chip(d)}</span><span class="side">${lang==='en'?'ENGLISH':'日本語'}</span></span>
     <button class="shufb" data-shuf aria-label="シャッフル" title="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
+    <button class="expb" data-exp aria-label="${bigCard?'カードを小さくする':'カードを大きくする'}">${bigCard?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10h-6V4M14 10l7-7M4 14h6v6M10 14l-7 7"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></svg>'}</button>
+    ${!isBack&&d.img?`<img class="cimg" src="${esc(d.img)}" alt="" loading="lazy">`:''}
     <div class="txt ${lang}">${esc(t)}</div>
     ${lang==='jp'&&d.g&&d.g.length?`<div class="gloss">${d.g.map(([w,m])=>`<div><b>${esc(w)}</b><span>${esc(m)}</span></div>`).join('')}</div>`:''}
     ${lang==='en'?`<button class="say" data-say>🔊 発音を聞く</button>`:''}
@@ -1718,7 +1771,7 @@ function buildCard(){
      <button class="btn" id="next" aria-label="次へ">→</button>
    </div>
    </div>`;
-  $('scene').onclick=e=>{if(e.target.closest('[data-shuf]')){e.stopPropagation();reshuffle();toast('<div><strong>シャッフルしました</strong></div>');return}const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
+  $('scene').onclick=e=>{if(e.target.closest('[data-exp]')){e.stopPropagation();setBigCard(!bigCard);return}if(e.target.closest('[data-shuf]')){e.stopPropagation();reshuffle();toast('<div><strong>シャッフルしました</strong></div>');return}const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
   $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1);
   $('yes').onclick=()=>mark(true); $('no').onclick=()=>mark(false);
   fillCard();
@@ -1845,9 +1898,11 @@ function fitCard(){setBnavH();
   f.style.height='';f.style.minHeight=''; const full=f.getBoundingClientRect().height;
   // measure against the menu bar itself (iPhone home-screen apps can report a wrong window height)
   const fr=f.getBoundingClientRect(), below=y.getBoundingClientRect().bottom-fr.bottom;
-  const room=nav.getBoundingClientRect().top-(fr.top+scrollY)-below-12;
-  f.style.minHeight='0';f.style.height=Math.max(200,Math.min(460,Math.round(room)))+'px';
-  const over=y.getBoundingClientRect().bottom+scrollY-(nav.getBoundingClientRect().top+scrollY)+12; if(over>0)f.style.height=Math.max(200,f.getBoundingClientRect().height-over)+'px'
+  const nb=nav.getBoundingClientRect(), safe=parseFloat(getComputedStyle(nav).paddingBottom)||0;
+  const limit=bigCard?nb.bottom-Math.max(16,safe):nb.top;
+  const room=limit-(fr.top+scrollY)-below-12;
+  f.style.minHeight='0';f.style.height=Math.max(200,Math.min(bigCard?1200:460,Math.round(room)))+'px';
+  const over=y.getBoundingClientRect().bottom+scrollY-(limit+scrollY)+12; if(over>0)f.style.height=Math.max(200,f.getBoundingClientRect().height-over)+'px'
 }
 {const _b=buildCard;buildCard=function(){const r=_b.apply(this,arguments);fitCard();return r}}
 addEventListener('resize',()=>requestAnimationFrame(fitCard));
@@ -1861,6 +1916,7 @@ if(window.ResizeObserver){const ro=new ResizeObserver(()=>requestAnimationFrame(
 addEventListener('load',()=>setTimeout(fitCard,50));
 document.fonts&&document.fonts.ready.then(()=>setTimeout(fitCard,30));
 function setTab(t){
+  if(t!=='card'&&bigCard){bigCard=false;document.body.classList.remove('cardbig')}
   tab=t; hideSheet();
   for(const x of ['card','quiz','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
   savePrefs(); refresh(false); requestAnimationFrame(fitCard);
@@ -1884,7 +1940,7 @@ $('navSet').onclick=()=>{renderAiStats();openNavView('setv');navOn('navSet')};
 $('libSel').onclick=()=>setLibSel(!libSel);
 $('libAll').onclick=()=>{if(libSel.size===S.decks.length)libSel.clear();else S.decks.forEach(d=>libSel.add(d.id));libArm=false;renderLib()};
 $('libDel').onclick=()=>{if(!libSel||!libSel.size)return; if(!libArm){libArm=true;renderLib();return}
-  const n=libSel.size; for(const dk of S.decks.filter(d=>libSel.has(d.id)))for(const c of dk.cards||[]){delete S.known[c.id];delete S.miss[c.id]}
+  const n=libSel.size; for(const dk of S.decks.filter(d=>libSel.has(d.id)))for(const c of dk.cards||[]){dropImg(c);delete S.known[c.id];delete S.miss[c.id]}
   const gone=libSel.has(S.deck); S.decks=S.decks.filter(d=>!libSel.has(d.id)); save(); if(gone)selectDeck('gold'); renderDeckBar();
   setLibSel(false); toast(`<div><strong>${n}個の単語帳を削除しました</strong></div>`)};
 $('libNew').onclick=()=>openDeckEdit('new');
@@ -1904,7 +1960,7 @@ $('dkBulkBtn').onclick=()=>{const {out,bad}=parseBulk($('dkBulk').value); const 
   if(n){$('dkBulk').value=bad.join('\n')}};
 let dkArm=false;
 $('dkDelete').onclick=()=>{ if(!dkArm){dkArm=true;$('dkDelete').textContent='もう一度押すと削除';return}
-  const dk=deckOf(dkId); dkDraft=null; if(dk){for(const c of dk.cards||[]){delete S.known[c.id];delete S.miss[c.id]} S.decks=S.decks.filter(x=>x!==dk)}
+  const dk=deckOf(dkId); dkDraft=null; if(dk){for(const c of dk.cards||[]){dropImg(c);delete S.known[c.id];delete S.miss[c.id]} S.decks=S.decks.filter(x=>x!==dk)}
   dkArm=false;$('dkDelete').textContent='削除する'; const v=$('deckv'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); document.body.classList.remove('sv-lock'); dkId=null; selectDeck('gold'); navOn('navHome'); toast('<div><strong>単語帳を削除しました</strong></div>')};
 $('askEn').addEventListener('click',async e=>{
   const w=e.target.closest('.w'); if(!w)return;
@@ -1932,7 +1988,7 @@ $('bagBtn').onclick=openShop; $('shopClose').onclick=closeShop;
 $('hangerBtn').onclick=e=>{e.stopPropagation();$('wardrobe').hidden?openWardrobe():closeWardrobe()};
 $('wardrobe').onclick=e=>e.stopPropagation();
 document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeOpt();if(deckOpen()){closeDeckEdit();navOn('navHome')}if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(bigCard)setBigCard(false);closeOpt();if(deckOpen()){closeDeckEdit();navOn('navHome')}if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
 applyWear(); renderAiStats();
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
 $('mascot').onclick=()=>{const d=(tab==='quiz'&&QP[qi])||P[ci]||DATA[0];if(d)openAsk(d);else openDeckEdit(S.deck==='gold'?'new':S.deck)};

@@ -4,11 +4,13 @@
 // 鍵はこのコードには書きません。Cloudflare の設定に保存します：
 //   シークレット GEMINI_API_KEY（Gemini） / シークレット GROQ_API_KEY（Groq） / バインディング AI（Workers AI）
 //   （なくても動く）KV バインディング KV … 答えの保存と、1日の回数の上限に使います
+//   （画像に必要）R2 バインディング IMG … カードの画像を保存します
 
 const ORIGIN = "https://tarou-web.github.io"; // このアプリ以外からは使えないようにする
 // 1日に使える回数（同じネットにつながっている人ごと）。保存した答えを返したときは数えない
 const LIMIT_ASK = 15; // アプリは1人10回。家族などで同じネットを使う人がいるので少し多め
 const LIMIT_PHOTO = 5; // アプリは1人3回
+const LIMIT_IMG = 40; // カードの画像のアップロード（同じネットから1日）
 const LIMIT_GEN = 3; // 自由に頼む単語帳づくり（アプリは1人2回）。おすすめの単語帳は一度作ったら保存して使い回すので数えない
 const ANSWER_DAYS = 60; // 保存した答えを使う日数
 
@@ -16,13 +18,23 @@ export default {
   async fetch(req, env) {
     const cors = {
       "Access-Control-Allow-Origin": ORIGIN,
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     };
     const json = (obj, status = 200) =>
       new Response(JSON.stringify(obj, null, 1), { status, headers: { ...cors, "Content-Type": "application/json; charset=utf-8" } });
 
     if (req.method === "OPTIONS") return new Response(null, { headers: cors });
+    // カードの画像を見せる（だれでも見られるが、名前は長いでたらめな文字なので当てられない）
+    if (req.method === "GET") {
+      const m = new URL(req.url).pathname.match(/^\/img\/([a-z0-9]{24})\.jpg$/);
+      if (m) {
+        if (!env.IMG) return new Response("no storage", { status: 404 });
+        const o = await env.IMG.get(m[1]);
+        if (!o) return new Response("not found", { status: 404, headers: cors });
+        return new Response(o.body, { headers: { ...cors, "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable" } });
+      }
+    }
     if (req.method === "GET") {
       // ブラウザで「…workers.dev/?test」を開くと、3つの AI それぞれに実際に聞いてみた結果を表示します
       if (new URL(req.url).searchParams.has("test")) {
@@ -44,6 +56,26 @@ export default {
     try { body = await req.json(); } catch { return json({ error: "bad request" }, 400); }
 
     const ip = req.headers.get("CF-Connecting-IP") || "?";
+
+    // カードの画像を保存する／消す
+    if (body.type === "img") {
+      if (!env.IMG) return json({ error: "画像を保存する場所（R2）がまだ設定されていません" }, 503);
+      const b64 = String(body.image || "");
+      if (!b64 || b64.length > 400000) return json({ error: "画像が大きすぎるか、ありません" }, 400);
+      if (await overLimit(env, "img", ip, LIMIT_IMG)) return json({ error: "今日はもう画像を追加できません。明日また試してね", limit: true }, 429);
+      let bytes;
+      try { bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)); } catch { return json({ error: "画像を読めませんでした" }, 400); }
+      if (bytes[0] !== 0xff || bytes[1] !== 0xd8) return json({ error: "JPEG の画像だけ使えます" }, 400);
+      const id = [...crypto.getRandomValues(new Uint8Array(12))].map((x) => x.toString(16).padStart(2, "0")).join("");
+      await env.IMG.put(id, bytes, { httpMetadata: { contentType: "image/jpeg" } });
+      await countUse(env, "img", ip);
+      return json({ id, url: new URL(`/img/${id}.jpg`, req.url).href });
+    }
+    if (body.type === "imgdel") {
+      const id = String(body.id || "");
+      if (env.IMG && /^[a-z0-9]{24}$/.test(id)) await env.IMG.delete(id).catch(() => {});
+      return json({ ok: true });
+    }
 
     // AIに単語帳を作ってもらう
     if (body.type === "gen") {
