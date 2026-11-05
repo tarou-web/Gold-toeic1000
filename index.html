@@ -664,6 +664,19 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .face .editb{position:absolute;left:12px;bottom:10px;width:40px;height:40px;border-radius:12px;border:2px solid rgba(40,45,50,.25);border-bottom-width:4px;background:rgba(255,255,255,.55);color:var(--on-accent);display:grid;place-items:center;padding:0;cursor:pointer;z-index:2}
 .face .editb svg{width:19px;height:19px}
 .face .memo{position:relative;z-index:1;max-width:88%;font-family:var(--f-jp);font-size:.85rem;font-weight:700;line-height:1.45;padding:6px 12px;border-radius:12px;background:rgba(255,255,255,.4);color:var(--on-accent)}
+.qkind{display:flex;gap:6px;justify-content:center;font-size:.72rem;font-weight:800}
+.qkind span{padding:3px 10px;border-radius:99px;border:2px solid var(--line);color:var(--muted)}
+.qkind span.on{background:var(--green);border-color:var(--green);color:var(--on-green)}
+.qskip{align-self:center;background:none;border:0;color:var(--muted);font:inherit;font-weight:800;font-size:.9rem;text-decoration:underline;padding:6px 10px;cursor:pointer}
+.ordans{min-height:58px;display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;padding:10px;border:2px dashed var(--line);border-radius:16px}
+.ordans.ok{border-style:solid;border-color:var(--green)}.ordans.ng{border-style:solid;border-color:var(--red-ink)}
+.ordpool{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tile{font:inherit;font-weight:800;font-size:1rem;padding:8px 12px;border-radius:12px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--fg);cursor:pointer}
+.tile:active{transform:translateY(2px);border-bottom-width:2px}
+.tile.used{visibility:hidden}
+.qacts{display:grid;grid-template-columns:1fr 2fr;gap:8px}
+.qin{font:inherit;font-size:18px;font-weight:700;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--fg);width:100%;box-sizing:border-box}
+.qin.ok{border-color:var(--green)}.qin.ng{border-color:var(--red-ink)}
 .cedit{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 40px) 16px 16px}
 .cedit[hidden]{display:none}
 .cebox{width:100%;max-width:440px;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:0 14px 40px rgba(0,0,0,.35)}
@@ -754,7 +767,7 @@ header{gap:6px}
 
   <div class="tabs" role="tablist">
     <button role="tab" id="t-card" aria-selected="true">カード</button>
-    <button role="tab" id="t-quiz" aria-selected="false">4択クイズ</button>
+    <button role="tab" id="t-quiz" aria-selected="false">学習</button>
     <button role="tab" id="t-list" aria-selected="false">一覧</button>
   </div>
   </div>
@@ -1919,43 +1932,134 @@ function mark(ok){
 }
 
 // ---- quiz
-let QP=[],qi=0,qs={r:0,n:0,xp:0},answered=false;
-const LESSON=10;
+let QP=[],qi=0,answered=false; // QP: the cards of this round
 let qOpts=null;
+// ---- wrong choices that look like the answer, so you cannot just rule the others out
+const STOPW=new Set('a an the of to in on at for by with and or is are was were be been am it its this that these those i you he she we they my your our their his her me us them do does did not no as from up out so if but can will would should could has have had there here what which who how'.split(' '));
+const enWords=t=>String(t).toLowerCase().replace(/[^a-z' ]/g,' ').split(/\s+/).filter(Boolean);
+const jaGrams=t=>{const x=String(t).replace(/[\s。、！？!?.,「」（）()・…〜~]/g,'');const g=new Set();for(let i=0;i<x.length-1;i++)g.add(x.slice(i,i+2));if(x.length===1)g.add(x);return g};
+function lev(a,b){if(a===b)return 0;const m=a.length,n=b.length;if(!m||!n)return m||n;let pr=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const cu=[i];for(let j=1;j<=n;j++)cu[j]=Math.min(pr[j]+1,cu[j-1]+1,pr[j-1]+(a[i-1]===b[j-1]?0:1));pr=cu}return pr[n]}
+const simW=(a,b)=>1-lev(a,b)/Math.max(a.length,b.length);
+function trickyOpts(d,je){
+  const show=x=>(je?x.en:x.jp).trim(), mine=show(d);
+  const dw=enWords(d.en), dc=dw.filter(w=>w.length>2&&!STOPW.has(w)), dg=jaGrams(d.jp);
+  const dice=(a,b)=>{if(!a.size||!b.size)return 0;let k=0;for(const x of a)if(b.has(x))k++;return 2*k/(a.size+b.size)};
+  const scored=[];
+  for(const o of DATA){
+    if(o.id===d.id)continue; const t=show(o); if(!t||t===mine)continue;
+    const ow=enWords(o.en), oc=ow.filter(w=>w.length>2&&!STOPW.has(w)), og=jaGrams(o.jp);
+    const jd=dice(dg,og); if(jd>.85)continue; // nearly the same meaning: not fair as a wrong choice
+    let sc=0;
+    for(const w of dc){let best=0;for(const v of oc){const s=w===v?1:simW(w,v);if(s>best)best=s}
+      if(best===1)sc+=3; else if(best>=.6)sc+=best*3.5; else if(oc.some(v=>v.length>3&&w.length>3&&(v.startsWith(w.slice(0,4)))))sc+=1.5}
+    sc+=jd*(je?2:5);                                   // similar Japanese
+    if(Math.abs(dw.length-ow.length)<=1)sc+=1.2;       // same kind of thing (word / phrase / sentence)
+    sc-=Math.min(2,Math.abs(mine.length-t.length)/Math.max(6,mine.length)*2); // similar length
+    if(S.miss[o.id])sc+=.8;                            // a card you got wrong before
+    scored.push([sc+Math.random()*1.2,o]);
+  }
+  scored.sort((a,b)=>b[0]-a[0]);
+  // take three from the closest ones, a little mixed so the same three do not always come back
+  const top=scored.slice(0,9).map(x=>x[1]), out=[], seen=new Set([mine]);
+  while(out.length<3&&top.length){const o=top.splice(Math.random()*Math.min(top.length,5)|0,1)[0];const t=show(o);if(!seen.has(t)){seen.add(t);out.push(o)}}
+  for(const [,o] of scored){if(out.length>=3)break;const t=show(o);if(!seen.has(t)){seen.add(t);out.push(o)}}
+  return out;
+}
+// ---- 学習: each card goes 4択 → 並べ替え (phrases) or 書く (words); both right = 覚えた
+const ROUND=7, MASTER=2;
+let LR=null; // {st:{id:stage}, q:[ids still to ask, in order], miss:{id:1}, step}
+function startQuiz(){
+  const p=pool().slice(); for(let i=p.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[p[i],p[j]]=[p[j],p[i]]}
+  QP=[...p.filter(d=>!S.known[d.id]),...p.filter(d=>S.known[d.id])].slice(0,ROUND); qi=0; qOpts=null;
+  LR={st:{},q:QP.map(d=>d.id),miss:{},step:0}; if(DATA.length<4)for(const d of QP)LR.st[d.id]=1;
+}
+const lrCard=()=>LR&&LR.q.length?QP.find(d=>d.id===LR.q[0]):null;
+const enTiles=en=>String(en).trim().split(/\s+/);
+const qKind=d=>(LR.st[d.id]||0)===0?'mc':enTiles(d.en).length>=3?'order':'write';
+const normAns=t=>String(t).toLowerCase().replace(/[’‘]/g,"'").replace(/[.!?。,、"]/g,'').replace(/\s+/g,' ').trim();
 function renderQuiz(){
   const v=$('v-quiz');
-  if(QP.length<1){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
-  if(DATA.length<4){v.innerHTML='<div class="empty">4択クイズは、単語帳にカードが4枚以上あると使えます。</div>';return}
-  if(qi>=QP.length){
-    const acc=Math.round(qs.r/Math.max(1,qs.n)*100);
-    v.innerHTML=`<div class="done"><h2>レッスン完了！</h2><p style="margin:0;color:var(--muted)">${qs.n}問中 ${qs.r}問 正解</p>
-      <div class="boxes"><div class="box"><b>正解</b><span>${qs.r}問</span></div><div class="box g"><b>正答率</b><span>${acc}%</span></div></div>
-      <button class="btn ok" id="again" style="width:100%;max-width:320px">次のレッスンへ</button></div>`;
-    fanfare(); $('again').onclick=()=>{startQuiz();renderQuiz()};return}
-  const d=QP[qi], je=$('dir').value==='je';
-  const others=DATA.filter(x=>x.id!==d.id); let guard=0;
-  let opts=qOpts&&qOpts.qi===qi&&qOpts.id===d.id?qOpts.list:null;
-  if(!opts){opts=[d];while(opts.length<4&&guard++<500){const o=others[Math.random()*others.length|0];if(!opts.includes(o)&&(je?o.en:o.jp)!==(je?d.en:d.jp))opts.push(o)}
-  opts.sort(()=>Math.random()-.5); qOpts={qi,id:d.id,list:opts}}
+  if(!QP.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
+  const d=lrCard(), done=QP.filter(x=>(LR.st[x.id]||0)>=MASTER).length;
+  if(!d){
+    const miss=Object.keys(LR.miss).length;
+    v.innerHTML=`<div class="done"><h2>ラウンド完了！</h2><p style="margin:0;color:var(--muted)">${QP.length}枚 ぜんぶ覚えました</p>
+      <div class="boxes"><div class="box g"><b>一発でクリア</b><span>${QP.length-miss}枚</span></div><div class="box"><b>間違えて復習</b><span>${miss}枚</span></div></div>
+      <button class="btn ok" id="again" style="width:100%;max-width:320px">次のラウンドへ</button></div>`;
+    fanfare(); mascotSay&&mascotSay('ok'); $('again').onclick=()=>{startQuiz();renderQuiz()};return}
+  const kind=qKind(d), je=$('dir').value==='je';
+  const head=`<div class="qhead"><div class="track"><i style="width:${done/QP.length*100}%"></i></div><span class="score">${done} / ${QP.length}</span></div>
+   <div class="qkind"><span class="${kind==='mc'?'on':''}">4択</span><span class="${kind!=='mc'?'on':''}">${enTiles(d.en).length>=3?'並べ替え':'書いて答える'}</span></div>`;
+  const bubble=(t,cls)=>`<div class="bubble"><div class="dot"><svg viewBox="0 0 24 24"><path fill="var(--green)" d="M4 5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-6l-5 4v-4a2 2 0 0 1-2-2z"/></svg></div><div class="say-box"><div class="txt ${cls}" style="font-size:1.12rem">${esc(t)}</div></div></div>`;
+  const cache=qOpts&&qOpts.step===LR.step&&qOpts.id===d.id?qOpts:null;
   answered=false;
-  v.innerHTML=`<div class="quiz" style="display:flex;flex-direction:column;gap:10px">
-   <div class="qhead"><div class="track"><i style="width:${qi/QP.length*100}%"></i></div><span class="score">${qi+1} / ${QP.length}</span></div>
-   <h2 class="ask">${je?'正しい英語を選んでください':'正しい意味を選んでください'}</h2>
-   <div class="bubble"><div class="dot"><svg viewBox="0 0 24 24"><path fill="var(--green)" d="M4 5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-6l-5 4v-4a2 2 0 0 1-2-2z"/></svg></div>
-     <div class="say-box"><div class="txt ${je?'jp':'en'}" style="font-size:1.12rem">${esc(je?d.jp:d.en)}</div></div></div>
-   <div class="opts">${opts.map((o,i)=>`<button class="opt ${je?'':'jp'}" data-id="${o.id}"><span class="k">${i+1}</span><span>${esc(je?o.en:o.jp)}</span></button>`).join('')}</div>
-   </div>`;
-  v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(b,d,je));
+  if(kind==='mc'){
+    let opts=cache&&cache.list;
+    if(!opts){opts=[d,...trickyOpts(d,je)];for(let i=opts.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[opts[i],opts[j]]=[opts[j],opts[i]]}qOpts={step:LR.step,id:d.id,list:opts}}
+    v.innerHTML=`<div class="quiz" style="display:flex;flex-direction:column;gap:10px">${head}
+     <h2 class="ask">${je?'正しい英語を選んでください':'正しい意味を選んでください'}</h2>${bubble(je?d.jp:d.en,je?'jp':'en')}
+     <div class="opts">${opts.map((o,i)=>`<button class="opt ${je?'':'jp'}" data-id="${o.id}"><span class="k">${i+1}</span><span>${esc(je?o.en:o.jp)}</span></button>`).join('')}</div>
+     <button class="qskip" id="qskip">わからない</button></div>`;
+    const mark=()=>{v.querySelector(`.opt[data-id="${d.id}"]`).classList.add('right');v.querySelectorAll('.opt').forEach(x=>x.disabled=true);$('qskip').disabled=true};
+    v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(answered)return;const ok=+b.dataset.id===d.id;if(!ok)b.classList.add('wrong');mark();lrJudge(d,ok,`正解：${esc(je?d.en:d.jp)}`)});
+    $('qskip').onclick=()=>{if(answered)return;mark();lrJudge(d,false,`正解：${esc(je?d.en:d.jp)}`)};
+  }else if(kind==='order'){
+    const words=enTiles(d.en);
+    let tiles=cache&&cache.tiles;
+    if(!tiles){
+      const low=new Set(words.map(w=>normAns(w))), dec=[];
+      for(const o of trickyOpts(d,true))for(const w of enTiles(o.en)){const n=normAns(w);if(n&&!low.has(n)&&!dec.some(x=>normAns(x)===n))dec.push(w.replace(/[.!?,]+$/,''))}
+      tiles=[...words,...dec.slice(0,words.length>7?1:2)];
+      for(let t=0;t<5;t++){for(let i=tiles.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[tiles[i],tiles[j]]=[tiles[j],tiles[i]]}if(tiles.slice(0,words.length).join(' ')!==words.join(' '))break}
+      qOpts={step:LR.step,id:d.id,tiles};
+    }
+    const picked=[];
+    v.innerHTML=`<div class="quiz" style="display:flex;flex-direction:column;gap:10px">${head}
+     <h2 class="ask">英語に並べ替えてください</h2>${bubble(d.jp,'jp')}
+     <div class="ordans" id="ordAns"></div>
+     <div class="ordpool" id="ordPool">${tiles.map((w,i)=>`<button class="tile" data-t="${i}">${esc(w)}</button>`).join('')}</div>
+     <div class="qacts"><button class="btn" id="qskip">わからない</button><button class="btn ok" id="qcheck" disabled>答え合わせ</button></div></div>`;
+    const draw=()=>{
+      $('ordAns').innerHTML=picked.map((t,k)=>`<button class="tile" data-k="${k}">${esc(tiles[t])}</button>`).join('');
+      v.querySelectorAll('#ordPool .tile').forEach(b=>b.classList.toggle('used',picked.includes(+b.dataset.t)));
+      $('ordAns').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{if(answered)return;picked.splice(+b.dataset.k,1);draw()});
+      $('qcheck').disabled=picked.length<words.length;
+    };
+    v.querySelectorAll('#ordPool .tile').forEach(b=>b.onclick=()=>{if(answered)return;const t=+b.dataset.t;if(picked.includes(t))return;picked.push(t);draw()});
+    draw();
+    const fin=ok=>{v.querySelectorAll('.tile,#qcheck,#qskip').forEach(x=>x.disabled=true);$('ordAns').classList.add(ok?'ok':'ng');lrJudge(d,ok,ok?'':`正解：${esc(d.en)}`)};
+    $('qcheck').onclick=()=>{if(answered)return;fin(normAns(picked.map(t=>tiles[t]).join(' '))===normAns(d.en))};
+    $('qskip').onclick=()=>{if(answered)return;fin(false)};
+  }else{
+    const ans=String(d.en).trim(), first=ans.replace(/^[^A-Za-z]+/,'')[0]||'', nw=enTiles(ans).length, nl=ans.replace(/[^A-Za-z]/g,'').length;
+    v.innerHTML=`<div class="quiz" style="display:flex;flex-direction:column;gap:10px">${head}
+     <h2 class="ask">英語で書いてください</h2>${bubble(d.jp,'jp')}
+     <input class="qin" id="qin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="ヒント：${esc(first)} で始まる${nw>1?nw+'語':nl+'文字'}">
+     <div class="qacts"><button class="btn" id="qskip">わからない</button><button class="btn ok" id="qcheck">答え合わせ</button></div></div>`;
+    const inp=$('qin');
+    const fin=(ok,near)=>{inp.disabled=true;$('qcheck').disabled=$('qskip').disabled=true;inp.classList.add(ok?'ok':'ng');lrJudge(d,ok,ok?(near?`つづりに注意：${esc(ans)}`:''):`正解：${esc(ans)}`)};
+    const check=()=>{if(answered)return;const a=normAns(inp.value),b=normAns(ans);if(!a){inp.focus();return}if(a===b)fin(true);else if(b.length>=5&&lev(a,b)<=1)fin(true,true);else fin(false)};
+    $('qcheck').onclick=check; inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();check()}});
+    $('qskip').onclick=()=>{if(answered)return;fin(false)};
+    setTimeout(()=>inp.focus({preventScroll:true}),60);
+  }
 }
-function answer(b,d,je){
-  if(answered) return; answered=true;
-  const v=$('v-quiz'); const ok=+b.dataset.id===d.id; qs.n++;
-  if(ok){qs.r++;qs.xp+=10;S.known[d.id]=1;studied(10);credit(d.id,false);earnCoin(d.id)}else{b.classList.add('wrong');S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}
-  v.querySelector(`.opt[data-id="${d.id}"]`).classList.add('right');
-  v.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+function lrJudge(d,ok,sub){
+  answered=true; LR.step++; LR.q.shift();
+  const later=(id,gap)=>LR.q.splice(Math.min(gap,LR.q.length),0,id);
+  let title;
+  if(ok){
+    const st=(LR.st[d.id]||0)+1; LR.st[d.id]=st; studied(5);
+    if(st>=MASTER){S.known[d.id]=1;studied(5);credit(d.id,false);earnCoin(d.id);title='覚えた！'}
+    else{later(d.id,2);title=CHEER[Math.random()*CHEER.length|0]}
+  }else{
+    LR.miss[d.id]=1; S.miss[d.id]=(S.miss[d.id]||0)+1; delete S.known[d.id]; later(d.id,3); title='不正解';
+    sub=(sub||'')+'<br><small>あとでもう一度出ます</small>';
+  }
   sfx(ok); buzz(ok); save(); header(); mascotSay(ok?'ok':'ng');
-  showSheet(ok,ok?CHEER[Math.random()*CHEER.length|0]:'不正解',ok?'':`正解：${esc(je?d.en:d.jp)}`,d);
-  requestAnimationFrame(()=>{const r=v.querySelector('.opt.right'),sh=$('sheet');if(!r)return;const over=r.getBoundingClientRect().bottom-(sh.getBoundingClientRect().top-12);if(over>0)scrollBy({top:over,behavior:'smooth'})});
+  showSheet(ok,title,sub,d);
+  const v=$('v-quiz');
+  requestAnimationFrame(()=>{const r=v.querySelector('.opt.right,.ordans,.qin'),sh=$('sheet');if(!r)return;const over=r.getBoundingClientRect().bottom-(sh.getBoundingClientRect().top-12);if(over>0)scrollBy({top:over,behavior:'smooth'})});
 }
 function showSheet(ok,title,sub,d){
   const sh=$('sheet');
@@ -1964,10 +2068,9 @@ function showSheet(ok,title,sub,d){
     <div class="acts"><button class="btn blue" id="qsay">🔊</button><button class="btn ${ok?'ok':'red'}" id="qnext">続ける</button></div>`;
   void sh.offsetWidth; sh.classList.add('show'); document.body.classList.add('sheet-open');
   $('qsay').onclick=()=>speak(d.en);
-  const n=$('qnext'); n.onclick=()=>{hideSheet();qi++;renderQuiz()}; n.focus({preventScroll:true});
+  const n=$('qnext'); n.onclick=()=>{hideSheet();renderQuiz()}; n.focus({preventScroll:true});
 }
 function hideSheet(){const sh=$('sheet');sh.classList.remove('show');document.body.classList.remove('sheet-open')}
-function startQuiz(){const p=pool();for(let i=p.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[p[i],p[j]]=[p[j],p[i]]}QP=p.slice(0,LESSON);qi=0;qs={r:0,n:0,xp:0}}
 
 // ---- list
 let LIM=150;
@@ -2109,7 +2212,7 @@ document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('cedit').hidden){closeCardEdit();return}if(bigCard)setBigCard(false);closeOpt();if(deckOpen()){closeDeckEdit();navOn('navHome')}if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
 applyWear(); renderAiStats();
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
-$('mascot').onclick=()=>{const d=(tab==='quiz'&&QP[qi])||P[ci]||DATA[0];if(d)openAsk(d);else openDeckEdit(S.deck==='gold'?'new':S.deck)};
+$('mascot').onclick=()=>{const d=(tab==='quiz'&&lrCard())||P[ci]||DATA[0];if(d)openAsk(d);else openDeckEdit(S.deck==='gold'?'new':S.deck)};
 $('goal').value=String(S.goal);
 $('goal').onchange=()=>{S.goal=+$('goal').value;if(checkGoal())celebrateGoal();save();header()};
 $('fireBtn').onclick=openStreak; $('svClose').onclick=closeStreak;
