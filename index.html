@@ -652,6 +652,15 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .dk-row .imgb svg{width:20px;height:20px}
 .dk-row .imgb.busy{opacity:.5;pointer-events:none}
 .dk-imgnote{margin:0;font-size:.8rem;color:var(--muted)}
+/* list: search + sort */
+.lsearch{position:relative;display:grid;grid-template-columns:1fr 48px;gap:8px}
+.lsort{width:48px;height:100%;min-height:44px;border-radius:14px;border:2px solid var(--line);background:var(--bg2);color:var(--fg);display:grid;place-items:center;padding:0;cursor:pointer}
+.lsort svg{width:22px;height:22px}
+.lsort.on{border-color:var(--accent-line);color:var(--accent-ink)}
+.lsmenu{position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:230px;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:6px;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.lsmenu[hidden]{display:none}
+.lsmenu button{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.92rem;text-align:left;padding:10px 12px;border:0;border-radius:10px;background:none;color:var(--fg);cursor:pointer}
+.lsmenu button[aria-pressed=true]{background:var(--accent-s);color:var(--accent-ink)}
 /* compact home top so the card gets more room */
 .kwrap{display:flex;flex-direction:column;gap:3px;align-items:stretch}
 .knum{line-height:1.1}.knum small{font-size:.72em;color:var(--muted);font-weight:800}
@@ -733,7 +742,8 @@ header{gap:6px}
   <section id="v-quiz" hidden></section>
   <section id="v-list" hidden>
     <div style="display:flex;flex-direction:column;gap:10px">
-      <input type="search" id="q" placeholder="英語・日本語で検索">
+      <div class="lsearch"><input type="search" id="q" placeholder="英語・日本語で検索"><button class="lsort" id="lsortBtn" aria-label="並べかえ" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 6h16M4 12h11M4 18h6"/></svg></button>
+        <div class="lsmenu" id="lsMenu" hidden></div></div>
       <div class="list" id="listbox"></div>
     </div>
   </section>
@@ -1897,10 +1907,26 @@ function startQuiz(){const p=pool();for(let i=p.length-1;i>0;i--){const j=Math.r
 
 // ---- list
 let LIM=150;
+// ---- list sort
+const LSORTS=[['no','番号順'],['new','新しく追加した順'],['old','古く追加した順'],['az','ABC順（英語）'],['kana','あいうえお順（日本語）'],['todo','覚えていないものから'],['weak','苦手な順']];
+let lsort=(prefs.lsort&&LSORTS.some(x=>x[0]===prefs.lsort))?prefs.lsort:'no';
+const jaColl=new Intl.Collator('ja'), enColl=new Intl.Collator('en',{sensitivity:'base'});
+function sortRows(r){
+  const st=d=>S.known[d.id]?2:S.miss[d.id]?1:0;
+  const cmp={no:(x,y)=>(x.no||x.id)-(y.no||y.id), new:(x,y)=>(y.no||y.id)-(x.no||x.id), old:(x,y)=>(x.no||x.id)-(y.no||y.id),
+    az:(x,y)=>enColl.compare(x.en,y.en), kana:(x,y)=>jaColl.compare(x.jp,y.jp),
+    todo:(x,y)=>st(x)-st(y)||(x.no||x.id)-(y.no||y.id), weak:(x,y)=>(S.miss[y.id]||0)-(S.miss[x.id]||0)||(x.no||x.id)-(y.no||y.id)}[lsort];
+  return lsort==='no'?r:r.slice().sort(cmp);
+}
+function renderLsMenu(){
+  const m=$('lsMenu'); m.innerHTML=LSORTS.map(([k,l])=>`<button data-ls="${k}" aria-pressed="${k===lsort}">${k===lsort?'✓ ':''}${l}</button>`).join('');
+  m.querySelectorAll('[data-ls]').forEach(b=>b.onclick=()=>{lsort=b.dataset.ls;savePrefs();toggleLsMenu(false);LIM=150;renderList();$('lsortBtn').classList.toggle('on',lsort!=='no')});
+}
+function toggleLsMenu(open){const m=$('lsMenu');open=open??m.hidden;m.hidden=!open;$('lsortBtn').setAttribute('aria-expanded',open);if(open)renderLsMenu()}
 function renderList(){
   const q=$('q').value.trim().toLowerCase();
   const [a,b]=$('range').value.split('-').map(Number);
-  const rows=(q?DATA:DATA.slice(a,b)).filter(d=>!q||d.en.toLowerCase().includes(q)||d.jp.includes(q));
+  const rows=sortRows((q?DATA:DATA.slice(a,b)).filter(d=>!q||d.en.toLowerCase().includes(q)||d.jp.includes(q)));
   $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):'<div class="empty" style="border:0">見つかりませんでした。</div>';
   $('listbox').querySelectorAll('button[data-id]').forEach(b=>b.onclick=()=>{const id=+b.dataset.id;if(S.known[id])delete S.known[id];else S.known[id]=1;save();header();b.innerHTML=chip(DATA.find(x=>x.id===id))});
   const m=$('more'); if(m) m.onclick=()=>{LIM+=300;renderList()};
@@ -1937,13 +1963,16 @@ function setTab(t){
   for(const x of ['card','quiz','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
   savePrefs(); refresh(false); requestAnimationFrame(fitCard);
 }
-function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({range:$('range').value,filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab}))}catch(e){}}
+function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({lsort:typeof lsort==='string'?lsort:'no',range:$('range').value,filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab}))}catch(e){}}
 function refresh(reset=true){
   if(reset||!P.length){P=pool();ci=0}
   if(tab==='card')buildCard();
   if(tab==='quiz'){if(reset||!QP.length)startQuiz();renderQuiz()}
   if(tab==='list'){LIM=150;renderList()}
 }
+$('lsortBtn').onclick=e=>{e.stopPropagation();toggleLsMenu()};
+document.addEventListener('click',e=>{const m=$('lsMenu');if(m&&!m.hidden&&!e.target.closest('.lsearch'))toggleLsMenu(false)});
+$('lsortBtn').classList.toggle('on',lsort!=='no');
 $('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
 $('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
 for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];refresh(true)};
