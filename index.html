@@ -620,6 +620,17 @@ body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .lib-sel{background:rgba(255,255,255,.4)}
 .dk-name input{color:var(--fg);border-color:var(--line);background:var(--surface)}
 .dk-name input::placeholder{color:var(--muted)}
+/* quiz fits the phone, and the result bar sits above the bottom menu */
+.quiz .ask{font-size:1.1rem;margin:0}
+.quiz .bubble .dot{width:44px;height:44px;border-radius:14px}
+.quiz .bubble .dot svg{width:24px;height:24px}
+.quiz .bubble .say-box{padding:10px 14px}
+.quiz .opts{gap:8px}
+.quiz .opt{padding:10px 14px;border-bottom-width:4px}
+.sheet{bottom:var(--bnavh,0px);padding-block:12px 12px;z-index:57}
+.sheet h3{font-size:1.15rem}
+.sheet .acts .btn{padding:10px}
+body.sheet-open .wrap{padding-bottom:calc(var(--bnavh,0px) + 180px)!important}
 /* compact home top so the card gets more room */
 .kwrap{display:flex;flex-direction:column;gap:3px;align-items:stretch}
 .knum{line-height:1.1}.knum small{font-size:.72em;color:var(--muted);font-weight:800}
@@ -1768,6 +1779,7 @@ function mark(ok){
 // ---- quiz
 let QP=[],qi=0,qs={r:0,n:0,xp:0},answered=false;
 const LESSON=10;
+let qOpts=null;
 function renderQuiz(){
   const v=$('v-quiz');
   if(QP.length<1){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
@@ -1780,14 +1792,15 @@ function renderQuiz(){
     fanfare(); $('again').onclick=()=>{startQuiz();renderQuiz()};return}
   const d=QP[qi], je=$('dir').value==='je';
   const others=DATA.filter(x=>x.id!==d.id); let guard=0;
-  const opts=[d];while(opts.length<4&&guard++<500){const o=others[Math.random()*others.length|0];if(!opts.includes(o)&&(je?o.en:o.jp)!==(je?d.en:d.jp))opts.push(o)}
-  opts.sort(()=>Math.random()-.5);
+  let opts=qOpts&&qOpts.qi===qi&&qOpts.id===d.id?qOpts.list:null;
+  if(!opts){opts=[d];while(opts.length<4&&guard++<500){const o=others[Math.random()*others.length|0];if(!opts.includes(o)&&(je?o.en:o.jp)!==(je?d.en:d.jp))opts.push(o)}
+  opts.sort(()=>Math.random()-.5); qOpts={qi,id:d.id,list:opts}}
   answered=false;
-  v.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
+  v.innerHTML=`<div class="quiz" style="display:flex;flex-direction:column;gap:10px">
    <div class="qhead"><div class="track"><i style="width:${qi/QP.length*100}%"></i></div><span class="score">${qi+1} / ${QP.length}</span></div>
    <h2 class="ask">${je?'正しい英語を選んでください':'正しい意味を選んでください'}</h2>
    <div class="bubble"><div class="dot"><svg viewBox="0 0 24 24"><path fill="var(--green)" d="M4 5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-6l-5 4v-4a2 2 0 0 1-2-2z"/></svg></div>
-     <div class="say-box"><div class="txt ${je?'jp':'en'}" style="font-size:1.25rem">${esc(je?d.jp:d.en)}</div></div></div>
+     <div class="say-box"><div class="txt ${je?'jp':'en'}" style="font-size:1.12rem">${esc(je?d.jp:d.en)}</div></div></div>
    <div class="opts">${opts.map((o,i)=>`<button class="opt ${je?'':'jp'}" data-id="${o.id}"><span class="k">${i+1}</span><span>${esc(je?o.en:o.jp)}</span></button>`).join('')}</div>
    </div>`;
   v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(b,d,je));
@@ -1800,6 +1813,7 @@ function answer(b,d,je){
   v.querySelectorAll('.opt').forEach(x=>x.disabled=true);
   sfx(ok); buzz(ok); save(); header(); mascotSay(ok?'ok':'ng');
   showSheet(ok,ok?CHEER[Math.random()*CHEER.length|0]:'不正解',ok?'':`正解：${esc(je?d.en:d.jp)}`,d);
+  requestAnimationFrame(()=>{const r=v.querySelector('.opt.right'),sh=$('sheet');if(!r)return;const over=r.getBoundingClientRect().bottom-(sh.getBoundingClientRect().top-12);if(over>0)scrollBy({top:over,behavior:'smooth'})});
 }
 function showSheet(ok,title,sub,d){
   const sh=$('sheet');
@@ -1825,7 +1839,8 @@ function renderList(){
 }
 
 // shrink the card (only as much as needed) so the まだ / 覚えた buttons stay above the bottom menu
-function fitCard(){
+function setBnavH(){const n=document.querySelector('.bnav');if(n)document.documentElement.style.setProperty('--bnavh',n.getBoundingClientRect().height+'px')}
+function fitCard(){setBnavH();
   const f=$('flip'), y=$('yes'), nav=document.querySelector('.bnav'); if(!f||!y||!nav||!f.offsetParent)return;
   f.style.height='';f.style.minHeight=''; const full=f.getBoundingClientRect().height;
   // measure against the menu bar itself (iPhone home-screen apps can report a wrong window height)
