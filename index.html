@@ -703,6 +703,12 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .cloze{margin:0;font-weight:900;font-size:1.1rem;line-height:1.7}
 .cloze .blank{display:inline-block;min-width:3em;padding:0 6px;margin:0 2px;border-bottom:3px solid var(--green);color:var(--green);letter-spacing:.05em}
 .cloze b{color:var(--green);text-decoration:underline;text-underline-offset:4px}
+.qrev{width:100%;margin-top:14px;text-align:left;border:2px solid var(--line);border-radius:18px;overflow:hidden}
+.qrev-h{padding:10px 14px;font-size:.8rem;font-weight:800;color:var(--muted);border-bottom:2px solid var(--line)}
+.qrev-r{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.qrev-r:last-child{border-bottom:0}
+.qrev-r .m{font-weight:900;font-size:1.05rem;line-height:1.4}.qrev-r.ok .m{color:var(--green)}.qrev-r.ng .m{color:var(--red-ink)}
+.qrev-r .e{font-weight:900}.qrev-r .j{font-family:var(--f-jp);font-weight:700;color:var(--muted);font-size:.92rem}
 .qkind{display:flex;gap:6px;justify-content:center;font-size:.72rem;font-weight:800}
 .qkind span{padding:3px 10px;border-radius:99px;border:2px solid var(--line);color:var(--muted)}
 .qkind span.on{background:var(--green);border-color:var(--green);color:var(--on-green)}
@@ -2146,8 +2152,8 @@ function showSheet(ok,title,sub,d,next){
 
 // ---- 4択クイズ: 10 quick questions with tricky wrong choices
 const MC_N=10;
-let MQ=[],mi=0,ms={r:0,n:0},manswered=false,mOpts=null;
-function startMc(){MQ=shuf(pool()).slice(0,MC_N);mi=0;ms={r:0,n:0};mOpts=null}
+let MQ=[],mi=0,ms={r:0,n:0,res:{}},manswered=false,mOpts=null;
+function startMc(){MQ=shuf(pool()).slice(0,MC_N);mi=0;ms={r:0,n:0,res:{}};mOpts=null}
 function renderMc(){
   const v=$('v-mc');
   if(!MQ.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
@@ -2156,7 +2162,8 @@ function renderMc(){
     const acc=Math.round(ms.r/Math.max(1,ms.n)*100);
     v.innerHTML=`<div class="done"><h2>クイズ完了！</h2><p style="margin:0;color:var(--muted)">${ms.n}問中 ${ms.r}問 正解</p>
       <div class="boxes"><div class="box"><b>正解</b><span>${ms.r}問</span></div><div class="box g"><b>正答率</b><span>${acc}%</span></div></div>
-      <button class="btn ok" id="mAgain" style="width:100%;max-width:320px">次のクイズへ</button></div>`;
+      <button class="btn ok" id="mAgain" style="width:100%;max-width:320px">次のクイズへ</button>
+      <div class="qrev"><div class="qrev-h">このクイズで出た単語</div>${MQ.map(d=>{const ok=ms.res[d.id];return `<div class="qrev-r ${ok?'ok':'ng'}"><span class="m">${ok?'○':'×'}</span><div><div class="e">${esc(d.en)}</div><div class="j">${esc(d.jp)}</div></div></div>`}).join('')}</div></div>`;
     fanfare(); $('mAgain').onclick=()=>{startMc();renderMc()};return}
   const d=MQ[mi], je=$('dir').value==='je';
   let opts=mOpts&&mOpts.mi===mi&&mOpts.id===d.id?mOpts.list:null;
@@ -2173,7 +2180,7 @@ function renderMc(){
 }
 function mcAnswer(b,d,je){
   if(manswered)return; manswered=true;
-  const v=$('v-mc'); const ok=+b.dataset.id===d.id; ms.n++;
+  const v=$('v-mc'); const ok=+b.dataset.id===d.id; ms.n++; ms.res[d.id]=ok;
   if(ok){ms.r++;S.known[d.id]=1;studied(10);credit(d.id,false);earnCoin(d.id)}else{b.classList.add('wrong');S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}
   v.querySelector(`.opt[data-id="${d.id}"]`).classList.add('right');
   v.querySelectorAll('.opt').forEach(x=>x.disabled=true);
