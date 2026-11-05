@@ -620,8 +620,13 @@ body.sheet-open .wrap{padding-bottom:calc(var(--bnavh,0px) + 180px)!important}
 body.cardbig .face .cimg{max-height:50%}
 body.cardbig header,body.cardbig .tabs,body.cardbig .controls{display:none!important}
 body.cardbig .bnav{visibility:hidden;pointer-events:none}
-body.cardbig .wrap{padding-bottom:16px!important}
-html.noscroll,html.noscroll body{overflow:hidden;overscroll-behavior:none}
+html.noscroll{overflow:hidden;overscroll-behavior:none}
+/* big card is laid out by CSS: the page is exactly one screen tall and the card takes all the space that is left */
+body.cardbig .wrap{height:calc(100dvh - env(safe-area-inset-top,0px));min-height:0;padding-top:24px!important;padding-bottom:max(16px,env(safe-area-inset-bottom,0px))!important;box-sizing:border-box;overflow:visible}
+body.cardbig #v-card{flex:1 1 auto;min-height:0;display:flex}
+body.cardbig #v-card>div{flex:1 1 auto;min-height:0}
+body.cardbig .scene{flex:1 1 auto;min-height:0;display:flex}
+body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .dk-row .imgb{color:var(--accent-ink);padding:0;overflow:hidden;display:grid;place-items:center}
 .dk-row .imgb img{width:100%;height:100%;object-fit:cover;display:block}
 .dk-row .imgb svg{width:20px;height:20px}
@@ -1873,6 +1878,7 @@ function renderList(){
 // shrink the card (only as much as needed) so the まだ / 覚えた buttons stay above the bottom menu
 function setBnavH(){const n=document.querySelector('.bnav');if(n)document.documentElement.style.setProperty('--bnavh',n.getBoundingClientRect().height+'px')}
 function fitCard(){setBnavH();
+  if(bigCard){const f=$('flip');if(f){f.style.height='';f.style.minHeight=''}return}
   const f=$('flip'), y=$('yes'), nav=document.querySelector('.bnav'); if(!f||!y||!nav||!f.offsetParent)return;
   // measure against the menu bar itself (iPhone home-screen apps can report a wrong window height)
   const fr=f.getBoundingClientRect(), below=y.getBoundingClientRect().bottom-fr.bottom;
