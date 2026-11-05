@@ -471,6 +471,7 @@ body.has-hat .tracklabel{padding-right:80px}
 .dk-bulk textarea{resize:vertical;font-family:var(--f);margin-bottom:8px}
 .dk-list{display:flex;flex-direction:column;gap:8px}
 .dk-row{display:grid;grid-template-columns:32px 1fr 1fr 40px 40px;gap:6px;align-items:center}
+.dk-row .memo{grid-column:2/4;grid-row:2;font-size:13px!important;padding:6px 10px!important;border-style:dashed!important}
 .dk-row .n{font-family:var(--f);font-weight:800;font-size:.8rem;color:var(--muted);text-align:center}
 .dk-row input{padding:8px 10px;font-size:15px}
 .dk-row button{width:40px;height:40px;border-radius:12px;border:2px solid var(--line);background:none;color:var(--red-ink);font-size:1.1rem;cursor:pointer}
@@ -510,7 +511,7 @@ body.has-hat .tracklabel{padding-right:80px}
 .ph-acts{display:grid;grid-template-columns:1fr 2fr;gap:8px}
 .ph-err{color:var(--red-ink);font-size:.88rem;margin:0}
 .dk-empty{color:var(--muted);font-size:.9rem;padding:8px 2px}
-@media (max-width:420px){.dk-row{grid-template-columns:26px 1fr 40px 40px}.dk-row .jp{grid-column:2}.dk-row .imgb{grid-row:1/3;grid-column:3}.dk-row .delb{grid-row:1/3;grid-column:4}}
+@media (max-width:420px){.dk-row{grid-template-columns:26px 1fr 40px 40px}.dk-row .jp{grid-column:2}.dk-row .memo{grid-column:2;grid-row:3}.dk-row .imgb{grid-row:1/4;grid-column:3}.dk-row .delb{grid-row:1/4;grid-column:4}}
 /* ask the parrot (AI) */
 .askbtn{font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:10px 14px;border-radius:16px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--accent-ink);cursor:pointer}
 .askbtn img{width:26px;height:auto;margin:-6px 0}
@@ -653,7 +654,7 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .dk-row .imgb.busy{opacity:.5;pointer-events:none}
 .dk-imgnote{margin:0;font-size:.8rem;color:var(--muted)}
 /* edit a card / memo */
-.face .editb{position:absolute;left:62px;bottom:10px;width:40px;height:40px;border-radius:12px;border:2px solid rgba(40,45,50,.25);border-bottom-width:4px;background:rgba(255,255,255,.55);color:var(--on-accent);display:grid;place-items:center;padding:0;cursor:pointer;z-index:2}
+.face .editb{position:absolute;left:12px;bottom:10px;width:40px;height:40px;border-radius:12px;border:2px solid rgba(40,45,50,.25);border-bottom-width:4px;background:rgba(255,255,255,.55);color:var(--on-accent);display:grid;place-items:center;padding:0;cursor:pointer;z-index:2}
 .face .editb svg{width:19px;height:19px}
 .face .memo{position:relative;z-index:1;max-width:88%;font-family:var(--f-jp);font-size:.85rem;font-weight:700;line-height:1.45;padding:6px 12px;border-radius:12px;background:rgba(255,255,255,.4);color:var(--on-accent)}
 .cedit{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 40px) 16px 16px}
@@ -681,7 +682,7 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .face .tr{position:absolute;top:12px;right:16px;display:flex;align-items:center;gap:6px}
 .face .tr .side{position:static}
 .face .tr .chip{font-size:.68rem;padding:2px 8px}
-.back .tr .chip{background:rgba(255,255,255,.2);color:#fff;border-color:transparent}
+.back .tr .chip{background:rgba(40,45,50,.12);color:var(--on-accent);border-color:transparent}
 .stats{justify-content:space-between;padding-inline:4px;font-size:1.05rem}
 .stats .stat svg{width:22px;height:22px}
 .face .shufb{position:absolute;right:12px;bottom:10px;width:40px;height:40px;border-radius:12px;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);color:var(--accent-ink);display:grid;place-items:center;padding:0;cursor:pointer;z-index:2}
@@ -838,6 +839,7 @@ header{gap:6px}
         <h3>カードを1枚ずつ追加</h3>
         <input id="dkEn" placeholder="英語（例：resume）" autocomplete="off" autocapitalize="off" spellcheck="false">
         <input id="dkJp" placeholder="日本語（例：履歴書、再開する）" autocomplete="off">
+        <input id="dkMemo" placeholder="📝 メモ（なくてもOK）" maxlength="120" autocomplete="off">
         <button class="btn ok" id="dkAddBtn">追加する</button>
       </div>
       <details class="dk-bulk">
@@ -1289,11 +1291,12 @@ function renderDeckEdit(){
   const dk=edDeck(); if(!dk)return; const cs=dk.cards||[];
   {const n=cs.filter(c=>c.img).length;const el=$('dkImgNote');if(el)el.textContent=`カードの🖼で画像をつけられます。無料：この単語帳 あと${Math.max(0,IMG_PER_DECK-n)}枚 ・ 全部で あと${Math.max(0,IMG_FREE_TOTAL-imgTotal())}枚`}
   $('dkCount').textContent=`${cs.length}枚`; $('dkListTitle').textContent=`カード（${cs.length}枚）`;
-  $('dkList').innerHTML=cs.length?cs.map((c,i)=>`<div class="dk-row" data-i="${i}"><span class="n">${i+1}</span><input class="en" value="${esc(c.en)}" aria-label="英語" autocapitalize="off" spellcheck="false"><input class="jp" value="${esc(c.jp)}" aria-label="日本語"><button class="imgb" data-img aria-label="${c.img?'画像を外す':'画像をつける'}">${c.img?`<img src="${esc(c.img)}" alt="">`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg>'}</button><button class="delb" aria-label="このカードを消す">✕</button></div>`).reverse().join(''):'<div class="dk-empty">まだカードがありません。上から追加してください。</div>';
+  $('dkList').innerHTML=cs.length?cs.map((c,i)=>`<div class="dk-row" data-i="${i}"><span class="n">${i+1}</span><input class="en" value="${esc(c.en)}" aria-label="英語" autocapitalize="off" spellcheck="false"><input class="jp" value="${esc(c.jp)}" aria-label="日本語"><input class="memo" value="${esc(c.memo||'')}" placeholder="📝 メモ" maxlength="120" aria-label="メモ"><button class="imgb" data-img aria-label="${c.img?'画像を外す':'画像をつける'}">${c.img?`<img src="${esc(c.img)}" alt="">`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg>'}</button><button class="delb" aria-label="このカードを消す">✕</button></div>`).reverse().join(''):'<div class="dk-empty">まだカードがありません。上から追加してください。</div>';
   $('dkList').querySelectorAll('.dk-row').forEach(r=>{
     const c=cs[+r.dataset.i];
     r.querySelector('.en').onchange=e=>{c.en=e.target.value.trim()||c.en;save()};
     r.querySelector('.jp').onchange=e=>{c.jp=e.target.value.trim()||c.jp;save()};
+    r.querySelector('.memo').onchange=e=>{const m=e.target.value.trim().slice(0,120); if(m)c.memo=m; else delete c.memo; save()};
     r.querySelector('.delb').onclick=()=>{cs.splice(+r.dataset.i,1);dropImg(c);delete S.known[c.id];delete S.miss[c.id];save();renderDeckEdit()};
     r.querySelector('.imgb').onclick=()=>cardImg(c,r.querySelector('.imgb'));
   });
@@ -1327,7 +1330,7 @@ function cardImg(c,btn){
 function addCards(pairs){
   const dk=edDeck(); if(!dk)return 0; dk.cards=dk.cards||[];
   const have=new Set(dk.cards.map(c=>c.en.toLowerCase()+'\t'+c.jp)); let n=0;
-  for(const [en,jp] of pairs){const k=en.toLowerCase()+'\t'+jp; if(!en||!jp||have.has(k))continue; have.add(k); dk.cards.push({id:S.nid++,en:en.slice(0,200),jp:jp.slice(0,200)}); n++}
+  for(const [en,jp,memo] of pairs){const k=en.toLowerCase()+'\t'+jp; if(!en||!jp||have.has(k))continue; have.add(k); {const c={id:S.nid++,en:en.slice(0,200),jp:jp.slice(0,200)}; const m=(memo||'').trim(); if(m)c.memo=m.slice(0,120); dk.cards.push(c)} n++}
   if(n){commitDraft();save();renderDeckEdit()} return n;
 }
 // ---- photo → cards (read by the AI server)
@@ -1805,7 +1808,7 @@ function faceHTML(d,lang,isBack){
   const t=lang==='en'?d.en:d.jp;
   return `<span class="corner">No.${d.no||d.id}</span>
     <span class="tr"><span class="stchip">${chip(d)}</span><span class="side">${lang==='en'?'ENGLISH':'日本語'}</span></span>
-    <button class="shufb" data-shuf aria-label="シャッフル" title="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
+    ${isBack?'':`<button class="shufb" data-shuf aria-label="シャッフル" title="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>`}
     <button class="expb" data-exp aria-label="${bigCard?'カードを小さくする':'カードを大きくする'}">${bigCard?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10h-6V4M14 10l7-7M4 14h6v6M10 14l-7 7"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7"/></svg>'}</button>
     ${!isBack&&d.img?`<img class="cimg" src="${esc(d.img)}" alt="" loading="lazy">`:''}
     <div class="txt ${lang}">${esc(t)}</div>
@@ -2030,14 +2033,15 @@ $('libNew').onclick=()=>openDeckEdit('new');
 
 $('dkName').onchange=()=>{if(dkDraft&&dkDraft.id===dkId){commitDraft();return}const dk=deckOf(dkId);if(dk){dk.name=$('dkName').value.trim();save()}};
 const dkAdd=()=>{const en=$('dkEn').value.trim(),jp=$('dkJp').value.trim(); if(!en){$('dkEn').focus();return} if(!jp){$('dkJp').focus();return}
-  if(addCards([[en,jp]])){$('dkEn').value='';$('dkJp').value='';$('dkEn').focus();toast('<div><strong>カードを追加しました</strong></div>')}else toast('<div><strong>同じカードがもうあります</strong></div>')};
+  if(addCards([[en,jp,$('dkMemo').value]])){$('dkEn').value='';$('dkJp').value='';$('dkMemo').value='';$('dkEn').focus();toast('<div><strong>カードを追加しました</strong></div>')}else toast('<div><strong>同じカードがもうあります</strong></div>')};
 $('dkAddBtn').onclick=dkAdd;
 $('dkGenBtn').onclick=()=>toggleGen();
 $('genGo').onclick=()=>makeDeck(null);
 $('genIn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();makeDeck(null)}});
 $('dkPhotoIn').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(f)readPhoto(f)};
 $('dkEn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('dkJp').focus()}});
-$('dkJp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();dkAdd()}});
+$('dkJp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();$('dkMemo').focus()}});
+$('dkMemo').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();dkAdd()}});
 $('dkBulkBtn').onclick=()=>{const {out,bad}=parseBulk($('dkBulk').value); const n=addCards(out); const m=$('dkBulkMsg');
   m.className='sync-msg'+(n?'':' bad'); m.textContent=n?`${n}枚追加しました。`+(bad.length?` 区切りが見つからなかった${bad.length}行は追加していません。`:''):(bad.length?'区切り（タブ・=・,・：）が見つかりませんでした。':'追加するカードがありませんでした（同じカードは追加しません）。');
   if(n){$('dkBulk').value=bad.join('\n')}};
