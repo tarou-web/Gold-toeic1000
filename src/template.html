@@ -627,7 +627,10 @@ body.sheet-open .wrap{padding-bottom:calc(var(--bnavh,0px) + 180px)!important}
 .face .cimg{position:relative;z-index:1;max-width:86%;max-height:42%;object-fit:contain;border-radius:12px;display:block}
 body.cardbig .face .cimg{max-height:50%}
 body.cardbig header,body.cardbig .tabs,body.cardbig .controls{display:none!important}
-body.testing header,body.testing .gzone>:not(.tabs),body.testing .bnav{display:none!important}
+body.testing header,body.testing .gzone>:not(.tabs),body.testing .bnav,body.testing .controls{display:none!important}
+.tfoot{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;flex-direction:column;gap:10px;padding:10px max(16px,env(safe-area-inset-left,0px)) max(14px,env(safe-area-inset-bottom,0px));background:var(--bg);border-top:2px solid var(--line)}
+.tfoot>*{width:100%;max-width:608px;margin-inline:auto;box-sizing:border-box}
+body.testing .ttest{padding-bottom:150px}
 body.testing .gzone{padding-top:12px;margin-top:0;min-height:0}
 body.cardbig .bnav{visibility:hidden;pointer-events:none}
 html.noscroll{overflow:hidden;overscroll-behavior:none}
@@ -2192,7 +2195,7 @@ function renderTest(){
     if(q.k==='write')body=`<p class="tp jp">${esc(d.jp)}</p><input class="qin" data-q="${i}" value="${esc(a||'')}" ${g?'disabled':''} autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next" placeholder="ヒント：${esc((d.en.replace(/^[^A-Za-z]+/,'')[0])||'')} で始まる英語">`;
     if(q.k==='order')body=`<p class="tp jp">${esc(d.jp)}</p><div class="ordans" data-ans="${i}"></div><div class="ordpool" data-pool="${i}">${q.tiles.map((w,t)=>`<button class="tile" data-q="${i}" data-t="${t}" ${g?'disabled':''}>${esc(w)}</button>`).join('')}</div>`;
     return `<div class="tq ${g?(ok?'ok':'ng'):''}" id="tq${i}" ${!g&&i!==TT.cur?'hidden':''}><div class="qn"><span><b class="qno">問${i+1}</b>${TKIND[q.k]}</span>${g?`<b>${ok?'○ 正解':'× 不正解'}</b>`:''}</div>${body}${g&&!ok?`<p class="corr">正解：${esc(q.k==='mc'&&!q.je?d.jp:q.k==='tf'?(q.truth?'○ 合っている':'× 違う（'+d.jp+'）'):d.en)}</p>`:''}</div>`}).join('')}
-    ${g?'':`<div class="tnav"><button class="btn" id="tPrev" aria-label="前の問題"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><span id="tPos"></span><button class="btn" id="tNext" aria-label="次の問題"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div><button class="btn ok" id="tGrade" style="width:100%">採点する</button>`}</div>`;
+    ${g?'':`<div class="tfoot"><div class="tnav"><button class="btn" id="tPrev" aria-label="前の問題"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><span id="tPos"></span><button class="btn" id="tNext" aria-label="次の問題"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div><button class="btn ok" id="tGrade" style="width:100%">採点する</button></div>`}</div>`;
   const count=()=>{const c=$('tCount');if(c)c.textContent=`回答 ${TT.qs.filter((q,i)=>{const a=TT.ans[i];return a!=null&&a!==''&&!(Array.isArray(a)&&!a.length)}).length} / ${n}`};
   const drawOrd=i=>{const q=TT.qs[i],a=TT.ans[i]||[],box=v.querySelector(`[data-ans="${i}"]`);
     box.innerHTML=a.map((t,k)=>`<button class="tile" data-k="${k}" ${g?'disabled':''}>${esc(q.tiles[t])}</button>`).join('');
