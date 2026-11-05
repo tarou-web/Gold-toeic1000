@@ -188,6 +188,9 @@ input[type=search],select{font:inherit;font-weight:700;font-size:.92rem;color:va
 .item .t[data-ed]{cursor:pointer}
 .item .acts{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .item .led{width:34px;height:30px;display:grid;place-items:center;border-radius:10px!important;border:2px solid var(--line)!important;color:var(--muted)}
+.item .lbtns{display:flex;gap:6px}
+.item .ldel{color:var(--red-ink)}
+.item .ldel.arm{width:auto;padding:0 8px!important;font-size:.75rem;font-weight:900;color:#fff;background:var(--red-ink)!important;border-color:var(--red-ink)!important}
 .item .led svg{width:16px;height:16px}
 .item .f{font-size:.7rem;color:var(--red-ink)}
 .item button{background:none;border:0;cursor:pointer;padding:2px}
@@ -1793,10 +1796,13 @@ function refreshData(){
 function deleteCardEdit(){
   const d=ceCard;if(!d)return; const b=$('ceDel');
   if(!ceArm){ceArm=true;b.classList.add('arm');b.textContent='もう一度押すと消えます';return}
+  closeCardEdit(); removeCard(d);
+}
+function removeCard(d){
   const dk=S.deck!=='gold'&&deckOf(S.deck);
   if(dk){const i=(dk.cards||[]).findIndex(x=>x.id===d.id);if(i>=0){const c=dk.cards[i];dk.cards.splice(i,1);dropImg(c)}}
   else S.edits[d.id]={...(S.edits[d.id]||{}),del:1};
-  delete S.known[d.id];delete S.miss[d.id]; save(); closeCardEdit(); refreshData();
+  delete S.known[d.id];delete S.miss[d.id]; save(); refreshData();
   toast(`<div><strong>「${esc(d.en).slice(0,30)}」を消しました</strong></div>`);
 }
 function saveCardEdit(){
@@ -1969,8 +1975,11 @@ function renderList(){
   const q=$('q').value.trim().toLowerCase();
   const [a,b]=$('range').value.split('-').map(Number);
   const rows=sortRows((q?DATA:DATA.slice(a,b)).filter(d=>!q||d.en.toLowerCase().includes(q)||d.jp.includes(q)));
-  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t" data-ed="${d.id}"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.memo?`<span class="j">📝 ${esc(d.memo)}</span>`:''}${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><div class="acts"><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button><button class="led" data-ed="${d.id}" aria-label="直す・消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):'<div class="empty" style="border:0">見つかりませんでした。</div>';
+  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t" data-ed="${d.id}"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.memo?`<span class="j">📝 ${esc(d.memo)}</span>`:''}${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><div class="acts"><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button><span class="lbtns"><button class="led" data-ed="${d.id}" aria-label="直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="led ldel" data-del="${d.id}" aria-label="消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></span></div></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):'<div class="empty" style="border:0">見つかりませんでした。</div>';
   $('listbox').querySelectorAll('button[data-id]').forEach(b=>b.onclick=()=>{const id=+b.dataset.id;if(S.known[id])delete S.known[id];else S.known[id]=1;save();header();b.innerHTML=chip(DATA.find(x=>x.id===id))});
+  $('listbox').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    if(!b.classList.contains('arm')){$('listbox').querySelectorAll('.ldel.arm').forEach(x=>{x.classList.remove('arm');x.innerHTML=x._svg});b._svg=b.innerHTML;b.classList.add('arm');b.textContent='消す？';clearTimeout(b._t);b._t=setTimeout(()=>{if(b.isConnected&&b.classList.contains('arm')){b.classList.remove('arm');b.innerHTML=b._svg}},3000);return}
+    const id=+b.dataset.del,d=DATA.find(x=>x.id===id); if(d)removeCard(d)});
   $('listbox').querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{const id=+b.dataset.ed;openCardEdit(DATA.find(x=>x.id===id),'list')});
   const m=$('more'); if(m) m.onclick=()=>{LIM+=300;renderList()};
 }
