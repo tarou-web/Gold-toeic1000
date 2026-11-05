@@ -856,7 +856,6 @@ header{gap:6px}
     <label>英語<input id="ceEn" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
     <label>日本語<input id="ceJp" autocomplete="off"></label>
     <label>メモ（1行）<input id="ceMemo" maxlength="120" placeholder="例：resume は「履歴書」と「再開する」の2つの意味" autocomplete="off"></label>
-    <button class="cedel" id="ceDel">🗑 このカードを消す</button>
     <div class="ceacts"><button class="btn" id="ceCancel">やめる</button><button class="btn ok" id="ceSave">保存する</button></div>
   </div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1785,18 +1784,13 @@ function setBigCard(on){
 function applyEdits(){for(const d of BUILTIN){const e=S.edits[d.id];if(!e){if(d._orig){d.en=d._orig.en;d.jp=d._orig.jp;d.memo=''}continue}if(!d._orig)d._orig={en:d.en,jp:d.jp};d.en=e.en??d._orig.en;d.jp=e.jp??d._orig.jp;d.memo=e.memo||''}}
 let ceCard=null;
 let ceFrom='card', ceArm=false;
-function openCardEdit(d,from){if(!d)return;ceCard=d;ceFrom=from||'card';ceArm=false;{const b=$('ceDel');b.classList.remove('arm');b.textContent='🗑 このカードを消す'}$('ceEn').value=d.en;$('ceJp').value=d.jp;$('ceMemo').value=d.memo||'';$('cedit').hidden=false;setTimeout(()=>$('ceMemo').focus({preventScroll:true}),80)}
+function openCardEdit(d,from){if(!d)return;ceCard=d;ceFrom=from||'card';ceArm=false;$('ceEn').value=d.en;$('ceJp').value=d.jp;$('ceMemo').value=d.memo||'';$('cedit').hidden=false;setTimeout(()=>$('ceMemo').focus({preventScroll:true}),80)}
 function closeCardEdit(){$('cedit').hidden=true;ceCard=null}
 // after a card was changed or removed: rebuild the deck's cards but keep the study order
 function refreshData(){
   selectDeck(S.deck,true); const m=new Map(DATA.map(d=>[d.id,d]));
   P=P.map(d=>m.get(d.id)).filter(Boolean); QP=[]; if(ci>=P.length)ci=Math.max(0,P.length-1);
   header(); renderDeckBar&&renderDeckBar(); if(tab==='list')renderList(); else if(tab==='card'){try{fillCard()}catch(e){}}
-}
-function deleteCardEdit(){
-  const d=ceCard;if(!d)return; const b=$('ceDel');
-  if(!ceArm){ceArm=true;b.classList.add('arm');b.textContent='もう一度押すと消えます';return}
-  closeCardEdit(); removeCard(d);
 }
 function removeCard(d){
   const dk=S.deck!=='gold'&&deckOf(S.deck);
@@ -2025,7 +2019,7 @@ function refresh(reset=true){
 $('lsortBtn').onclick=e=>{e.stopPropagation();toggleLsMenu()};
 document.addEventListener('click',e=>{const m=$('lsMenu');if(m&&!m.hidden&&!e.target.closest('.lsearch'))toggleLsMenu(false)});
 $('lsortBtn').classList.toggle('on',lsort!=='no');
-$('ceCancel').onclick=closeCardEdit;$('ceSave').onclick=saveCardEdit;$('ceDel').onclick=deleteCardEdit;
+$('ceCancel').onclick=closeCardEdit;$('ceSave').onclick=saveCardEdit;
 $('cedit').onclick=e=>{if(e.target.id==='cedit')closeCardEdit()};
 ['ceEn','ceJp','ceMemo'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();saveCardEdit()}}));
 $('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
