@@ -829,10 +829,15 @@ header{gap:6px}
 .row .btn{height:54px;padding:0;display:grid;place-items:center;border-radius:18px}
 .row .btn.bad{border-color:#44444a;color:var(--fg);background:transparent}
 .scene.judge-ok .face,.scene.judge-ng .face{border-width:2px!important}
-.bigask{display:none}
-body.cardbig .bigask{display:flex;align-self:flex-end;align-items:center;gap:6px;height:64px;border:0;background:none;padding:0;cursor:pointer;color:var(--bg)}
-.bigask span{padding:6px 12px;border-radius:14px 14px 4px 14px;background:var(--fg);font-family:var(--f-jp);font-weight:800;font-size:.75rem;white-space:nowrap}
-.bigask img{width:52px;height:64px;object-fit:contain}
+.bigtop{display:none}
+body.cardbig .bigtop{display:flex;align-items:center;gap:12px;margin-bottom:2px}
+.bgoal{flex:1;min-width:0;display:flex;align-items:center;gap:10px;font-family:var(--f-jp)}
+.bring{--p:0%;width:52px;height:52px;flex:none;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--green) 0 var(--p),var(--chipbg) var(--p) 100%)}
+.bring b{width:40px;height:40px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-family:var(--f);font-weight:900;font-size:12px;color:var(--fg)}
+.bgt{display:flex;flex-direction:column;gap:2px;min-width:0}.bgt b{font-size:13px;font-weight:800}.bgt small{font-size:11px;color:var(--muted);font-weight:700}
+.bigask{display:flex;align-items:center;gap:8px;height:64px;padding:0 16px 0 6px;border-radius:22px;border:1px solid var(--line);background:var(--surface);color:var(--fg);text-align:left;font-family:var(--f-jp);cursor:pointer;flex:none}
+.bigask img{width:50px;height:60px;object-fit:contain}
+.bigask span{display:flex;flex-direction:column;gap:2px}.bigask b{font-size:14px;font-weight:800}.bigask small{font-size:11px;color:var(--muted);font-weight:700}
 body.cardbig .gzone{display:none}
 body.cardbig .bnav{visibility:visible;pointer-events:auto}
 body.cardbig .wrap{padding-top:8px!important;padding-bottom:calc(var(--bnavh,64px) + 10px)!important}
@@ -2336,8 +2341,9 @@ function speak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.r
 let P=[],ci=0,turned=false,flipAnim=null,flipTimer=null;
 // ---- big card: hide everything but the goal, Meemo and the card
 var bigCard=false;
+function renderBigTop(){const n=$('bRingN');if(!n)return;const g=S.goal||20,d=Math.min(doneCount(),g);n.textContent=`${d}/${g}`;$('bRing').style.setProperty('--p',(d/g*100)+'%');$('bRingSub').textContent=d>=g?'達成しました':`あと${g-d}問`}
 function setBigCard(on){
-  bigCard=!!on&&tab==='card'; document.body.classList.toggle('cardbig',bigCard);
+  bigCard=!!on&&tab==='card'; document.body.classList.toggle('cardbig',bigCard); renderBigTop();
   hideSheet&&hideSheet(); document.documentElement.classList.toggle('noscroll',bigCard); scrollTo(0,0); fillCard(); fitCard();
 }
 // ---- fix a card or add a memo, right from the card
@@ -2393,7 +2399,7 @@ function buildCard(){
   const v=$('v-card');
   if(!P.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。<br>下の「出題」や「範囲」を変えてみてください。</div>';return}
   v.innerHTML=`<div class="cardcol">
-   <button class="bigask" id="bigAsk" aria-label="ミーモに聞く"><span>ミーモに聞く</span><img src="mascot.png" alt=""></button>
+   <div class="bigtop"><div class="bgoal"><span class="bring" id="bRing"><b id="bRingN"></b></span><span class="bgt"><b>今日の目標</b><small id="bRingSub"></small></span></div><button class="bigask" id="bigAsk" aria-label="ミーモに聞く"><img src="mascot.png" alt=""><span><b>ミーモに聞く</b><small>意味・例文・覚え方</small></span></button></div>
    <div class="scene" id="scene" tabindex="0" role="button" aria-label="カードを回転させる">
      <div class="flip" id="flip"><div class="face front" id="front"></div><div class="face back" id="back"></div></div>
      <div class="swlab" id="swl" aria-hidden="true"></div>
@@ -2408,7 +2414,7 @@ function buildCard(){
    </div>`;
   swipeCard($('scene'));
   $('scene').onclick=e=>{if(swiped){swiped=false;return}if(e.target.closest('[data-edit-card]')){e.stopPropagation();openCardEdit(P[ci]);return}if(e.target.closest('[data-exp]')){e.stopPropagation();sZoom(!bigCard);setBigCard(!bigCard);return}if(e.target.closest('[data-shuf]')){e.stopPropagation();sShuffle();reshuffle();return}const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
-  $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1); $('bigAsk').onclick=()=>$('mascot').click();
+  $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1); $('bigAsk').onclick=()=>$('mascot').click(); renderBigTop();
   $('yes').onclick=()=>mark(true); $('no').onclick=()=>mark(false);
   fillCard();
 }
@@ -2445,7 +2451,7 @@ function flip(){
 function go(n){const c=Math.max(0,Math.min(P.length-1,ci+n));if(c!==ci){ci=c;fillCard()}}
 let judging=false;
 function mark(ok,fast){
-  const d=P[ci]; if(!d||judging) return;
+  const d=P[ci]; if(!d||judging) return; setTimeout(renderBigTop,0);
   review(d.id,ok); if(ok){S.known[d.id]=1;studied(5);credit(d.id,true);earnCoin(d.id)} else {delete S.known[d.id]; S.miss[d.id]=(S.miss[d.id]||0)+1}
   sfx(ok); buzz(ok); save();header(); document.querySelectorAll('.stchip').forEach(x=>x.innerHTML=chip(d)); mascotSay(ok?'ok':'ng');
   if(fast){if(ci<P.length-1){ci++;fillCard()}return}
