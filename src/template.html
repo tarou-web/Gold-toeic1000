@@ -1066,6 +1066,47 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .qd-h{display:flex;justify-content:space-between;font-family:var(--f-jp);font-size:.82rem;font-weight:800;padding:2px 2px 0}
 .qd-h span+span{color:var(--muted);font-size:.75rem}
 .qdone .qrev{margin-top:0}
+
+/* settings 案A */
+.setbody{gap:6px}
+.sgl{margin:12px 4px 0;font-family:var(--f-jp);font-size:.75rem;font-weight:800;color:var(--muted)}
+.sgroup{background:var(--surface);border-radius:20px;display:flex;flex-direction:column;overflow:hidden}
+.srow{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:54px;padding:0 16px;border-bottom:1px solid var(--line2);font-family:var(--f-jp);font-size:.95rem;cursor:pointer}
+.srow:last-child{border-bottom:0}
+.sval{position:relative;display:flex;align-items:center;gap:6px;color:var(--muted)}
+.sval select{appearance:none;-webkit-appearance:none;background:none!important;border:0!important;padding:8px 0;width:auto;text-align:right;color:var(--muted);font-size:16px;font-family:var(--f-jp);font-weight:700}
+.aistats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:14px 10px;gap:8px;text-align:center}
+.aic{display:flex;flex-direction:column;gap:2px}
+.aic b{font-family:var(--f);font-weight:900;font-size:1.4rem;line-height:1.2}
+.aic b .y{color:var(--green)}.aic b small{font-size:.75rem;color:var(--muted)}
+.aic>span{font-size:.7rem;color:var(--muted);font-weight:700}
+.aistats .ais-note{grid-column:1/-1;margin:4px 0 0;font-size:.68rem;color:var(--muted)}
+.sdet summary{display:flex;align-items:center;justify-content:space-between;min-height:52px;padding:0 16px;font-family:var(--f-jp);font-size:.95rem;cursor:pointer;list-style:none;border-bottom:1px solid var(--line2)}
+.sdet summary::-webkit-details-marker{display:none}
+.sdet summary svg{color:var(--muted);transition:transform .2s}
+.sdet[open] summary svg{transform:rotate(90deg)}
+.sdet:last-child summary{border-bottom:0}
+.sdet[open]:last-child summary{border-bottom:1px solid var(--line2)}
+.sdet.danger summary{color:var(--red-ink)}
+.sdin{display:flex;flex-direction:column;gap:8px;padding:12px 16px 16px;border-bottom:1px solid var(--line2)}
+.sdet:last-child .sdin{border-bottom:0}
+.sdin p{margin:0;font-size:.82rem;color:var(--muted);font-weight:600}
+.acard,.acard0{display:flex;align-items:center;gap:12px}
+.acard{background:var(--surface);border-radius:20px;padding:14px}
+.acard[hidden]{display:none}
+.aav{width:46px;height:46px;border-radius:50%;background:var(--chipbg);display:grid;place-items:center;color:#c9c9cc;flex:0 0 auto}
+.atx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.atx b{font-family:var(--f-jp);font-weight:800;font-size:.95rem}
+.atx small{font-size:.72rem;color:var(--muted);overflow-wrap:anywhere}
+.acard .btn{padding:8px 12px;font-size:.8rem;border-radius:12px;border-color:#44444a}
+.apad{padding:14px;gap:8px}
+#acctOut[hidden]{display:none}
+.acct-in{background:var(--bg);border:1px solid var(--line)}
+#acctIn.acard{flex-direction:row;align-items:center;text-align:left;gap:12px}
+#acctIn.acard[hidden]{display:none}
+#acMsg{margin:4px 4px 0;min-height:0;font-size:.8rem}
+#acMsg:empty{display:none}
+.acct{display:flex;flex-direction:column}
 /* toast */
 .toast{border:1px solid var(--line);border-bottom-width:1px;background:var(--surface)}
 </style>
@@ -1264,51 +1305,56 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 
 <section class="bv navv setv" id="setv" role="dialog" aria-labelledby="setTitle" aria-hidden="true">
   <div class="bv-hero"><div class="sv-in"><div class="sv-bar"><span></span><h2 id="setTitle">設定</h2><span></span></div></div></div>
-  <div class="sv-in bv-body">
-  <section class="sync" aria-labelledby="prefTitle">
-    <h2 id="prefTitle">基本の設定</h2>
-    <div class="setgrid">
-    <label class="ctl">1日の目標<select id="goal"><option value="5">5問</option><option value="10">10問</option><option value="15">15問</option><option value="20">20問</option><option value="30">30問</option></select></label>
-    <label class="ctl">効果音<select id="sound"><option value="on">オン</option><option value="off">オフ</option></select></label>
-    <label class="ctl">振動<select id="vib"><option value="on">オン</option><option value="off">オフ</option></select></label>
+  <div class="sv-in bv-body setbody">
+  <section class="acct" id="acct" aria-labelledby="acctTitle" hidden>
+    <h2 id="acctTitle" class="vh">アカウント</h2>
+    <div id="acctIn" class="acard" hidden>
+      <span class="aav" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>
+      <div class="atx"><b>ログインしています</b><small><span id="acWho"></span><br>記録は自動で保存されます</small></div>
+      <button class="btn" id="acLogout">ログアウト</button>
     </div>
-  </section>
-  <section class="sync aisec" aria-labelledby="aiTitle">
-    <h2 id="aiTitle">ミーモ（AI）に質問した回数</h2>
-    <div class="aistats" id="aiStats"></div>
-  </section>
-  <section class="sync acct" id="acct" aria-labelledby="acctTitle" hidden>
-    <h2 id="acctTitle">アカウント</h2>
-    <div id="acctOut">
-      <p>ログインすると、記録がアカウントに保存されます。機種変更しても、別の端末でも同じ記録で続けられます。今の記録はそのまま引きつがれます。</p>
+    <div id="acctOut" class="sgroup apad">
+      <div class="acard0"><span class="aav" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><div class="atx"><b>ログインして記録を守る</b><small>機種変更しても、別の端末でも同じ記録で続けられます</small></div></div>
       <input class="acct-in" id="acEmail" type="email" placeholder="メールアドレス" autocomplete="email" autocapitalize="off" spellcheck="false">
       <input class="acct-in" id="acPass" type="password" placeholder="パスワード（6文字以上）" autocomplete="current-password">
       <div class="acct-btns"><button class="btn ok" id="acLogin">ログイン</button><button class="btn blue" id="acSignup">新しく登録</button></div>
       <button class="acct-link" id="acForgot">パスワードを忘れたとき</button>
     </div>
-    <div id="acctIn" hidden>
-      <p><b id="acWho"></b> でログインしています。記録は自動でアカウントに保存されます。</p>
-      <button class="btn" id="acLogout">ログアウト</button>
-    </div>
     <p class="sync-msg" id="acMsg" role="status"></p>
   </section>
-  <section class="sync" aria-labelledby="syncTitle">
-    <h2 id="syncTitle">ウィジェット連携・バックアップ</h2>
-    <p class="sync-st" id="syncSt">準備中…</p>
-    <p><a class="sync-link" href="widget/setup.html">ホーム画面ウィジェットの設置方法 →</a></p>
-    <label class="ctl" for="syncKey">あなたの合言葉（ウィジェットに貼り付けます）</label>
-    <div class="sync-row"><input id="syncKey" readonly><button class="btn blue" id="syncCopy">コピー</button></div>
-    <details class="sync-more"><summary>別の端末や消えた記録を読み込む</summary>
-      <p>以前の合言葉を貼り付けると、その記録をこの端末に読み込みます。今のこの端末の記録は上書きされます。</p>
-      <div class="sync-row"><input id="syncIn" placeholder="合言葉を貼り付け" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn blue" id="syncLoad">読み込む</button></div>
-      <p class="sync-msg" id="syncMsg" role="status"></p>
+  <h2 class="sgl" id="prefTitle">基本の設定</h2>
+  <div class="sgroup">
+    <label class="srow"><span>1日の目標</span><span class="sval"><select id="goal"><option value="5">5問</option><option value="10">10問</option><option value="15">15問</option><option value="20">20問</option><option value="30">30問</option></select><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></label>
+    <label class="srow"><span>効果音</span><span class="sval"><select id="sound"><option value="on">オン</option><option value="off">オフ</option></select><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></label>
+    <label class="srow"><span>振動</span><span class="sval"><select id="vib"><option value="on">オン</option><option value="off">オフ</option></select><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></label>
+  </div>
+  <h2 class="sgl" id="aiTitle">ミーモ（AI）に質問した回数</h2>
+  <div class="sgroup aistats" id="aiStats"></div>
+  <h2 class="sgl" id="syncTitle">そのほか</h2>
+  <div class="sgroup">
+    <details class="sdet"><summary><span>ウィジェット連携・合言葉</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></summary>
+      <div class="sdin">
+        <p class="sync-st" id="syncSt">準備中…</p>
+        <p><a class="sync-link" href="widget/setup.html">ホーム画面ウィジェットの設置方法 →</a></p>
+        <label class="ctl" for="syncKey">あなたの合言葉（ウィジェットに貼り付けます）</label>
+        <div class="sync-row"><input id="syncKey" readonly><button class="btn blue" id="syncCopy">コピー</button></div>
+      </div>
     </details>
-    <details class="sync-more"><summary>学習記録をリセットする</summary>
-      <p>覚えたフレーズ、苦手、ポイント、バッジ、今日の進み具合を最初の状態に戻します。連続日数とカレンダーはそのまま残ります。</p>
-      <button class="btn bad" id="resetBtn">リセットする</button>
-      <p class="sync-msg" id="resetMsg" role="status"></p>
+    <details class="sdet"><summary><span>別の端末の記録を読み込む</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></summary>
+      <div class="sdin">
+        <p>以前の合言葉を貼り付けると、その記録をこの端末に読み込みます。今のこの端末の記録は上書きされます。</p>
+        <div class="sync-row"><input id="syncIn" placeholder="合言葉を貼り付け" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn blue" id="syncLoad">読み込む</button></div>
+        <p class="sync-msg" id="syncMsg" role="status"></p>
+      </div>
     </details>
-  </section>
+    <details class="sdet danger"><summary><span>学習記録をリセットする</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></summary>
+      <div class="sdin">
+        <p>覚えたフレーズ、苦手、ポイント、バッジ、今日の進み具合を最初の状態に戻します。連続日数とカレンダーはそのまま残ります。</p>
+        <button class="btn bad" id="resetBtn">リセットする</button>
+        <p class="sync-msg" id="resetMsg" role="status"></p>
+      </div>
+    </details>
+  </div>
   </div>
 </section>
 
@@ -1848,9 +1894,8 @@ function renderAiStats(){
   const ks=Object.keys(a.days).filter(x=>/^\d+-\d+-\d+$/.test(x)).sort((x,y)=>dk(x)-dk(y));
   const nd=ks.length?Math.max(1,Math.round((dk(today())-dk(ks[0]))/864e5)+1):0;
   const avg=nd?a.n/nd:0, avgTxt=avg>=10?Math.round(avg):Math.round(avg*10)/10;
-  box.innerHTML=`<div class="ais-row"><b>${a.n}</b><span>合計</span></div><div class="ais-row"><b>${t}</b><span>今日</span></div><div class="ais-row"><b>${avgTxt}</b><span>1日の平均${nd?`（${nd}日間）`:''}</span></div>`+
-    `<div class="ais-by">${Object.entries(a.by).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`<span>${AI_NAME[k]||esc(k)} ${v}回</span>`).join('')||'<span>まだ質問していません</span>'}</div>`+
-    (since?`<p class="ais-note">${since.replace(/-/g,'/')} から数えています</p>`:'');
+  box.innerHTML=`<div class="aic"><b><span class="y">${t}</span><small>/${AI_LIMIT}</small></b><span>今日</span></div><div class="aic"><b>${avgTxt}</b><span>1日の平均</span></div><div class="aic"><b>${a.n}</b><span>これまで</span></div>`+
+    (since?`<p class="ais-note">${since.replace(/-/g,'/')} から数えています${Object.keys(a.by).length?' ・ '+Object.entries(a.by).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`${AI_NAME[k]||esc(k)} ${v}回`).join(' ・ '):''}</p>`:'');
 }
 const AI_NAME={gemini:'Gemini',groq:'Groq',workersAI:'Cloudflare Workers AI'};
 let askY=0, askCard=null, askMsgs=[], askBusy=false; const askCache={};
