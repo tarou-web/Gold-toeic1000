@@ -1449,7 +1449,8 @@ try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}c
 S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}}; S.coins=S.coins||0; S.owned=S.owned||{}; S.wear=S.wear||''; S.skin=S.skin||''; S.hat=S.hat||''; S.neck=S.neck||''; S.cpd=S.cpd||{d:'',ids:{}};
 S.edits=S.edits&&typeof S.edits==='object'?S.edits:{};
 S.decks=(Array.isArray(S.decks)?S.decks:[]).filter(d=>d&&(d.cards||[]).length); S.deck=S.deck||'gold'; if(S.deck!=='gold'&&!S.decks.some(d=>d.id===S.deck))S.deck='gold';
-var dkId=null, dkDraft=null, libSel=null, libArm=false; S.nid=S.nid||100001;
+var dkId=null, dkDraft=null, libSel=null, libArm=false; S.nid=S.nid||100001; S.goldAdd=Array.isArray(S.goldAdd)?S.goldAdd.filter(Boolean):[];
+const GOLDDK={id:'gold',name:'金のフレーズ',builtin:1,get cards(){return S.goldAdd},set cards(v){S.goldAdd=v}};
 if(!S.bcoin){S.bcoin={};}
 if(!S.bcoinInit){for(const b of [0,10,30,50,100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1500,2000,2500,3000,3500,4000,4500,5000,6000,7000,8000,9000,10000])if(b<=(S.points||0))S.bcoin[b]=1;S.bcoinInit=1}
 // one-time gift: answers made before the shop existed
@@ -1467,7 +1468,7 @@ var syncTimer=null,syncBusy=false,syncDirty=false;
 function syncPayload(){
   const td=todayState();
   return {points:S.points||0,goal:S.goal||10,todayKey:td.d,todayDone:Object.keys(td.done).length,todayPts:td.pts,todayDoneMap:td.done,streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},days:S.days||{},
-    decks:S.decks||[],edits:S.edits||{},rv:S.rv||{},deck:S.deck||'gold',nid:S.nid||100001,ai:S.ai||{n:0,by:{},days:{}},coins:S.coins||0,bcoin:S.bcoin||{},bcoinInit:S.bcoinInit||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',hat:S.hat||'',neck:S.neck||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:S.updatedAt||Date.now(),tz:-new Date().getTimezoneOffset()};
+    decks:S.decks||[],goldAdd:S.goldAdd||[],edits:S.edits||{},rv:S.rv||{},deck:S.deck||'gold',nid:S.nid||100001,ai:S.ai||{n:0,by:{},days:{}},coins:S.coins||0,bcoin:S.bcoin||{},bcoinInit:S.bcoinInit||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',hat:S.hat||'',neck:S.neck||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:S.updatedAt||Date.now(),tz:-new Date().getTimezoneOffset()};
 }
 function scheduleSync(){ if(!FB_ON||(!S.syncKey&&!AU))return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
 async function pushSync(keepalive){
@@ -1561,7 +1562,7 @@ function initAcct(){
 function applyCloud(d){
   // the database may return numbered maps as arrays with gaps; turn them back into plain maps
   const obj=x=>{const o={};if(x)for(const k of Object.keys(x))if(x[k]!=null)o[k]=x[k];return o};
-  Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},edits:obj(d.edits),rv:obj(d.rv),decks:Array.isArray(d.decks)?d.decks.filter(Boolean).map(x=>({...x,cards:(x.cards||[]).filter(Boolean)})):(S.decks||[]),deck:d.deck||'gold',nid:d.nid||S.nid||100001,ai:d.ai&&d.ai.n?{n:d.ai.n,by:obj(d.ai.by),days:obj(d.ai.days)}:(S.ai||{n:0,by:{},days:{}}),coins:d.coins||0,bcoin:obj(d.bcoin),bcoinInit:d.bcoinInit||1,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',hat:d.hat||'',neck:d.neck||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}}});
+  Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},edits:obj(d.edits),rv:obj(d.rv),decks:Array.isArray(d.decks)?d.decks.filter(Boolean).map(x=>({...x,cards:(x.cards||[]).filter(Boolean)})):(S.decks||[]),deck:d.deck||'gold',goldAdd:Array.isArray(d.goldAdd)?d.goldAdd.filter(Boolean):(S.goldAdd||[]),nid:d.nid||S.nid||100001,ai:d.ai&&d.ai.n?{n:d.ai.n,by:obj(d.ai.by),days:obj(d.ai.days)}:(S.ai||{n:0,by:{},days:{}}),coins:d.coins||0,bcoin:obj(d.bcoin),bcoinInit:d.bcoinInit||1,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',hat:d.hat||'',neck:d.neck||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}}});
   S.updatedAt=d.updatedAt||Date.now();
   $('goal').value=String(S.goal);
   applyWear(); renderAiStats(); selectDeck(S.deck);
@@ -1766,7 +1767,7 @@ function renderWardrobe(){
   $('wardrobe').querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{const v=b.dataset.skin??b.dataset.wear;const k=b.dataset.slot;if(k==='skin')S.skin=v;else if(k==='face')S.wear=v;else if(k==='neck')S.neck=v;else S.hat=v;save();applyWear();renderWardrobe();setTimeout(closeWardrobe,250);mascotSay('tap')});
 }
 // ---- your own decks
-function goldCards(){return BUILTIN.filter(d=>!(S.edits[d.id]||{}).del)}
+function goldCards(){return BUILTIN.filter(d=>!(S.edits[d.id]||{}).del).concat((S.goldAdd||[]).map((c,i)=>({...c,no:BUILTIN.length+i+1})))}
 function deckOf(id){return S.decks.find(x=>x.id===id)}
 function deckCards(dk){return (dk.cards||[]).map((c,i)=>({...c,no:i+1}))}
 function selectDeck(id,quiet){
@@ -1780,7 +1781,7 @@ function renderDeckBar(){
 }
 
 // a new deck is only kept once it has a name and at least one card
-function edDeck(){return dkDraft&&dkDraft.id===dkId?dkDraft:deckOf(dkId)}
+function edDeck(){return dkId==='gold'?GOLDDK:dkDraft&&dkDraft.id===dkId?dkDraft:deckOf(dkId)}
 function commitDraft(){
   const d=dkDraft; if(!d||d.id!==dkId)return;
   d.name=$('dkName').value.trim();
@@ -1790,7 +1791,7 @@ function openDeckEdit(id){
   closeNavViews(); navOn('navNew');
   if(id==='new'){dkDraft={id:'d'+Date.now().toString(36),name:'',cards:[]};id=dkDraft.id}else dkDraft=null;
   dkId=id; const dk=edDeck(); if(!dk)return;
-  closePhoto(); setDm('one'); renderPhotoLeft(); $('dkName').value=dk.name||''; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
+  closePhoto(); setDm('one'); renderPhotoLeft(); $('dkName').value=dk.name||'';$('dkName').readOnly=id==='gold'; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
   renderDeckEdit();
   const v=$('deckv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); document.body.classList.add('sv-lock');
   setTimeout(()=>{(dk.name?$('dkEn'):$('dkName')).focus({preventScroll:true})},350);
@@ -1799,6 +1800,7 @@ function closeDeckEdit(){
   commitDraft();
   if(dkDraft&&dkDraft.id===dkId){const d=dkDraft;dkDraft=null;
     if(d.cards.length||$('dkName').value.trim())toast('<div><strong>単語帳は作られませんでした</strong><span>名前とカード1枚以上が必要です</span></div>')}
+  else if(dkId==='gold'){save();if(S.deck==='gold')refreshData()}
   else{const dk=deckOf(dkId); if(dk){dk.name=$('dkName').value.trim()||dk.name||'新しい単語帳'; save(); selectDeck(dk.id)}}
   const v=$('deckv'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); dkId=null;
   document.body.classList.remove('sv-lock');
@@ -1820,7 +1822,7 @@ function renderDeckEdit(){
 }
 // ---- card images (saved through the AI server into Cloudflare R2)
 const IMG_PER_DECK=5, IMG_FREE_TOTAL=30;
-function imgTotal(){let n=0;for(const d of S.decks)for(const c of d.cards||[])if(c.img)n++;if(dkDraft)for(const c of dkDraft.cards||[])if(c.img)n++;return n}
+function imgTotal(){let n=0;for(const c of S.goldAdd||[])if(c.img)n++;for(const d of S.decks)for(const c of d.cards||[])if(c.img)n++;if(dkDraft)for(const c of dkDraft.cards||[])if(c.img)n++;return n}
 function dropImg(c){if(c&&c.imgId){fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'imgdel',id:c.imgId})}).catch(()=>{})}if(c){delete c.img;delete c.imgId}}
 async function shrinkCardImg(file){
   const url=URL.createObjectURL(file);
@@ -1845,12 +1847,12 @@ function cardImg(c,btn){
   inp.click();
 }
 const normEn=t=>String(t||'').trim().toLowerCase().replace(/\s+/g,' ');
-function dupCard(en){const dk=edDeck();return dk&&(dk.cards||[]).find(c=>normEn(c.en)===normEn(en))}
+function dupCard(en){const dk=edDeck();if(!dk)return null;const k=normEn(en);return (dk.cards||[]).find(c=>normEn(c.en)===k)||(dk.id==='gold'?BUILTIN.find(c=>!(S.edits[c.id]||{}).del&&normEn(c.en)===k):null)}
 function addCards(pairs){
   const dk=edDeck(); if(!dk)return 0; dk.cards=dk.cards||[];
-  const have=new Set(dk.cards.map(c=>normEn(c.en))); let n=0;
+  const have=new Set(dk.cards.map(c=>normEn(c.en))); if(dk.id==='gold')for(const c of goldCards())have.add(normEn(c.en)); let n=0;
   for(const [en,jp,memo] of pairs){const k=normEn(en); if(!en||!jp||have.has(k))continue; have.add(k); {const c={id:S.nid++,en:en.slice(0,200),jp:jp.slice(0,200)}; const m=(memo||'').trim(); if(m)c.memo=m.slice(0,120); dk.cards.push(c)} n++}
-  if(n){commitDraft();save();renderDeckEdit()} return n;
+  if(n){commitDraft();save();renderDeckEdit();if(dk.id==='gold'&&S.deck==='gold')refreshData()} return n;
 }
 // ---- photo → cards (read by the AI server)
 let phCards=[], phMade=false, phTitle='';
@@ -1954,7 +1956,7 @@ function renderLib(){
   const all=[{id:'gold',name:'金のフレーズ',cards:goldCards(),builtin:1},...S.decks.map(d=>({...d,cards:d.cards||[]}))];
   $('libList').innerHTML=all.map(d=>{const n=d.cards.length,k=d.cards.reduce((a,c)=>a+(S.known[c.id]?1:0),0),cur=S.deck===d.id;
     if(sel)return `<div class="lib-item ${d.builtin?'nosel':''} ${sel.has(d.id)?'picked':''}" role="checkbox" aria-checked="${sel.has(d.id)}" tabindex="0" data-pick="${d.builtin?'':d.id}"><span class="li-check" aria-hidden="true"></span><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚${d.builtin?' ・ 消せません':''}</small></div></div>`;
-    return `<div class="lib-item ${cur?'cur':''}" role="button" tabindex="0" data-deck="${d.id}"><span class="li-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚 ・ 覚えた ${k}枚${d.builtin?' ・ 最初から入っている単語帳':''}</small><div class="li-bar"><i style="width:${n?k/n*100:0}%"></i></div></div>${cur?'<span class="li-cur">勉強中</span>':''}${d.builtin?'':`<button class="li-edit" data-edit="${d.id}">編集</button>`}</div>`}).join('');
+    return `<div class="lib-item ${cur?'cur':''}" role="button" tabindex="0" data-deck="${d.id}"><span class="li-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚 ・ 覚えた ${k}枚${d.builtin?' ・ 最初から入っている単語帳':''}</small><div class="li-bar"><i style="width:${n?k/n*100:0}%"></i></div></div>${cur?'<span class="li-cur">勉強中</span>':''}<button class="li-edit" data-edit="${d.id}">編集</button></div>`}).join('');
   $('libList').querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>{const id=el.dataset.pick;if(!id)return;sel.has(id)?sel.delete(id):sel.add(id);libArm=false;renderLib()});
   $('libList').querySelectorAll('[data-deck]').forEach(el=>el.onclick=e=>{const ed=e.target.closest('[data-edit]');if(ed){e.stopPropagation();openDeckEdit(ed.dataset.edit);return}selectDeck(el.dataset.deck);goHome()});
 }
@@ -2344,7 +2346,7 @@ function refreshData(){
 function removeCard(d){
   const dk=S.deck!=='gold'&&deckOf(S.deck);
   if(dk){const i=(dk.cards||[]).findIndex(x=>x.id===d.id);if(i>=0){const c=dk.cards[i];dk.cards.splice(i,1);dropImg(c)}}
-  else S.edits[d.id]={...(S.edits[d.id]||{}),del:1};
+  else{const gi=(S.goldAdd||[]).findIndex(x=>x.id===d.id);if(gi>=0){dropImg(S.goldAdd[gi]);S.goldAdd.splice(gi,1)}else S.edits[d.id]={...(S.edits[d.id]||{}),del:1}}
   delete S.known[d.id];delete S.miss[d.id];S.rv&&delete S.rv[d.id]; save(); refreshData();
   toast(`<div><strong>「${esc(d.en).slice(0,30)}」を消しました</strong></div>`);
 }
@@ -2353,7 +2355,8 @@ function saveCardEdit(){
   if(!en||!jp){toast('<div><strong>英語と日本語は空にできません</strong></div>');return}
   if(ceFrom==='deck'){d.en=en;d.jp=jp;if(memo)d.memo=memo;else delete d.memo;save();closeCardEdit();renderDeckEdit();if(dkId===S.deck)refreshData();toast('<div><strong>カードを保存しました</strong></div>');return}
   const dk=S.deck!=='gold'&&deckOf(S.deck);
-  if(dk){const c=(dk.cards||[]).find(x=>x.id===d.id);if(c){c.en=en;c.jp=jp;if(memo)c.memo=memo;else delete c.memo}}
+  const ga=!dk&&(S.goldAdd||[]).find(x=>x.id===d.id);
+  if(dk||ga){const c=ga||(dk.cards||[]).find(x=>x.id===d.id);if(c){c.en=en;c.jp=jp;if(memo)c.memo=memo;else delete c.memo}}
   else{const o=d._orig||{en:d.en,jp:d.jp};const e={};if((S.edits[d.id]||{}).del)e.del=1;if(en!==o.en)e.en=en;if(jp!==o.jp)e.jp=jp;if(memo)e.memo=memo;if(Object.keys(e).length)S.edits[d.id]=e;else delete S.edits[d.id];if(!d._orig)d._orig=o}
   d.en=en;d.jp=jp;d.memo=memo; save(); const from=ceFrom; closeCardEdit(); refreshData(); if(from==='card'){const f=$('flip'); if(!f.classList.contains('turned'))flip()}
   toast('<div><strong>カードを保存しました</strong></div>');
@@ -2927,7 +2930,7 @@ $('libDel').onclick=()=>{if(!libSel||!libSel.size)return; if(!libArm){libArm=tru
   setLibSel(false); toast(`<div><strong>${n}個の単語帳を削除しました</strong></div>`)};
 $('libNew').onclick=()=>openDeckEdit('new');
 
-$('dkName').onchange=()=>{if(dkDraft&&dkDraft.id===dkId){commitDraft();return}const dk=deckOf(dkId);if(dk){dk.name=$('dkName').value.trim();save()}};
+$('dkName').onchange=()=>{if(dkId==='gold')return;if(dkDraft&&dkDraft.id===dkId){commitDraft();return}const dk=deckOf(dkId);if(dk){dk.name=$('dkName').value.trim();save()}};
 const dkAdd=()=>{const en=$('dkEn').value.trim(),jp=$('dkJp').value.trim(); if(!en){$('dkEn').focus();return} if(!jp){$('dkJp').focus();return}
   {const old=dupCard(en); if(old){toast(`<div><strong>以前同じ単語を入力しました</strong><span>${esc(old.en)}＝${esc(old.jp)}</span></div>`);$('dkEn').select();return}}
   if(addCards([[en,jp,$('dkMemo').value]])){$('dkEn').value='';$('dkJp').value='';$('dkMemo').value='';$('dkEn').focus();toast('<div><strong>カードを追加しました</strong></div>')}else toast('<div><strong>同じカードがもうあります</strong></div>')};
