@@ -1193,6 +1193,22 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 #deckv .dk-bulk .btn{height:48px;border-radius:16px}
 #deckv .dk-bulk .sync-msg:empty{display:none}
 .dk-sep{height:1px;background:var(--line2);margin:2px 0}
+#deckv .dk-nbox input:focus,#deckv .dk-nbox input:focus-visible{outline:none!important;box-shadow:none!important}
+.dk-nbox{transition:box-shadow .15s}.dk-nbox:focus-within{box-shadow:0 0 0 2px var(--fg)}
+#deckv .dk-list{gap:0}
+.dk-row2{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center;gap:2px;padding:8px 0 8px 2px;border-bottom:1px solid var(--line2)}
+.dk-row2:last-child{border-bottom:0}
+.dk-row2 .t{min-width:0;display:flex;flex-direction:column;gap:2px;cursor:pointer}
+.dk-row2 .e{font-family:var(--f);font-weight:900;font-size:16px;overflow-wrap:anywhere}
+.dk-row2 .j{font-size:13px;color:var(--muted)}
+.dk-row2 .m{font-size:12px;color:var(--muted);opacity:.85}
+.dk-row2 .th{width:36px;height:36px;border-radius:8px;object-fit:cover;margin-right:4px}
+.dk-row2 .led{width:44px;height:44px;display:grid;place-items:center;border:0;border-radius:12px;background:transparent;color:var(--muted);cursor:pointer;font:inherit}
+.dk-row2 .led svg{width:18px;height:18px}
+.dk-row2 .ldel{color:var(--red-ink)}
+.dk-row2 .ldel.arm{width:auto;height:34px;padding:0 10px;font-size:.75rem;font-weight:900;color:#fff;background:var(--red-ink)}
+.ce-img{margin-top:4px}
+.dk-sep[hidden]{display:none}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -1350,14 +1366,8 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
       </div>
       <div class="ph-box" id="dkPhoto" hidden></div>
       <div class="dk-sep" aria-hidden="true"></div>
-      <h3 id="dkListTitle">カード</h3>
-      <p class="dk-imgnote" id="dkImgNote"></p>
       <input type="file" id="dkImgIn" accept="image/*" hidden>
       <div class="dk-list" id="dkList"></div>
-      <details class="sync-more dk-danger"><summary>この単語帳を削除する</summary>
-        <p>カードと、その覚えた・苦手の記録が消えます。元に戻せません。</p>
-        <button class="btn bad" id="dkDelete">削除する</button>
-      </details>
     </div>
   </section>
   <input id="askProxy" tabindex="-1" aria-hidden="true" autocomplete="off">
@@ -1370,6 +1380,7 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
     <label>英語<input id="ceEn" autocomplete="off" autocapitalize="off" spellcheck="false"></label>
     <label>日本語<input id="ceJp" autocomplete="off"></label>
     <label>メモ<input id="ceMemo" maxlength="120" placeholder="例：resume は「履歴書」と「再開する」の2つの意味" autocomplete="off"></label>
+    <button class="btn ce-img" id="ceImg" hidden></button>
   </div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sheet" id="sheet" role="status" aria-live="polite"><div class="in" id="sheetin"></div></div>
@@ -1813,15 +1824,15 @@ const deckOpen=()=>$('deckv').classList.contains('open');
 function renderDeckEdit(){
   const dk=edDeck(); if(!dk)return; const cs=dk.cards||[];
   {const n=cs.filter(c=>c.img).length;const el=$('dkImgNote');if(el)el.textContent=`カードの🖼で画像をつけられます。無料：この単語帳 あと${Math.max(0,IMG_PER_DECK-n)}枚 ・ 全部で あと${Math.max(0,IMG_FREE_TOTAL-imgTotal())}枚`}
-  $('dkCount').textContent=`${cs.length}枚`; $('dkListTitle').textContent=`カード（${cs.length}枚）`;
-  $('dkList').innerHTML=cs.length?cs.map((c,i)=>`<div class="dk-row" data-i="${i}"><span class="n">${i+1}</span><input class="en" value="${esc(c.en)}" aria-label="英語" autocapitalize="off" spellcheck="false"><input class="jp" value="${esc(c.jp)}" aria-label="日本語"><input class="memo" value="${esc(c.memo||'')}" placeholder="📝 メモ" maxlength="120" aria-label="メモ"><button class="imgb" data-img aria-label="${c.img?'画像を外す':'画像をつける'}">${c.img?`<img src="${esc(c.img)}" alt="">`:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg>'}</button><button class="delb" aria-label="このカードを消す">✕</button></div>`).reverse().join(''):'<div class="dk-empty">まだカードがありません。上から追加してください。</div>';
-  $('dkList').querySelectorAll('.dk-row').forEach(r=>{
+  $('dkCount').textContent=`${cs.length}枚`;{const sp=document.querySelector('#deckv .dk-sep');if(sp)sp.hidden=!cs.length}
+  $('dkList').innerHTML=cs.map((c,i)=>`<div class="dk-row2" data-i="${i}"><div class="t" data-ed><span class="e">${esc(c.en)}</span><span class="j">${esc(c.jp)}</span>${c.memo?`<span class="m">${esc(c.memo)}</span>`:''}</div>${c.img?`<img class="th" src="${esc(c.img)}" alt="">`:''}<button class="led" data-ed aria-label="直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="led ldel" data-del aria-label="消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></div>`).reverse().join('');
+  $('dkList').querySelectorAll('.dk-row2').forEach(r=>{
     const c=cs[+r.dataset.i];
-    r.querySelector('.en').onchange=e=>{c.en=e.target.value.trim()||c.en;save()};
-    r.querySelector('.jp').onchange=e=>{c.jp=e.target.value.trim()||c.jp;save()};
-    r.querySelector('.memo').onchange=e=>{const m=e.target.value.trim().slice(0,120); if(m)c.memo=m; else delete c.memo; save()};
-    r.querySelector('.delb').onclick=()=>{cs.splice(+r.dataset.i,1);dropImg(c);delete S.known[c.id];delete S.miss[c.id];S.rv&&delete S.rv[c.id];save();renderDeckEdit()};
-    r.querySelector('.imgb').onclick=()=>cardImg(c,r.querySelector('.imgb'));
+    r.querySelectorAll('[data-ed]').forEach(x=>x.onclick=()=>openCardEdit(c,'deck'));
+    const b=r.querySelector('[data-del]');
+    b.onclick=()=>{
+      if(!b.classList.contains('arm')){$('dkList').querySelectorAll('.ldel.arm').forEach(x=>{x.classList.remove('arm');x.innerHTML=x._svg});b._svg=b.innerHTML;b.classList.add('arm');b.textContent='消す？';clearTimeout(b._t);b._t=setTimeout(()=>{if(b.isConnected&&b.classList.contains('arm')){b.classList.remove('arm');b.innerHTML=b._svg}},3000);return}
+      cs.splice(+r.dataset.i,1);dropImg(c);delete S.known[c.id];delete S.miss[c.id];S.rv&&delete S.rv[c.id];save();renderDeckEdit();if(dkId===S.deck)refreshData()};
   });
 }
 // ---- card images (saved through the AI server into Cloudflare R2)
@@ -2333,7 +2344,7 @@ function setBigCard(on){
 function applyEdits(){for(const d of BUILTIN){const e=S.edits[d.id];if(!e){if(d._orig){d.en=d._orig.en;d.jp=d._orig.jp;d.memo=''}continue}if(!d._orig)d._orig={en:d.en,jp:d.jp};d.en=e.en??d._orig.en;d.jp=e.jp??d._orig.jp;d.memo=e.memo||''}}
 let ceCard=null;
 let ceFrom='card', ceArm=false;
-function openCardEdit(d,from){if(!d)return;ceCard=d;ceFrom=from||'card';ceArm=false;$('ceEn').value=d.en;$('ceJp').value=d.jp;$('ceMemo').value=d.memo||'';$('cedit').hidden=false;setTimeout(()=>$('ceMemo').focus({preventScroll:true}),80)}
+function openCardEdit(d,from){if(!d)return;ceCard=d;ceFrom=from||'card';ceArm=false;$('ceEn').value=d.en;$('ceJp').value=d.jp;$('ceMemo').value=d.memo||'';{const b=$('ceImg');b.hidden=ceFrom!=='deck';b.textContent=d.img?'画像を外す':'画像をつける'}$('cedit').hidden=false;setTimeout(()=>$('ceMemo').focus({preventScroll:true}),80)}
 function closeCardEdit(){$('cedit').hidden=true;$('cedit').style.paddingBottom='';ceCard=null}
 // keep the edit sheet (and its 保存 button) just above the keyboard
 function ceFit(){const c=$('cedit');if(!c||c.hidden)return;const vv=window.visualViewport,H=document.documentElement.clientHeight;
@@ -2356,6 +2367,7 @@ function removeCard(d){
 function saveCardEdit(){
   const d=ceCard;if(!d)return;const en=$('ceEn').value.trim(),jp=$('ceJp').value.trim(),memo=$('ceMemo').value.trim().slice(0,120);
   if(!en||!jp){toast('<div><strong>英語と日本語は空にできません</strong></div>');return}
+  if(ceFrom==='deck'){d.en=en;d.jp=jp;if(memo)d.memo=memo;else delete d.memo;save();closeCardEdit();renderDeckEdit();if(dkId===S.deck)refreshData();toast('<div><strong>カードを保存しました</strong></div>');return}
   const dk=S.deck!=='gold'&&deckOf(S.deck);
   if(dk){const c=(dk.cards||[]).find(x=>x.id===d.id);if(c){c.en=en;c.jp=jp;if(memo)c.memo=memo;else delete c.memo}}
   else{const o=d._orig||{en:d.en,jp:d.jp};const e={};if((S.edits[d.id]||{}).del)e.del=1;if(en!==o.en)e.en=en;if(jp!==o.jp)e.jp=jp;if(memo)e.memo=memo;if(Object.keys(e).length)S.edits[d.id]=e;else delete S.edits[d.id];if(!d._orig)d._orig=o}
@@ -2911,7 +2923,7 @@ function refresh(reset=true){
 $('lsortBtn').onclick=e=>{e.stopPropagation();toggleLsMenu()};
 document.addEventListener('click',e=>{const m=$('lsMenu');if(m&&!m.hidden&&!e.target.closest('.lsearch'))toggleLsMenu(false)});
 $('lsortBtn').classList.toggle('on',lsort!=='no');
-$('ceCancel').onclick=closeCardEdit;$('ceSave').onclick=saveCardEdit;
+$('ceCancel').onclick=closeCardEdit;$('ceImg').onclick=()=>{const c=ceCard;if(!c)return;closeCardEdit();cardImg(c,$('ceImg'))};$('ceSave').onclick=saveCardEdit;
 $('cedit').onclick=e=>{if(e.target.id==='cedit')closeCardEdit()};
 ['ceEn','ceJp','ceMemo'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();saveCardEdit()}}));
 $('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
@@ -2948,7 +2960,7 @@ $('dkBulkBtn').onclick=()=>{const {out,bad}=parseBulk($('dkBulk').value); const 
   m.className='sync-msg'+(n?'':' bad'); m.textContent=n?`${n}枚追加しました。`+(out.length>n?` 以前入力した単語${out.length-n}個は追加していません。`:'')+(bad.length?` 区切りが見つからなかった${bad.length}行は追加していません。`:''):(bad.length?'区切り（タブ・=・,・：）が見つかりませんでした。':'追加するカードがありませんでした（以前入力した単語は追加しません）。');
   if(n){$('dkBulk').value=bad.join('\n')}};
 let dkArm=false;
-$('dkDelete').onclick=()=>{ if(!dkArm){dkArm=true;$('dkDelete').textContent='もう一度押すと削除';return}
+if($('dkDelete'))$('dkDelete').onclick=()=>{ if(!dkArm){dkArm=true;$('dkDelete').textContent='もう一度押すと削除';return}
   const dk=deckOf(dkId); dkDraft=null; if(dk){for(const c of dk.cards||[]){dropImg(c);delete S.known[c.id];delete S.miss[c.id];S.rv&&delete S.rv[c.id]} S.decks=S.decks.filter(x=>x!==dk)}
   dkArm=false;$('dkDelete').textContent='削除する'; const v=$('deckv'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); document.body.classList.remove('sv-lock'); dkId=null; selectDeck('gold'); navOn('navHome'); toast('<div><strong>単語帳を削除しました</strong></div>')};
 $('askEn').addEventListener('click',async e=>{
