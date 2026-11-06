@@ -1249,6 +1249,9 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 #askLim .lim{margin-bottom:8px}
 #askForm[hidden],#genRow[hidden],.dk-two2[hidden],#deckv .gen-h[hidden]{display:none!important}
 .sn-ad .sn-g{padding:0 8px}
+.bnav button.navplus .np{width:40px;height:30px;border-radius:12px;display:grid;place-items:center;background:var(--fg);color:var(--bg)}
+.bnav button.navplus .np svg{width:22px;height:22px}
+.bnav button.navplus.on .np{box-shadow:0 0 0 2px var(--green)}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -1440,8 +1443,8 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 
 <nav class="bnav" aria-label="メニュー">
   <button id="navHome" class="on" aria-label="ホーム"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg><span>ホーム</span></button>
-  <button id="navNew" aria-label="新しい単語帳を作る"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span>追加</span></button>
   <button id="navLib" aria-label="単語帳のライブラリ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h4v14H4zM10 5h4v14h-4zM16 6l3.5-1 2.5 13.5-3.5 1z"/></svg><span>ライブラリ</span></button>
+  <button id="navNew" class="navplus" aria-label="新しい単語帳を作る"><i class="np"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i><span>追加</span></button>
   <button id="navShop" aria-label="ショップ"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg><span>ショップ</span></button>
   <button id="navSet" aria-label="設定"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span>設定</span></button>
 </nav>
