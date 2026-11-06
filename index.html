@@ -1213,6 +1213,7 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .dk-row2 .ldel{color:var(--red-ink)}
 .dk-row2 .ldel.arm{width:auto;height:34px;padding:0 10px;font-size:.75rem;font-weight:900;color:#fff;background:var(--red-ink)}
 .ce-img{margin-top:4px}
+.dk-more{margin-top:10px;width:100%}
 .dk-sep[hidden]{display:none}
 </style>
 
@@ -1812,7 +1813,7 @@ function commitDraft(){
 function openDeckEdit(id){
   closeNavViews(); navOn('navNew');
   if(id==='new'){dkDraft={id:'d'+Date.now().toString(36),name:'',cards:[]};id=dkDraft.id}else dkDraft=null;
-  dkId=id; const dk=edDeck(); if(!dk)return;
+  dkId=id; dkLim=100; const dk=edDeck(); if(!dk)return;
   closePhoto(); setDm('one'); renderPhotoLeft(); $('dkName').value=dk.name||'';$('dkName').readOnly=id==='gold'; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
   renderDeckEdit();
   const v=$('deckv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); document.body.classList.add('sv-lock');
@@ -1828,19 +1829,22 @@ function closeDeckEdit(){
   document.body.classList.remove('sv-lock');
 }
 const deckOpen=()=>$('deckv').classList.contains('open');
+let dkLim=100;
 function renderDeckEdit(){
-  const dk=edDeck(); if(!dk)return; const cs=dk.cards||[];
+  const dk=edDeck(); if(!dk)return; const G=dk.id==='gold', cs=G?goldCards():(dk.cards||[]);
   {const n=cs.filter(c=>c.img).length;const el=$('dkImgNote');if(el)el.textContent=`カードの🖼で画像をつけられます。無料：この単語帳 あと${Math.max(0,IMG_PER_DECK-n)}枚 ・ 全部で あと${Math.max(0,IMG_FREE_TOTAL-imgTotal())}枚`}
   $('dkCount').textContent=`${cs.length}枚`;{const sp=document.querySelector('#deckv .dk-sep');if(sp)sp.hidden=!cs.length}
-  $('dkList').innerHTML=cs.map((c,i)=>`<div class="dk-row2" data-i="${i}"><div class="t" data-ed><span class="e">${esc(c.en)}</span><span class="j">${esc(c.jp)}</span>${c.memo?`<span class="m">${esc(c.memo)}</span>`:''}</div>${c.img?`<img class="th" src="${esc(c.img)}" alt="">`:''}<button class="led" data-ed aria-label="直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="led ldel" data-del aria-label="消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></div>`).reverse().join('');
+  $('dkList').innerHTML=cs.map((c,i)=>[c,i]).reverse().slice(0,dkLim).map(([c,i])=>`<div class="dk-row2" data-i="${i}"><div class="t" data-ed><span class="e">${esc(c.en)}</span><span class="j">${esc(c.jp)}</span>${c.memo?`<span class="m">${esc(c.memo)}</span>`:''}</div>${c.img?`<img class="th" src="${esc(c.img)}" alt="">`:''}<button class="led" data-ed aria-label="直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="led ldel" data-del aria-label="消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></div>`).join('')+(cs.length>dkLim?`<button class="btn dk-more" id="dkMore">さらに表示（残り${cs.length-dkLim}枚）</button>`:'');
   $('dkList').querySelectorAll('.dk-row2').forEach(r=>{
     const c=cs[+r.dataset.i];
-    r.querySelectorAll('[data-ed]').forEach(x=>x.onclick=()=>openCardEdit(c,'deck'));
+    r.querySelectorAll('[data-ed]').forEach(x=>x.onclick=()=>openCardEdit(G?(BUILTIN.find(y=>y.id===c.id)||(S.goldAdd||[]).find(y=>y.id===c.id)||c):c,G?'gold':'deck'));
     const b=r.querySelector('[data-del]');
     b.onclick=()=>{
       if(!b.classList.contains('arm')){$('dkList').querySelectorAll('.ldel.arm').forEach(x=>{x.classList.remove('arm');x.innerHTML=x._svg});b._svg=b.innerHTML;b.classList.add('arm');b.textContent='消す？';clearTimeout(b._t);b._t=setTimeout(()=>{if(b.isConnected&&b.classList.contains('arm')){b.classList.remove('arm');b.innerHTML=b._svg}},3000);return}
+      if(G){removeCard(c,true);renderDeckEdit();return}
       cs.splice(+r.dataset.i,1);dropImg(c);delete S.known[c.id];delete S.miss[c.id];S.rv&&delete S.rv[c.id];save();renderDeckEdit();if(dkId===S.deck)refreshData()};
   });
+  {const m=$('dkMore');if(m)m.onclick=()=>{dkLim+=200;renderDeckEdit()}}
 }
 // ---- card images (saved through the AI server into Cloudflare R2)
 const IMG_PER_DECK=5, IMG_FREE_TOTAL=30;
@@ -2365,8 +2369,8 @@ function refreshData(){
   P=P.map(d=>m.get(d.id)).filter(Boolean); QP=[]; if(ci>=P.length)ci=Math.max(0,P.length-1);
   header(); renderDeckBar&&renderDeckBar(); if(tab==='list')renderList(); else if(tab==='card'){try{fillCard()}catch(e){}}
 }
-function removeCard(d){
-  const dk=S.deck!=='gold'&&deckOf(S.deck);
+function removeCard(d,gold){
+  const dk=!gold&&S.deck!=='gold'&&deckOf(S.deck);
   if(dk){const i=(dk.cards||[]).findIndex(x=>x.id===d.id);if(i>=0){const c=dk.cards[i];dk.cards.splice(i,1);dropImg(c)}}
   else{const gi=(S.goldAdd||[]).findIndex(x=>x.id===d.id);if(gi>=0){dropImg(S.goldAdd[gi]);S.goldAdd.splice(gi,1)}else S.edits[d.id]={...(S.edits[d.id]||{}),del:1}}
   delete S.known[d.id];delete S.miss[d.id];S.rv&&delete S.rv[d.id]; save(); refreshData();
@@ -2376,11 +2380,11 @@ function saveCardEdit(){
   const d=ceCard;if(!d)return;const en=$('ceEn').value.trim(),jp=$('ceJp').value.trim(),memo=$('ceMemo').value.trim().slice(0,120);
   if(!en||!jp){toast('<div><strong>英語と日本語は空にできません</strong></div>');return}
   if(ceFrom==='deck'){d.en=en;d.jp=jp;if(memo)d.memo=memo;else delete d.memo;save();closeCardEdit();renderDeckEdit();if(dkId===S.deck)refreshData();toast('<div><strong>カードを保存しました</strong></div>');return}
-  const dk=S.deck!=='gold'&&deckOf(S.deck);
+  const dk=ceFrom!=='gold'&&S.deck!=='gold'&&deckOf(S.deck);
   const ga=!dk&&(S.goldAdd||[]).find(x=>x.id===d.id);
   if(dk||ga){const c=ga||(dk.cards||[]).find(x=>x.id===d.id);if(c){c.en=en;c.jp=jp;if(memo)c.memo=memo;else delete c.memo}}
   else{const o=d._orig||{en:d.en,jp:d.jp};const e={};if((S.edits[d.id]||{}).del)e.del=1;if(en!==o.en)e.en=en;if(jp!==o.jp)e.jp=jp;if(memo)e.memo=memo;if(Object.keys(e).length)S.edits[d.id]=e;else delete S.edits[d.id];if(!d._orig)d._orig=o}
-  d.en=en;d.jp=jp;d.memo=memo; save(); const from=ceFrom; closeCardEdit(); refreshData(); if(from==='card'){const f=$('flip'); if(!f.classList.contains('turned'))flip()}
+  d.en=en;d.jp=jp;d.memo=memo; save(); const from=ceFrom; closeCardEdit(); refreshData(); if(from==='gold')renderDeckEdit(); if(from==='card'){const f=$('flip'); if(!f.classList.contains('turned'))flip()}
   toast('<div><strong>カードを保存しました</strong></div>');
 }
 function faceHTML(d,lang,isBack){
