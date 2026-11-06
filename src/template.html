@@ -765,14 +765,16 @@ header{gap:6px}
 /* top: goal card with Meemo inside */
 .goalbox{background:var(--surface);border:0;border-radius:20px;padding:14px 16px;gap:8px}
 .gzone .goalbox{margin-right:0;padding-right:104px}
-.goalbox.done{background:var(--green-s);border:0}
+.goalbox.done{background:var(--green-s);border:0;align-items:stretch;text-align:left;padding:14px 104px 14px 16px;gap:8px}
+.goalbox{min-height:86px;justify-content:center}
+.goalbox .gtrack i,.goalbox.done .gtrack i{background:var(--green)}
 .goalrow{font-family:var(--f-jp);font-size:.95rem}
 .goalrow #goalNum{font-family:var(--f);font-weight:900}
 .gtrack{height:10px;background:var(--chipbg)}
 .track i::after{display:none}
 .goalsub{font-family:var(--f-jp);font-size:.75rem;font-weight:700;color:var(--muted)}
-.mascot{right:16px;top:-14px;width:66px}
-.hanger{top:58px;right:6px;width:32px;height:32px;border:2px solid var(--bg);background:var(--chipbg);box-shadow:none}
+.mascot{right:18px;top:0;width:69px}
+.hanger{top:50px;right:2px;width:34px;height:34px;border:2px solid var(--bg);background:var(--chipbg);box-shadow:none}
 .mbub{right:96px}
 .wardrobe{top:100px}
 /* tabs: one quiet segmented bar */
