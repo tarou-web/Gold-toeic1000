@@ -1272,6 +1272,17 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .bnav button.navplus .np{width:40px;height:30px;border-radius:12px;display:grid;place-items:center;background:var(--fg);color:var(--bg)}
 .bnav button.navplus .np svg{width:22px;height:22px}
 .bnav button.navplus.on .np{box-shadow:0 0 0 2px var(--green)}
+/* home goal: Meemo's speech bubble (案10) */
+#goalbox{--gb:var(--surface);position:relative;flex-direction:row;align-items:center;gap:12px;min-height:86px;padding:12px 14px!important;margin-right:96px!important;border-radius:20px 20px 6px 20px;background:var(--gb);border:0}
+#goalbox.done{--gb:var(--green-s)}
+#goalbox::after{content:"";position:absolute;right:-6px;bottom:16px;width:14px;height:14px;background:var(--gb);transform:rotate(45deg);border-radius:3px}
+.gring{--p:0%;width:58px;height:58px;flex:none;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--green) 0 var(--p),var(--chipbg) var(--p) 100%)}
+.gring b{width:44px;height:44px;border-radius:50%;background:var(--gb);display:flex;align-items:center;justify-content:center;font-family:var(--f);font-weight:900;font-size:15px;color:var(--fg);line-height:1}
+.gring b small{font-size:10px;color:var(--muted);margin-top:3px}
+.gtx{display:flex;flex-direction:column;gap:3px;min-width:0;font-family:var(--f-jp)}
+.gtx>b{font-size:17px;font-weight:800}
+.gtx>span:not(.gstk){font-size:12px;color:var(--muted);font-weight:700}
+.gstk{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--green);font-weight:800}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -1311,9 +1322,9 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
   <div class="wardrobe" id="wardrobe" role="dialog" aria-label="着せ替え" hidden></div>
   <div class="mbub" id="mbub" aria-live="polite"></div>
   <div class="goalbox" id="goalbox">
-    <div class="goalrow"><span id="goalTxt">今日の目標</span><span id="goalNum">0 / 10</span></div>
-    <div class="track gtrack"><i id="goalBar"></i></div>
-    <div class="goalsub" id="goalSub"></div>
+    <span class="gring" id="goalRing" aria-hidden="true"><b id="goalNum">0</b></span>
+    <div class="gtx"><b id="goalTxt">今日もやろう！</b><span id="goalSub"></span><span class="gstk"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-3 2-4 2-6 1 1 2 2 3 2 0-2-1-4 0-6z"/></svg><span id="goalStk"></span></span></div>
+    <i id="goalBar" hidden></i>
   </div>
 
   <div class="tabs" role="tablist">
@@ -2288,10 +2299,12 @@ function header(){
   {const cur=BADGES.filter(b=>b<=S.points).pop()||0;const im=$('curBadge');const src=`badges/badge-${cur}.png`;if(im.getAttribute('src')!==src)im.setAttribute('src',src);im.alt=`${cur}ポイントのバッジ（いま${S.points}ポイント）`;$('ptsBtn').title=`${S.points}ポイント`}
   $('known').textContent=k; $('coins').textContent=S.coins||0;
   const dc=doneCount(), g=S.goal, ok=S.last===today();
-  $('goalNum').textContent=`${Math.min(dc,g)} / ${g}`;
-  $('goalTxt').textContent=ok?'今日の目標 達成！':'今日の目標';
-  $('goalBar').style.width=Math.min(100,dc/g*100)+'%';
-  $('goalSub').textContent=ok?'今日も続けられました':`あと${Math.max(0,g-dc)}問で達成`;
+  {const d=Math.min(dc,g), left=Math.max(0,g-dc), st=curStreak();
+  $('goalNum').innerHTML=`${d}<small>/${g}</small>`; $('goalRing').style.setProperty('--p',(ok?100:d/g*100)+'%');
+  $('goalTxt').textContent=ok?'達成！すごい':dc===0?'今日もやろう！':left<=g/2?'あと少し！':'その調子！';
+  $('goalSub').textContent=ok?'今日の目標をクリアしました':`今日の目標まで あと${left}問`;
+  $('goalStk').textContent=ok?`${st}日連続で達成中`:st?`達成で${st+1}日連続`:'達成で連続記録スタート';
+  $('goalbox').setAttribute('aria-label',`今日の目標 ${d}/${g}問`);}
   $('goalbox').classList.toggle('done',ok);
   const N=Math.max(1,DATA.length);
   $('bar').style.width=Math.max(k?2:0,k/N*100)+'%';
