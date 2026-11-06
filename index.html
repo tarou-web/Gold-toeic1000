@@ -1159,6 +1159,40 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .swlab.ng{color:var(--red-ink);border-color:var(--red-ink);left:18px;transform:rotate(-8deg)}
 /* toast */
 .toast{border:1px solid var(--line);border-bottom-width:1px;background:var(--surface)}
+/* 単語帳の追加 案4 */
+#deckv .dk-name{flex-direction:column;align-items:stretch;gap:6px}
+#deckv .dk-name label{font-size:12px;font-weight:800;color:var(--muted);font-family:var(--f-jp)}
+.dk-nbox{display:flex;align-items:center;gap:10px;height:52px;padding:0 16px;border-radius:16px;background:var(--surface)}
+#deckv .dk-nbox input{flex:1;min-width:0;height:52px;padding:0!important;border:0!important;background:transparent!important;border-radius:0;font-size:18px;color:var(--fg)}
+.dk-nbox span{font-family:var(--f);font-weight:900;font-size:13px;color:var(--muted)}
+.dk-seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:16px;background:var(--surface)}
+.dk-seg button{height:40px;border:0;border-radius:12px;background:transparent;color:var(--muted);font:inherit;font-family:var(--f-jp);font-weight:800;font-size:13px;cursor:pointer;transition:background .15s,color .15s}
+.dk-seg button[aria-selected=true]{background:var(--fg);color:var(--bg)}
+.dk-pane[hidden]{display:none!important}
+#deckv .dk-add{background:none;border-radius:0;padding:0;gap:8px}
+#deckv .dk-add input{height:50px;padding:0 16px;border-radius:16px;border:1px solid var(--line);background:transparent;font-size:16px}
+#deckv .dk-add #dkEn{font-family:var(--f);font-weight:800;font-size:17px}
+.dk-addrow{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:8px}
+#deckv .dk-addrow #dkMemo{height:48px;border:0!important;background:var(--surface2)!important;font-size:14px}
+.dk-addrow .btn{height:48px;padding:0;border-radius:16px;font-size:15px}
+.dk-two2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#deckv .dk-two2 .photo-btn{flex-direction:row;height:48px;gap:8px;font-size:14px;border-radius:16px;background:transparent;border:1px solid var(--line)}
+.dk-two2 svg{width:18px;height:18px;color:var(--green)}
+#deckv .gen-box{border:0;background:none;padding:0;display:flex;flex-direction:column;gap:8px}
+#deckv .gen-h{margin:4px 0 0;font-family:var(--f-jp);font-weight:800;font-size:13px;display:flex;justify-content:space-between;align-items:baseline}
+#deckv .gen-h small{font-size:12px;color:var(--muted);font-weight:700}
+#deckv .gen-h b{font-size:12px;color:var(--green)}#deckv .gen-h b.zero{color:var(--red-ink)}
+#deckv .gen-chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#deckv .gen-chips button{height:46px;padding:0 14px;border-radius:14px;border:1px solid var(--line);background:transparent;text-align:left;font-size:14px}
+#deckv .gen-row{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:8px}
+#deckv .gen-row input{height:50px;padding:0 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:15px;min-width:0;box-sizing:border-box}
+#deckv .gen-row .btn{height:50px;padding:0;border-radius:16px}
+#deckv .dk-bulk{border:0;background:none;padding:0;display:flex;flex-direction:column;gap:8px}
+#deckv .dk-bulk p{margin:0;font-size:13px;line-height:1.6}#deckv .dk-bulk p b{color:var(--fg)}
+#deckv .dk-bulk textarea{margin:0;border-radius:18px;border:1px solid var(--line);background:var(--surface);padding:14px 16px;line-height:1.7}
+#deckv .dk-bulk .btn{height:48px;border-radius:16px}
+#deckv .dk-bulk .sync-msg:empty{display:none}
+.dk-sep{height:1px;background:var(--line2);margin:2px 0}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -1285,36 +1319,37 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
       <div class="sv-bar"><span></span><h2 id="deckTitle">単語帳</h2><span></span></div>
     </div></div>
     <div class="sv-in bv-body">
-      <div class="dk-name"><input id="dkName" placeholder="単語帳の名前（例：TOEIC 頻出）" maxlength="40" autocomplete="off"><span id="dkCount"></span></div>
-      <div class="dk-photo">
-        <div class="dk-two">
-        <label class="btn photo-btn" id="dkPhotoBtn"><input type="file" id="dkPhotoIn" accept="image/*" hidden><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>写真から</label>
-        <button class="btn gen-btn" id="dkGenBtn" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/></svg>AIで作る</button>
-        <button class="btn bulk-btn" id="dkBulkOpen"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v3H8z"/><path d="M6 6h-1v15h14V6h-1"/><path d="M9 12h6M9 16h4"/></svg>まとめて貼る</button>
-        </div>
-        <div class="gen-box" id="dkGen" hidden>
-          <p class="gen-h">どんな単語帳がほしい？</p>
-          <div class="gen-chips" id="genChips"></div>
-          <div class="gen-row"><input id="genIn" placeholder="例：ホテルの受付で使う英語を30個" maxlength="300" autocomplete="off" enterkeyhint="go"><button class="btn ok" id="genGo">作る</button></div>
-          <p class="ph-note">上のボタンはいつでも使えます。自由に頼めるのは<b id="genLeft"></b>。</p>
-        </div>
-        <p class="ph-note">単語帳やプリントを撮ると、AIが英語と日本語を読み取ります。<b id="phLeft"></b></p>
-        <div class="ph-box" id="dkPhoto" hidden></div>
+      <div class="dk-name"><label for="dkName">単語帳の名前</label><div class="dk-nbox"><input id="dkName" placeholder="例：TOEIC 頻出" maxlength="40" autocomplete="off"><span id="dkCount"></span></div></div>
+      <div class="dk-seg" role="tablist" aria-label="追加のしかた">
+        <button role="tab" data-dm="one" aria-selected="true">1枚ずつ</button><button role="tab" data-dm="photo" aria-selected="false">写真</button><button role="tab" data-dm="ai" id="dkGenBtn" aria-selected="false">AI</button><button role="tab" data-dm="paste" aria-selected="false">貼り付け</button>
       </div>
-      <div class="dk-add">
-        <h3>カードを1枚ずつ追加</h3>
+      <div class="dk-add dk-pane" data-pane="one">
         <input id="dkEn" placeholder="英語（例：resume）" autocomplete="off" autocapitalize="off" spellcheck="false">
         <input id="dkJp" placeholder="日本語（例：履歴書、再開する）" autocomplete="off">
-        <input id="dkMemo" placeholder="メモ（なくてもOK）" maxlength="120" autocomplete="off">
-        <button class="btn ok" id="dkAddBtn">追加する</button>
+        <div class="dk-addrow"><input id="dkMemo" placeholder="メモ（なくてもOK）" maxlength="120" autocomplete="off"><button class="btn ok" id="dkAddBtn">追加</button></div>
       </div>
-      <details class="dk-bulk" id="dkBulkBox">
-        <summary>まとめて貼り付けて追加</summary>
-        <p>1行に1枚。英語と日本語の間は「タブ」「 = 」「,」「：」のどれかで区切ります。Quizletやメモ帳からそのまま貼り付けられます。</p>
-        <textarea id="dkBulk" rows="6" placeholder="resume = 履歴書&#10;apply for a job, 仕事に応募する&#10;deadline：締め切り"></textarea>
-        <button class="btn blue" id="dkBulkBtn">まとめて追加</button>
+      <div class="dk-pane dk-photo" data-pane="photo" hidden>
+        <div class="dk-two2">
+          <label class="btn photo-btn" id="dkPhotoBtn"><input type="file" id="dkPhotoIn" accept="image/*" capture="environment" hidden><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>撮る</label>
+          <label class="btn photo-btn" id="dkPhotoBtn2"><input type="file" id="dkPhotoIn2" accept="image/*" hidden><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 16l5-5 4 4 2-2 5 5"/></svg>アルバムから</label>
+        </div>
+        <p class="ph-note">単語帳やプリントを撮ると、AIが英語と日本語を読み取ります。<b id="phLeft"></b></p>
+      </div>
+      <div class="dk-pane gen-box" data-pane="ai" id="dkGen" hidden>
+        <p class="gen-h">テーマを選ぶ<small>何回でも使えます</small></p>
+        <div class="gen-chips" id="genChips"></div>
+        <p class="gen-h">自由に頼む<b id="genLeft"></b></p>
+        <div class="gen-row"><input id="genIn" placeholder="例：ホテルの受付の英語" maxlength="300" autocomplete="off" enterkeyhint="go"><button class="btn ok" id="genGo">作る</button></div>
+        <p class="ph-note">約30語を作ります。できたら選んで追加できます。</p>
+      </div>
+      <div class="dk-pane dk-bulk" data-pane="paste" id="dkBulkBox" hidden>
+        <p>1行に1枚。英語と日本語のあいだは <b>=</b>　<b>,</b>　<b>：</b>　タブ のどれかで。Quizletやメモ帳からそのまま貼れます。</p>
+        <textarea id="dkBulk" rows="5" placeholder="resume = 履歴書&#10;apply for a job, 仕事に応募する&#10;deadline：締め切り"></textarea>
+        <button class="btn ok" id="dkBulkBtn">まとめて追加</button>
         <p class="sync-msg" id="dkBulkMsg" role="status"></p>
-      </details>
+      </div>
+      <div class="ph-box" id="dkPhoto" hidden></div>
+      <div class="dk-sep" aria-hidden="true"></div>
       <h3 id="dkListTitle">カード</h3>
       <p class="dk-imgnote" id="dkImgNote"></p>
       <input type="file" id="dkImgIn" accept="image/*" hidden>
@@ -1761,7 +1796,7 @@ function openDeckEdit(id){
   closeNavViews(); navOn('navNew');
   if(id==='new'){dkDraft={id:'d'+Date.now().toString(36),name:'',cards:[]};id=dkDraft.id}else dkDraft=null;
   dkId=id; const dk=edDeck(); if(!dk)return;
-  closePhoto(); toggleGen(false); renderPhotoLeft(); $('dkName').value=dk.name||''; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
+  closePhoto(); setDm('one'); renderPhotoLeft(); $('dkName').value=dk.name||''; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
   renderDeckEdit();
   const v=$('deckv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); document.body.classList.add('sv-lock');
   setTimeout(()=>{(dk.name?$('dkEn'):$('dkName')).focus({preventScroll:true})},350);
@@ -1837,9 +1872,9 @@ async function shrinkPhoto(file){
 }
 async function readPhoto(file){
   const box=$('dkPhoto'); box.hidden=false;
-  if(photoUsed()>=PHOTO_LIMIT){box.innerHTML=`<p class="ph-err">写真の読み取りは1日${PHOTO_LIMIT}回までです。明日また使ってね。</p>`;$('dkPhotoIn').value='';return} $('dkPhotoBtn').classList.add('busy');
+  if(photoUsed()>=PHOTO_LIMIT){box.innerHTML=`<p class="ph-err">写真の読み取りは1日${PHOTO_LIMIT}回までです。明日また使ってね。</p>`;$('dkPhotoIn').value='';return} $('dkPhotoBtn').classList.add('busy');$('dkPhotoBtn2').classList.add('busy');
   let shot;
-  try{shot=await shrinkPhoto(file)}catch(e){box.innerHTML='<p class="ph-err">この写真は開けませんでした。別の写真で試してください。</p>';$('dkPhotoBtn').classList.remove('busy');return}
+  try{shot=await shrinkPhoto(file)}catch(e){box.innerHTML='<p class="ph-err">この写真は開けませんでした。別の写真で試してください。</p>';($('dkPhotoBtn').classList.remove('busy'),$('dkPhotoBtn2').classList.remove('busy'));return}
   box.innerHTML=`<div class="ph-wait"><img src="${shot.thumb}" alt=""><span class="spin"></span><span>ミーモが写真を読んでいます…<br><small>10〜30秒ほどかかります</small></span></div>`;
   try{
     const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'photo',image:shot.data,mime:'image/jpeg'})});
@@ -1852,7 +1887,7 @@ async function readPhoto(file){
     phCards=d.cards.map(c=>({en:c.en,jp:c.jp,on:!have.has(c.en.toLowerCase()),dup:have.has(c.en.toLowerCase())}));
     phMade=false; renderPhoto();
   }catch(e){box.innerHTML=`<p class="ph-err">読み取れませんでした（${esc(String(e.message||e))}）。少し待ってからもう一度試してください。</p>`}
-  finally{$('dkPhotoBtn').classList.remove('busy')}
+  finally{($('dkPhotoBtn').classList.remove('busy'),$('dkPhotoBtn2').classList.remove('busy'))}
 }
 function renderPhoto(){
   const box=$('dkPhoto'), n=phCards.filter(c=>c.on).length;
@@ -1880,7 +1915,9 @@ const GEN_CHIPS=[['toeic600','TOEIC 600点'],['toeic730','TOEIC 730点'],['toeic
 function genUsed(){try{const m=JSON.parse(localStorage.getItem(KEY+'-gen')||'{}');return m[today()]||0}catch(e){return 0}}
 function genCount(){try{localStorage.setItem(KEY+'-gen',JSON.stringify({[today()]:genUsed()+1}))}catch(e){}renderGenLeft()}
 function renderGenLeft(){const el=$('genLeft');if(el){const n=Math.max(0,GEN_LIMIT-genUsed());el.textContent=`今日あと${n}回`;el.classList.toggle('zero',!n)}}
-function toggleGen(open){const b=$('dkGen');open=open??b.hidden;b.hidden=!open;$('dkGenBtn').setAttribute('aria-expanded',open);if(open){renderGenLeft();$('genChips').innerHTML=GEN_CHIPS.map(([id,l])=>`<button data-gp="${id}">${l}</button>`).join('');$('genChips').querySelectorAll('[data-gp]').forEach(x=>x.onclick=()=>makeDeck(x.dataset.gp,x.textContent))}}
+let dkMode='one';
+function setDm(m){dkMode=m;document.querySelectorAll('.dk-seg [data-dm]').forEach(b=>b.setAttribute('aria-selected',b.dataset.dm===m));document.querySelectorAll('#deckv .dk-pane').forEach(p=>p.hidden=p.dataset.pane!==m);if(m==='ai')toggleGen(true)}
+function toggleGen(open){if(open===false)return;{renderGenLeft();$('genChips').innerHTML=GEN_CHIPS.map(([id,l])=>`<button data-gp="${id}">${l}</button>`).join('');$('genChips').querySelectorAll('[data-gp]').forEach(x=>x.onclick=()=>makeDeck(x.dataset.gp,x.textContent))}}
 async function makeDeck(preset,label){
   const free=!preset, text=free?$('genIn').value.trim():'';
   if(free&&!text){$('genIn').focus();return}
@@ -2261,7 +2298,7 @@ function sPage(fwd){if($('sound').value!=='on')return;const c=ac();if(!c)return;
   const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.setValueAtTime(fwd?520:700,t);o.frequency.exponentialRampToValueAtTime(fwd?700:520,t+0.08);
   g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.08,t+0.01);g.gain.exponentialRampToValueAtTime(0.0001,t+0.11);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+0.12)}
 const SOUNDS=[['#tNext',()=>sPage(true)],['#tPrev',()=>sPage(false)],['.ordans .tile',()=>sTick(false)],['.tile,.tq .opt',()=>sTick(true)],
-  ['.tnum button,#tStart,#tQuit,#tNew,#tLearn,#again,#mAgain,#qnext,#lsortBtn,#lsMenu button,.item .led,.ceacts button,#dkAddBtn,#dkBulkBtn,.editb,.dk-row .delb,.dk-row .imgb,#tGrade:not([data-arm])',uiClick],['#hangerBtn,.wardrobe button[data-skin],.wardrobe button[data-wear]',sClothes],['#bagBtn',sShop],['#fireBtn',sFire],['#ptsBtn',sBadge],['.tabs button,.sv-x,.bnav button,.pill.gear',uiClick]];
+  ['.tnum button,#tStart,#tQuit,#tNew,#tLearn,#again,#mAgain,#qnext,#lsortBtn,#lsMenu button,.item .led,.ceacts button,#dkAddBtn,#dkBulkBtn,.dk-seg button,.editb,.dk-row .delb,.dk-row .imgb,#tGrade:not([data-arm])',uiClick],['#hangerBtn,.wardrobe button[data-skin],.wardrobe button[data-wear]',sClothes],['#bagBtn',sShop],['#fireBtn',sFire],['#ptsBtn',sBadge],['.tabs button,.sv-x,.bnav button,.pill.gear',uiClick]];
 document.addEventListener('click',e=>{if(!e.target.closest)return;for(const [sel,fn] of SOUNDS){const b=e.target.closest(sel);if(b){if(!b.disabled)fn();return}}},true);
 // opening the parrot chat: a cheerful two-note chirp
 function sAsk(){if($('sound').value!=='on')return;const c=ac();if(!c)return;const t=c.currentTime+0.01;
@@ -2899,8 +2936,8 @@ const dkAdd=()=>{const en=$('dkEn').value.trim(),jp=$('dkJp').value.trim(); if(!
   {const old=dupCard(en); if(old){toast(`<div><strong>以前同じ単語を入力しました</strong><span>${esc(old.en)}＝${esc(old.jp)}</span></div>`);$('dkEn').select();return}}
   if(addCards([[en,jp,$('dkMemo').value]])){$('dkEn').value='';$('dkJp').value='';$('dkMemo').value='';$('dkEn').focus();toast('<div><strong>カードを追加しました</strong></div>')}else toast('<div><strong>同じカードがもうあります</strong></div>')};
 $('dkAddBtn').onclick=dkAdd;
-$('dkGenBtn').onclick=()=>toggleGen();
-$('dkBulkOpen').onclick=()=>{const b=$('dkBulkBox');b.open=true;b.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>$('dkBulk').focus({preventScroll:true}),350)};
+document.querySelectorAll('.dk-seg [data-dm]').forEach(b=>b.onclick=()=>{setDm(b.dataset.dm);if(b.dataset.dm==='one')$('dkEn').focus({preventScroll:true})});
+$('dkPhotoIn2').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(f)readPhoto(f)};
 $('genGo').onclick=()=>makeDeck(null);
 $('genIn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();makeDeck(null)}});
 $('dkPhotoIn').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(f)readPhoto(f)};
