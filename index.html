@@ -1069,6 +1069,23 @@ select,input[type=search]{border-width:1px}
 .bs-box small{font-family:var(--f-jp);font-size:.75rem;font-weight:800;color:var(--muted)}
 .bstep.now .bs-box small{color:var(--green)}
 #bv .bv-hero,#shopv .bv-hero,#sv .sv-hero,.navv .bv-hero,.deckv .bv-hero{position:sticky;top:0;z-index:5}
+body.qmode header,body.qmode .gzone>:not(.tabs),body.qmode .controls{display:none!important}
+body.qmode .gzone{padding-top:12px}
+body.qmode.qactive .bnav{display:none}
+body.qmode.qactive .wrap{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))!important}
+body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
+.qdone{align-items:stretch;text-align:left;padding:4px 0 0;gap:12px}
+.qd-card{display:flex;align-items:center;gap:14px;background:var(--surface);border-radius:22px;padding:16px}
+.qd-ring{--p:0;width:86px;height:86px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;background:conic-gradient(var(--green) calc(var(--p)*1%),var(--chipbg) 0)}
+.qd-ring span{width:68px;height:68px;border-radius:50%;background:var(--surface);display:flex;align-items:baseline;justify-content:center;padding-top:22px;box-sizing:border-box;font-family:var(--f);font-weight:900;font-size:1.35rem}
+.qd-ring small{font-size:.7rem}
+.qd-t{display:flex;flex-direction:column;gap:4px}
+.qd-t h2{font-size:1.35rem;margin:0}
+.qd-t span{font-size:.82rem;color:var(--muted)}
+.qdone #mAgain{min-height:52px}
+.qd-h{display:flex;justify-content:space-between;font-family:var(--f-jp);font-size:.82rem;font-weight:800;padding:2px 2px 0}
+.qd-h span+span{color:var(--muted);font-size:.75rem}
+.qdone .qrev{margin-top:0}
 /* toast */
 .toast{border:1px solid var(--line);border-bottom-width:1px;background:var(--surface)}
 </style>
@@ -2411,7 +2428,8 @@ function makeTiles(d){
   return tiles;
 }
 function shuf(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
-function renderQuiz(){
+function renderQuiz(){ try{ return renderQuiz0() } finally { if(typeof qmodeSync==='function')qmodeSync() } }
+function renderQuiz0(){
   const v=$('v-quiz');
   if(!QP.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
   const d=lrCard(), done=QP.filter(x=>(LR.st[x.id]||0)>=MASTER).length;
@@ -2507,16 +2525,18 @@ function showSheet(ok,title,sub,d,next){
 const MC_N=10;
 let MQ=[],mi=0,ms={r:0,n:0,res:{}},manswered=false,mOpts=null;
 function startMc(){MQ=shuf(pool()).slice(0,MC_N);mi=0;ms={r:0,n:0,res:{}};mOpts=null}
-function renderMc(){
+function renderMc(){ try{ return renderMc0() } finally { qmodeSync() } }
+function renderMc0(){
   const v=$('v-mc');
   if(!MQ.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
   if(DATA.length<4){v.innerHTML='<div class="empty">4択クイズは、単語帳にカードが4枚以上あると使えます。</div>';return}
   if(mi>=MQ.length){
     const acc=Math.round(ms.r/Math.max(1,ms.n)*100);
-    v.innerHTML=`<div class="done"><h2>クイズ完了！</h2><p style="margin:0;color:var(--muted)">${ms.n}問中 ${ms.r}問 正解</p>
-      <div class="boxes"><div class="box"><b>正解</b><span>${ms.r}問</span></div><div class="box g"><b>正答率</b><span>${acc}%</span></div></div>
-      <button class="btn ok" id="mAgain" style="width:100%;max-width:320px">次のクイズへ</button>
-      <div class="qrev"><div class="qrev-h">このクイズで出た単語</div>${MQ.map(d=>{const ok=ms.res[d.id];return `<div class="qrev-r ${ok?'ok':'ng'}"><span class="m">${ok?'○':'×'}</span><div><div class="e">${esc(d.en)}</div><div class="j">${esc(d.jp)}</div></div></div>`}).join('')}</div></div>`;
+    v.innerHTML=`<div class="done qdone">
+      <div class="qd-card"><div class="qd-ring" style="--p:${acc}"><span>${acc}<small>%</small></span></div><div class="qd-t"><h2>クイズ完了！</h2><span>${ms.n}問中 ${ms.r}問 正解</span></div></div>
+      <button class="btn ok" id="mAgain">次のクイズへ</button>
+      <div class="qd-h"><span>このクイズで出た単語</span><span>× ${ms.n-ms.r}問</span></div>
+      <div class="qrev">${MQ.map(d=>{const ok=ms.res[d.id];return `<div class="qrev-r ${ok?'ok':'ng'}"><span class="m">${ok?'○':'×'}</span><div><div class="e">${esc(d.en)}</div><div class="j">${esc(d.jp)}</div></div></div>`}).join('')}</div></div>`;
     fanfare(); $('mAgain').onclick=()=>{startMc();renderMc()};return}
   const d=MQ[mi], je=$('dir').value==='je';
   let opts=mOpts&&mOpts.mi===mi&&mOpts.id===d.id?mOpts.list:null;
@@ -2695,11 +2715,17 @@ window.visualViewport&&visualViewport.addEventListener('resize',()=>requestAnima
 if(window.ResizeObserver){const ro=new ResizeObserver(()=>requestAnimationFrame(fitCard));addEventListener('DOMContentLoaded',()=>{for(const el of document.querySelectorAll('header,.gzone,.tabs,.bnav,body'))ro.observe(el,{box:'border-box'})});for(const el of document.querySelectorAll('header,.gzone,.tabs,.bnav,body'))ro.observe(el,{box:'border-box'})}
 addEventListener('load',()=>setTimeout(fitCard,50));
 document.fonts&&document.fonts.ready.then(()=>setTimeout(fitCard,30));
+function qmodeSync(){
+  const on=tab==='quiz'||tab==='mc', v=$(tab==='mc'?'v-mc':'v-quiz');
+  document.body.classList.toggle('qmode',on);
+  document.body.classList.toggle('qactive',on&&!!v&&!v.querySelector('.done,.empty'));
+  setBnavH&&setBnavH();
+}
 function setTab(t){
   if(t!=='card'&&bigCard){bigCard=false;document.body.classList.remove('cardbig');document.documentElement.classList.remove('noscroll')}
   tab=t; hideSheet(); if(t!=='test'&&document.body.classList.contains('testing')){document.body.classList.remove('testing');document.documentElement.classList.remove('noscroll')}
   for(const x of ['card','quiz','mc','test','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
-  savePrefs(); refresh(false); requestAnimationFrame(fitCard);
+  savePrefs(); refresh(false); qmodeSync(); requestAnimationFrame(fitCard);
 }
 function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({lsort:typeof lsort==='string'?lsort:'no',range:$('range').value,filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab,testN:testN||10,testKinds:typeof testKinds!=='undefined'?testKinds:undefined}))}catch(e){}}
 function refresh(reset=true){
