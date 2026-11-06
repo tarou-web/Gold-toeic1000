@@ -1131,6 +1131,12 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 #v-mc .opts{gap:calc(8px*var(--mcf,1))}
 #v-mc .opt{font-size:calc(.95rem*var(--mcf,1));padding:calc(11px*var(--mcf,1)) 12px;line-height:1.3}
 #v-mc .opt .k{width:calc(26px*var(--mcf,1));height:calc(26px*var(--mcf,1))}
+.tabs{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.tabs button{transition:background .15s,color .15s}
+.scene{touch-action:pan-y}
+.swlab{position:absolute;top:22px;left:50%;z-index:8;transform:translateX(-50%) rotate(-6deg);padding:6px 18px;border-radius:14px;border:3px solid;font-family:var(--f-jp);font-weight:900;font-size:1.4rem;letter-spacing:.06em;opacity:0;pointer-events:none;background:var(--bg)}
+.swlab.ok{color:var(--green);border-color:var(--green);left:auto;right:18px;transform:rotate(8deg)}
+.swlab.ng{color:var(--red-ink);border-color:var(--red-ink);left:18px;transform:rotate(-8deg)}
 /* toast */
 .toast{border:1px solid var(--line);border-bottom-width:1px;background:var(--surface)}
 </style>
@@ -2319,6 +2325,7 @@ function buildCard(){
    <button class="bigask" id="bigAsk" aria-label="ミーモに聞く"><span>ミーモに聞く</span><img src="mascot.png" alt=""></button>
    <div class="scene" id="scene" tabindex="0" role="button" aria-label="カードを回転させる">
      <div class="flip" id="flip"><div class="face front" id="front"></div><div class="face back" id="back"></div></div>
+     <div class="swlab" id="swl" aria-hidden="true"></div>
    </div>
    <div class="cpos" id="pos"></div>
    <div class="row">
@@ -2328,7 +2335,8 @@ function buildCard(){
      <button class="btn" id="next" aria-label="次へ"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
    </div>
    </div>`;
-  $('scene').onclick=e=>{if(e.target.closest('[data-edit-card]')){e.stopPropagation();openCardEdit(P[ci]);return}if(e.target.closest('[data-exp]')){e.stopPropagation();sZoom(!bigCard);setBigCard(!bigCard);return}if(e.target.closest('[data-shuf]')){e.stopPropagation();sShuffle();reshuffle();return}const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
+  swipeCard($('scene'));
+  $('scene').onclick=e=>{if(swiped){swiped=false;return}if(e.target.closest('[data-edit-card]')){e.stopPropagation();openCardEdit(P[ci]);return}if(e.target.closest('[data-exp]')){e.stopPropagation();sZoom(!bigCard);setBigCard(!bigCard);return}if(e.target.closest('[data-shuf]')){e.stopPropagation();sShuffle();reshuffle();return}const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
   $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1); $('bigAsk').onclick=()=>$('mascot').click();
   $('yes').onclick=()=>mark(true); $('no').onclick=()=>mark(false);
   fillCard();
@@ -2365,10 +2373,11 @@ function flip(){
 }
 function go(n){const c=Math.max(0,Math.min(P.length-1,ci+n));if(c!==ci){ci=c;fillCard()}}
 let judging=false;
-function mark(ok){
+function mark(ok,fast){
   const d=P[ci]; if(!d||judging) return;
   review(d.id,ok); if(ok){S.known[d.id]=1;studied(5);credit(d.id,true);earnCoin(d.id)} else {delete S.known[d.id]; S.miss[d.id]=(S.miss[d.id]||0)+1}
   sfx(ok); buzz(ok); save();header(); document.querySelectorAll('.stchip').forEach(x=>x.innerHTML=chip(d)); mascotSay(ok?'ok':'ng');
+  if(fast){if(ci<P.length-1){ci++;fillCard()}return}
   const sc=$('scene'); judging=true;
   sc.classList.add(ok?'judge-ok':'judge-ng');
   if(ok && !matchMedia('(prefers-reduced-motion: reduce)').matches){
@@ -2781,6 +2790,43 @@ window.visualViewport&&visualViewport.addEventListener('resize',()=>requestAnima
 if(window.ResizeObserver){const ro=new ResizeObserver(()=>requestAnimationFrame(fitCard));addEventListener('DOMContentLoaded',()=>{for(const el of document.querySelectorAll('header,.gzone,.tabs,.bnav,body'))ro.observe(el,{box:'border-box'})});for(const el of document.querySelectorAll('header,.gzone,.tabs,.bnav,body'))ro.observe(el,{box:'border-box'})}
 addEventListener('load',()=>setTimeout(fitCard,50));
 document.fonts&&document.fonts.ready.then(()=>setTimeout(fitCard,30));
+
+// ---- swipe the card: right = 覚えた, left = まだ (like Quizlet)
+let swiped=false;
+function swipeCard(sc){
+  let x0=0,y0=0,dx=0,drag=false,id=null;
+  const lab=$('swl');
+  const reset=anim=>{sc.style.transition=anim?'transform .22s cubic-bezier(.3,1.3,.5,1)':'none';sc.style.transform='';lab.style.opacity=0;lab.className='swlab'};
+  sc.addEventListener('pointerdown',e=>{if(judging||e.target.closest('button'))return;id=e.pointerId;x0=e.clientX;y0=e.clientY;dx=0;drag=false});
+  sc.addEventListener('pointermove',e=>{
+    if(e.pointerId!==id)return; const mx=e.clientX-x0,my=e.clientY-y0;
+    if(!drag){if(Math.abs(mx)>10&&Math.abs(mx)>Math.abs(my)*1.2){drag=true;try{sc.setPointerCapture(id)}catch(_){} sc.style.transition='none'}else return}
+    dx=mx; sc.style.transform=`translateX(${dx}px) rotate(${dx/22}deg)`;
+    const ok=dx>0, k=Math.min(1,Math.abs(dx)/(sc.offsetWidth*.28));
+    lab.textContent=ok?'覚えた':'まだ'; lab.className='swlab '+(ok?'ok':'ng'); lab.style.opacity=k;
+  });
+  const end=e=>{
+    if(e.pointerId!==id)return; id=null; if(!drag)return; drag=false; swiped=true; setTimeout(()=>swiped=false,350);
+    const W=sc.offsetWidth;
+    if(Math.abs(dx)<W*.28){reset(true);return}
+    const ok=dx>0;
+    sc.style.transition='transform .2s ease-in'; sc.style.transform=`translateX(${ok?1:-1}${Math.round(W*1.3)}px) rotate(${ok?18:-18}deg)`;
+    setTimeout(()=>{reset(false);mark(ok,true);sc.animate([{opacity:0,transform:'scale(.94)'},{opacity:1,transform:'none'}],{duration:220,easing:'ease-out'})},190);
+  };
+  sc.addEventListener('pointerup',end); sc.addEventListener('pointercancel',e=>{if(e.pointerId===id){id=null;if(drag){drag=false;reset(true)}}});
+}
+// ---- slide a finger along the tab bar to switch tabs
+(function(){
+  const bar=document.querySelector('.tabs'); if(!bar)return;
+  let on=false,moved=false,cur=null;
+  const at=x=>{const r=bar.getBoundingClientRect();const el=document.elementFromPoint(Math.max(r.left+2,Math.min(r.right-2,x)),r.top+r.height/2);return el&&el.closest('.tabs button')};
+  const show=b=>bar.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  bar.addEventListener('pointerdown',e=>{on=true;moved=false;cur=at(e.clientX)});
+  bar.addEventListener('pointermove',e=>{if(!on)return;const b=at(e.clientX);if(b&&b!==cur){if(!moved){try{bar.setPointerCapture(e.pointerId)}catch(_){}}moved=true;cur=b;show(b);typeof sTick==='function'&&sTick(true)}});
+  const end=()=>{if(!on)return;on=false;if(moved&&cur){const t=cur.id.slice(2);bar._skip=true;setTimeout(()=>bar._skip=false,50);if(t!==tab)setTab(t);else show(cur)}};
+  bar.addEventListener('pointerup',end);bar.addEventListener('pointercancel',()=>{on=false;if(moved)setTab(tab)});
+  bar.addEventListener('click',e=>{if(bar._skip){e.stopPropagation();e.preventDefault()}},true);
+})();
 function qmodeSync(){
   const on=tab==='quiz'&&!!(LR&&LR.started), v=$('v-quiz');
   document.body.classList.toggle('qmode',on);
