@@ -320,7 +320,7 @@ body.sv-lock{overflow:hidden}
 .goalbox.done{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 12%,transparent)}
 .stat.bag{font:inherit;font-weight:900;background:none;border:0;padding:4px 6px;margin:-4px -6px;border-radius:10px;cursor:pointer;color:var(--accent-ink)}
 .stat.bag:active{transform:scale(.94)}
-.stat.bag.bump svg{animation:bagbump .5s cubic-bezier(.3,1.6,.5,1)}
+.bnav #navShop.bump svg,.stat.bag.bump svg{animation:bagbump .5s cubic-bezier(.3,1.6,.5,1)}
 @keyframes bagbump{40%{transform:scale(1.35) rotate(-8deg)}}
 .mfig{position:relative;display:block}
 /* reserve the figure's box before the picture loads, so the overlay drawings never render at full size */
@@ -1296,7 +1296,7 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
   <header>
     <h1 class="vh">Meemory</h1>
     <div class="stats">
-      <button class="stat bag" id="bagBtn" aria-label="ショップを開く"><svg viewBox="0 0 24 24"><path d="M8 8.5V6.8a4 4 0 0 1 8 0v1.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path fill="currentColor" d="M5.3 8h13.4c.6 0 1 .4 1.1 1l.9 10.8A2 2 0 0 1 18.7 22H5.3a2 2 0 0 1-2-2.2L4.2 9c.1-.6.5-1 1.1-1z"/><circle cx="9" cy="11.5" r="1.1" fill="#fff" opacity=".85"/><circle cx="15" cy="11.5" r="1.1" fill="#fff" opacity=".85"/></svg><span id="coins">0</span></button>
+      <button class="stat bag rank" id="bagBtn" aria-label="ランキング（準備中）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0z" fill="currentColor"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7"/></svg><span>--位</span><span id="coins" hidden>0</span></button>
       <button class="stat fire" id="fireBtn" aria-label="連続記録を見る"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.4 1.1-4 2.3-5.2.2 1.7 1 2.7 2 3.1C11 8 10.6 5 12 2z"/></svg><span id="streak">0</span></button>
       <button class="stat pts" id="ptsBtn" aria-label="ポイントとバッジを見る"><img id="curBadge" src="badges/badge-0.png" alt=""></button>
       <span class="stat know" title="覚えたフレーズ"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.3 14.3-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z"/></svg><span class="kwrap"><span class="knum"><span id="known">0</span><small> / <span id="knownOf">0</span></small></span><span class="kbar" title="全体の進み具合"><i id="bar"></i></span></span></span>
@@ -1315,8 +1315,8 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 
   <div class="tabs" role="tablist">
     <button role="tab" id="t-card" aria-selected="true">カード</button>
-    <button role="tab" id="t-quiz" aria-selected="false">学習</button>
     <button role="tab" id="t-mc" aria-selected="false">4択</button>
+    <button role="tab" id="t-quiz" aria-selected="false">学習</button>
     <button role="tab" id="t-test" aria-selected="false">テスト</button>
     <button role="tab" id="t-list" aria-selected="false">一覧</button>
   </div>
@@ -1798,7 +1798,7 @@ const skinStyle=id=>{const k=skinOf(id);return (k.w?`width:${k.w*100}%;max-width
 function earnCoin(id){
   const t=today(); if(S.cpd.d!==t)S.cpd={d:t,ids:{}};
   if(S.cpd.ids[id])return; S.cpd.ids[id]=1; S.coins=(S.coins||0)+1;
-  const b=$('bagBtn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
+  const b=$('navShop'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
 }
 const CROWN_SVG=`<svg class="m-acc" viewBox="0 0 221 320" aria-hidden="true"><g transform="rotate(-9 97 10)"><path d="M52 17L47 -22L72 -3L97 -34L122 -3L147 -22L142 17Z" fill="#FFC83D"/><path d="M122 -3L147 -22L142 17L119 17Z" fill="#F0A91C"/><rect x="49" y="4" width="96" height="15" rx="6" fill="#F2A818"/><circle cx="47" cy="-24" r="6.5" fill="#FFDA5E"/><circle cx="97" cy="-37" r="7.5" fill="#FFDA5E"/><circle cx="147" cy="-24" r="6.5" fill="#F7C33A"/><circle cx="97" cy="11.5" r="5.5" fill="#E8414F"/><circle cx="72" cy="11.5" r="3.8" fill="#3FA9F5"/><circle cx="122" cy="11.5" r="3.8" fill="#3FA9F5"/><path d="M57 12L54 -12L62 -6L64 12Z" fill="#fff" opacity=".45"/><circle cx="95" cy="9.5" r="1.6" fill="#fff" opacity=".8"/></g></svg>`;
 const SANTA_SVG=`<svg class="m-acc" viewBox="0 0 221 320" aria-hidden="true"><g transform="rotate(-6 97 10)"><path d="M38 8Q46 -46 110 -52Q160 -55 188 -10L174 -2Q162 -26 142 -26Q152 -10 160 8Z" fill="#E5333F"/><path d="M110 -52Q160 -55 188 -10L174 -2Q162 -26 142 -26Q130 -40 110 -52Z" fill="#C4222E"/><path d="M60 -6Q70 -34 98 -42" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none" opacity=".35"/><circle cx="183" cy="-6" r="12" fill="#fff"/><circle cx="187" cy="-3" r="7" fill="#E6EAF0"/><rect x="28" y="-4" width="140" height="24" rx="12" fill="#fff"/><path d="M34 14Q98 24 162 14V18Q98 28 34 18Z" fill="#E1E6EE"/><circle cx="44" cy="-1" r="5" fill="#fff"/><circle cx="76" cy="-3" r="5" fill="#fff"/><circle cx="110" cy="-3" r="5" fill="#fff"/><circle cx="144" cy="-1" r="5" fill="#fff"/></g></svg>`;
@@ -2215,7 +2215,7 @@ function badgeReward(p){
 }
 function celebrateBadge(p){const n=badgeReward(p);save();header();
   toast(`${badgeHTML(p)}<div><strong>バッジ獲得！</strong><span>${p}ポイント達成${n?`・ショッピングポイント +${n}`:''}</span></div>`);fanfare();
-  if(n){const b=$('bagBtn');b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}}
+  if(n){const b=$('navShop');b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}}
 function openBadges(){renderBadges();const v=$('bv');v.classList.add('open');v.setAttribute('aria-hidden','false');document.body.classList.add('sv-lock');setTimeout(()=>$('bvClose').focus({preventScroll:true}),50)}
 function closeBadges(){const v=$('bv');v.classList.remove('open');v.setAttribute('aria-hidden','true');document.body.classList.remove('sv-lock');$('ptsBtn').focus({preventScroll:true})}
 function renderBadges(){
@@ -3103,7 +3103,7 @@ $('askProxy').addEventListener('blur',()=>setTimeout(fitAsk,60));
 $('askIn').addEventListener('focus',()=>{[0,100,300,600].forEach(t=>setTimeout(()=>{fitAsk();if(askMsgs.length){const v=$('askv');v.scrollTop=v.scrollHeight}},t))});
 $('askIn').addEventListener('blur',()=>setTimeout(fitAsk,100));
 $('askForm').onsubmit=e=>{e.preventDefault();const v=$('askIn').value;$('askIn').value='';askSend(v)};
-$('bagBtn').onclick=openShop; $('shopClose').onclick=closeShop;
+$('bagBtn').onclick=()=>toast('<div><strong>ランキングは準備中です</strong><span>使う人が増えたら、ミーモと一緒に順位が出るようになります</span></div>'); $('shopClose').onclick=closeShop;
 $('hangerBtn').onclick=e=>{e.stopPropagation();$('wardrobe').hidden?openWardrobe():closeWardrobe()};
 $('wardrobe').onclick=e=>e.stopPropagation();
 document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()});
