@@ -1107,6 +1107,28 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 #acMsg{margin:4px 4px 0;min-height:0;font-size:.8rem}
 #acMsg:empty{display:none}
 .acct{display:flex;flex-direction:column}
+/* learning start */
+.lstart{display:flex;flex-direction:column;gap:14px;background:var(--surface);border-radius:24px;padding:18px}
+.ls-h{display:flex;align-items:center;gap:12px}
+.ls-h img{width:54px;height:66px;object-fit:contain;flex:0 0 auto}
+.ls-h b{display:block;font-family:var(--f-jp);font-weight:800;font-size:1.15rem}
+.ls-h small{display:block;font-size:.78rem;color:var(--muted);margin-top:2px}
+.ls-n{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}
+.ls-n div{background:var(--bg);border-radius:16px;padding:10px 6px;display:flex;flex-direction:column;align-items:center}
+.ls-n b{font-family:var(--f);font-weight:900;font-size:1.5rem;line-height:1.2}
+.ls-n div:first-child b{color:var(--green)}
+.ls-n span{font-size:.72rem;color:var(--muted);font-weight:800}
+.lstart #lsGo{min-height:54px}
+.qfade{animation:qfade .32s ease-out}
+@keyframes qfade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* 4択 on the home layout: compact, and the text shrinks if it would not fit */
+#v-mc .quiz{gap:8px!important}
+#v-mc .ask{padding-top:14px}
+#v-mc .bubble .say-box{padding:4px 16px 16px}
+#v-mc .bubble .txt{font-size:calc(1.3rem*var(--mcf,1))!important}
+#v-mc .opts{gap:calc(8px*var(--mcf,1))}
+#v-mc .opt{font-size:calc(.95rem*var(--mcf,1));padding:calc(11px*var(--mcf,1)) 12px;line-height:1.3}
+#v-mc .opt .k{width:calc(26px*var(--mcf,1));height:calc(26px*var(--mcf,1))}
 /* toast */
 .toast{border:1px solid var(--line);border-bottom-width:1px;background:var(--surface)}
 </style>
@@ -2456,12 +2478,23 @@ function renderQuiz0(){
   const v=$('v-quiz');
   if(!QP.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
   const d=lrCard(), done=QP.filter(x=>(LR.st[x.id]||0)>=MASTER).length;
+  if(!LR.started&&d){
+    const due=QP.filter(x=>LR.due&&LR.due[x.id]).length, weak=QP.filter(x=>!(LR.due&&LR.due[x.id])&&S.miss[x.id]&&!S.known[x.id]).length;
+    const fresh=QP.filter(x=>!(LR.due&&LR.due[x.id])&&!S.known[x.id]&&!S.miss[x.id]).length, rest=QP.length-due-weak-fresh, cont=LR.step>0;
+    v.innerHTML=`<div class="lstart">
+      <div class="ls-h"><img src="mascot.png" alt=""><div><b>${cont?'続きから学習しよう':'今日のラウンド'}</b><small>${cont?`${QP.length}枚中 ${done}枚 覚えたところ`:`${QP.length}枚を覚えきるまで続けます`}</small></div></div>
+      <div class="ls-n">${[[due,'復習'],[weak,'苦手'],[fresh,'新しい'],[rest,'おさらい']].filter(x=>x[0]).map(([n,l])=>`<div><b>${n}</b><span>${l}</span></div>`).join('')}</div>
+      <button class="btn ok" id="lsGo">${cont?'続きから始める':'学習を始める'}</button>
+    </div>`;
+    $('lsGo').onclick=()=>{LR.started=true;scrollTo(0,0);renderQuiz();const q=v.firstElementChild;if(q){q.classList.add('qfade')}};
+    return;
+  }
   if(!d){
     const miss=Object.keys(LR.miss).length;
     v.innerHTML=`<div class="done"><img class="dmas" src="mascot.png" alt=""><h2>ラウンド完了！</h2><p style="margin:0;color:var(--muted)">${QP.length}枚 ぜんぶ覚えました</p>
       <div class="boxes"><div class="box g"><b>一発でクリア</b><span>${QP.length-miss}枚</span></div><div class="box"><b>間違えて復習</b><span>${miss}枚</span></div></div>
       <button class="btn ok" id="again" style="width:100%;max-width:320px">次のラウンドへ</button></div>`;
-    fanfare(); mascotSay&&mascotSay('ok'); $('again').onclick=()=>{startQuiz();renderQuiz()};return}
+    fanfare(); mascotSay&&mascotSay('ok'); $('again').onclick=()=>{startQuiz();LR.started=true;scrollTo(0,0);renderQuiz()};return}
   const kind=qKind(d), je=$('dir').value==='je';
   const segs=QP.map(x=>{const st=LR.st[x.id]||0;return `<i class="${st>=MASTER?'d':st>0?'h':''}"></i>`}).join('');
   const head=`<div class="qhead"><div class="lsegs" style="grid-template-columns:repeat(${QP.length},minmax(0,1fr))">${segs}</div><span class="score">${done} / ${QP.length}</span></div>
@@ -2548,7 +2581,15 @@ function showSheet(ok,title,sub,d,next){
 const MC_N=10;
 let MQ=[],mi=0,ms={r:0,n:0,res:{}},manswered=false,mOpts=null;
 function startMc(){MQ=shuf(pool()).slice(0,MC_N);mi=0;ms={r:0,n:0,res:{}};mOpts=null}
-function renderMc(){ try{ return renderMc0() } finally { qmodeSync() } }
+function renderMc(){ try{ return renderMc0() } finally { qmodeSync(); fitMc() } }
+// shrink the 4択 text only as much as needed so all four choices stay above the bottom menu
+function fitMc(){
+  const v=$('v-mc'), nav=document.querySelector('.bnav'); if(!v||v.hidden||!nav)return;
+  v.style.setProperty('--mcf',1); const last=v.querySelector('.opts .opt:last-child'); if(!last)return;
+  const lim=nav.getBoundingClientRect().top-10;
+  for(let f=1;f>=.72;f-=.04){v.style.setProperty('--mcf',f.toFixed(2)); if(last.getBoundingClientRect().bottom+scrollY<=lim)break}
+}
+addEventListener('resize',()=>{if(tab==='mc')fitMc()});
 function renderMc0(){
   const v=$('v-mc');
   if(!MQ.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
@@ -2653,7 +2694,7 @@ function renderTest(){
   TT.qs.forEach((q,i)=>{if(q.k==='order')drawOrd(i)});
   if(g){
     $('tNew').onclick=()=>{startTest();renderTest();scrollTo(0,0)};
-    const l=$('tLearn'); if(l)l.onclick=()=>{const w=TT.qs.filter(q=>!testOk(q)).map(q=>q.d);QP=w.slice(0,ROUND*3);qi=0;qOpts=null;LR={st:{},q:QP.map(d=>d.id),miss:{},step:0};if(DATA.length<4)for(const d of QP)LR.st[d.id]=1;setTab('quiz');scrollTo(0,0)};
+    const l=$('tLearn'); if(l)l.onclick=()=>{const w=TT.qs.filter(q=>!testOk(q)).map(q=>q.d);QP=w.slice(0,ROUND*3);qi=0;qOpts=null;LR={st:{},q:QP.map(d=>d.id),miss:{},step:0,started:true};if(DATA.length<4)for(const d of QP)LR.st[d.id]=1;setTab('quiz');scrollTo(0,0)};
     return}
   count();
   const go=k=>{TT.cur=Math.max(0,Math.min(n-1,k));v.querySelectorAll('.tq').forEach((x,i)=>x.hidden=i!==TT.cur);
@@ -2739,12 +2780,13 @@ if(window.ResizeObserver){const ro=new ResizeObserver(()=>requestAnimationFrame(
 addEventListener('load',()=>setTimeout(fitCard,50));
 document.fonts&&document.fonts.ready.then(()=>setTimeout(fitCard,30));
 function qmodeSync(){
-  const on=tab==='quiz'||tab==='mc', v=$(tab==='mc'?'v-mc':'v-quiz');
+  const on=tab==='quiz'&&!!(LR&&LR.started), v=$('v-quiz');
   document.body.classList.toggle('qmode',on);
   document.body.classList.toggle('qactive',on&&!!v&&!v.querySelector('.done,.empty'));
   setBnavH&&setBnavH();
 }
 function setTab(t){
+  if(tab==='quiz'&&t!=='quiz'&&LR)LR.started=false;
   if(t!=='card'&&bigCard){bigCard=false;document.body.classList.remove('cardbig');document.documentElement.classList.remove('noscroll')}
   tab=t; hideSheet(); if(t!=='test'&&document.body.classList.contains('testing')){document.body.classList.remove('testing');document.documentElement.classList.remove('noscroll')}
   for(const x of ['card','quiz','mc','test','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
