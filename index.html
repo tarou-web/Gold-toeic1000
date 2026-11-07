@@ -1333,6 +1333,29 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 #shopnv .sn-adc .sn-g{height:32px}
 #shopnv .sn-ad{min-height:48px;padding:6px 8px 6px 10px}
 #shopnv .sn-prem{min-height:50px}
+/* shop tab 案C: everything about skins in one compact box */
+.sn-box{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:22px;background:var(--surface)}
+.sn-top{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:stretch}
+.sn-stg{height:112px;border-radius:16px;background:radial-gradient(ellipse at 50% 85%,var(--green-s) 0,var(--bg) 70%);display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.sn-stg .sh-fig{width:70px;margin-bottom:6px}
+.sn-side{display:flex;flex-direction:column;justify-content:space-between;gap:6px;min-width:0}
+#shopnv .sn-cats{display:flex;gap:3px;padding:3px;border-radius:12px;background:var(--bg)}
+#shopnv .sn-cats button{flex:1;height:28px;padding:0;border-radius:9px;background:transparent;font-size:12px}
+#shopnv .sn-cats button[aria-selected=true]{background:var(--fg);color:var(--bg)}
+.sn-line{display:flex;align-items:center;gap:6px;min-width:0;font-family:var(--f-jp)}
+.sn-line b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sn-line .sn-tag{font-size:11px;font-weight:800;color:var(--muted);white-space:nowrap}
+.sn-line .sn-tag.on{color:var(--green);background:none}
+#shopnv .sn-line .sn-reset{position:static;margin-left:auto;height:28px;padding:0 4px;border:0;font-size:11px}
+#shopnv .sn-act{position:static}
+#shopnv .sn-buy{height:40px;border-radius:12px;font-size:14px}
+.sn-hint{height:40px;display:grid;place-items:center;border-radius:12px;border:1px dashed var(--line);color:var(--muted);font-family:var(--f-jp);font-size:11px;font-weight:700}
+#shopnv .sn-shelf{margin:0 -10px;padding:0 10px;scroll-padding-inline:10px;gap:6px}
+#shopnv .sn-shelf .sn-it{width:60px;padding:6px 2px 5px;border-radius:14px;background:var(--bg)}
+#shopnv .sn-shelf .sn-it .sh-pv{width:36px}
+#shopnv .sn-shelf .sn-it.on{background:var(--green-s)}
+#shopnv .sn-shelf .sn-nm{font-size:10px;white-space:nowrap}
+#shopnv .sn-shelf .sn-pr{font-size:10px}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -1542,9 +1565,17 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 <section class="bv navv shopnv" id="shopnv" role="dialog" aria-labelledby="snTitle" aria-hidden="true">
   <div class="bv-hero"><div class="sv-in"><div class="sv-bar"><span></span><h2 id="snTitle">ショップ</h2><span class="sn-coins"><svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f5c518"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#b38b00" stroke-width="1.6"/></svg><b id="snCoins">0</b></span></div></div></div>
   <div class="sv-in bv-body sn-body">
-    <div class="sh-stage sn-stage"><span class="sh-try sn-tag" id="snTag">今のミーモ</span><button class="sn-reset" id="snReset" hidden>元に戻す</button><div class="sh-fig mfig" id="snFig"></div><i class="sh-floor"></i><div class="sn-act" id="snAct"></div></div>
-    <div class="sn-cats" id="snCats" role="tablist" aria-label="種類"></div>
-    <div class="sn-shelf" id="snItems"></div>
+    <div class="sn-box">
+      <div class="sn-top">
+        <div class="sn-stg"><div class="sh-fig mfig" id="snFig"></div></div>
+        <div class="sn-side">
+          <div class="sn-cats" id="snCats" role="tablist" aria-label="種類"></div>
+          <div class="sn-line"><b id="snName">今のミーモ</b><span class="sn-tag" id="snTag"></span><button class="sn-reset" id="snReset" hidden>元に戻す</button></div>
+          <div class="sn-act" id="snAct"></div>
+        </div>
+      </div>
+      <div class="sn-shelf" id="snItems"></div>
+    </div>
     <div class="sn-h"><b>広告を見てもらう</b><small>毎日リセット</small></div>
     <button class="sn-adc" data-ad="coin"><span class="sn-t"><svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f5c518"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#b38b00" stroke-width="1.6"/></svg><span><b>コイン</b><small id="adL-coin"></small></span></span><span class="sn-g"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>+20</span></button>
     <div class="sn-grid"><button class="sn-ad" data-ad="chat"><span class="sn-t"><b><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>AIチャット</b><small id="adL-chat"></small></span><span class="sn-g"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>+3回</span></button><button class="sn-ad" data-ad="photo"><span class="sn-t"><b><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/></svg>写真読み込み</b><small id="adL-photo"></small></span><span class="sn-g"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>+1回</span></button><button class="sn-ad" data-ad="gen"><span class="sn-t"><b><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3z"/></svg>AIで作成</b><small id="adL-gen"></small></span><span class="sn-g"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>+1回</span></button><button class="sn-ad" data-ad="img"><span class="sn-t"><b><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM4 16l5-5 4 4 2-2 5 5"/></svg>画像追加</b><small id="adL-img"></small></span><span class="sn-g"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>+3枚</span></button></div>
@@ -2132,13 +2163,11 @@ function renderShopTab(){
   const it=list.find(x=>x.id===snSel)||null, own=it&&!!S.owned[it.id], on=it&&worn===it.id;
   const look=it?{...c,[key]:it.id}:c;
   $('snFig').innerHTML=fig(look.skin,look.face,look.hat,look.neck);
-  $('snTag').textContent=!it?'今のミーモ':on?`着ている：${it.name}`:`試着中：${it.name}`;
+  $('snName').textContent=it?it.name:'今のミーモ'; $('snTag').textContent=!it?'':on?'着ている':'試着中';
   $('snTag').classList.toggle('on',!!it&&!on);
   $('snReset').hidden=!it;
-  document.querySelector('#shopnv .sn-stage').classList.toggle('try',!!it);
   const C='<svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f5c518"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#b38b00" stroke-width="1.6"/></svg>';
-  $('snAct').innerHTML=!it?'':on?`<button class="sn-buy sub" id="snOff">はずす</button>`:own?`<button class="sn-buy" id="snWear">着る</button>`:coins>=it.price?`<button class="sn-buy" id="snBuy">${C}${it.price} で買う</button>`:`<button class="sn-buy" disabled>${C}あと ${it.price-coins} コイン</button>`;
-  $('snAct').hidden=!it;
+  $('snAct').innerHTML=!it?'<span class="sn-hint">下から選ぶと試着できます</span>':on?`<button class="sn-buy sub" id="snOff">はずす</button>`:own?`<button class="sn-buy" id="snWear">着る</button>`:coins>=it.price?`<button class="sn-buy" id="snBuy">${C}${it.price} で買う</button>`:`<button class="sn-buy" disabled>${C}あと ${it.price-coins} コイン</button>`;
   $('snCats').innerHTML=cats.map(([sl,l])=>`<button role="tab" data-cat="${sl}" aria-selected="${sl===snCat}">${l}</button>`).join('');
   const pv=x=>slot==='head'?fig('','',x.id):slot==='neck'?fig('','','',x.id):fig('',x.id,'');
   $('snItems').innerHTML=list.map(x=>{const o=S.owned[x.id],w=worn===x.id;
