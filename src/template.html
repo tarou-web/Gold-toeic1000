@@ -1297,6 +1297,22 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .sn-shelf .sn-it .sh-pv{width:56px}
 .sn-shelf .sn-it.on{background:var(--green-s);box-shadow:inset 0 0 0 2px var(--green)}
 .sn-pr{font-size:11px}
+/* shop tab: tighter so ads and premium fit on one screen */
+#shopnv .sn-body{gap:10px}
+#shopnv .sn-stage{height:196px;padding-bottom:12px}
+#shopnv .sn-stage .sh-fig{width:92px}
+#shopnv .sn-stage.try{padding-bottom:58px}
+#shopnv .sn-stage.try .sh-fig{width:84px}
+#shopnv .sn-act{bottom:10px;left:10px;right:10px}
+#shopnv .sn-buy{height:42px}
+#shopnv .sn-cats button{height:32px;font-size:12px;padding:0 12px}
+#shopnv .sn-shelf .sn-it{width:76px;padding:6px 2px 6px;gap:1px}
+#shopnv .sn-shelf .sn-it .sh-pv{width:44px}
+#shopnv .sn-h{margin-top:0}
+#shopnv .sn-adc{min-height:48px}
+#shopnv .sn-adc .sn-g{height:32px}
+#shopnv .sn-ad{min-height:48px;padding:6px 8px 6px 10px}
+#shopnv .sn-prem{min-height:50px}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -2097,6 +2113,7 @@ function renderShopTab(){
   $('snTag').textContent=!it?'今のミーモ':on?`着ている：${it.name}`:`試着中：${it.name}`;
   $('snTag').classList.toggle('on',!!it&&!on);
   $('snReset').hidden=!it;
+  document.querySelector('#shopnv .sn-stage').classList.toggle('try',!!it);
   const C='<svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f5c518"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#b38b00" stroke-width="1.6"/></svg>';
   $('snAct').innerHTML=!it?'':on?`<button class="sn-buy sub" id="snOff">はずす</button>`:own?`<button class="sn-buy" id="snWear">着る</button>`:coins>=it.price?`<button class="sn-buy" id="snBuy">${C}${it.price} で買う</button>`:`<button class="sn-buy" disabled>${C}あと ${it.price-coins} コイン</button>`;
   $('snAct').hidden=!it;
