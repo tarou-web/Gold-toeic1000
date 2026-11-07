@@ -1275,6 +1275,28 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .peek{position:absolute;z-index:1;pointer-events:none;transform:scale(.92);opacity:.5;transform-origin:50% 60%;border-radius:26px}
 .peek .face{position:absolute;inset:0}
 .peek .shufb,.peek .expb{visibility:hidden}
+/* shop tab 案3: try on in the stage, buy from the stage, items on a sideways shelf */
+#shopnv .sn-stage{height:250px;padding-bottom:66px}
+#shopnv .sn-stage .sh-fig{width:120px}
+.sn-tag.on{background:var(--green-s);color:var(--green)}
+.sn-reset{position:absolute;top:12px;right:12px;z-index:2;height:32px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-family:var(--f-jp);font-weight:800;font-size:12px;cursor:pointer}
+.sn-reset[hidden],.sn-act[hidden]{display:none}
+.sn-act{position:absolute;left:12px;right:12px;bottom:12px;z-index:2}
+.sn-buy{width:100%;height:46px;border-radius:14px;border:0;background:var(--green);color:#1a1a1a;font:inherit;font-family:var(--f-jp);font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
+.sn-buy .coin{width:16px;height:16px}
+.sn-buy .coin circle:first-child{fill:#1a1a1a}.sn-buy .coin circle+circle{stroke:#f5c518}
+.sn-buy:disabled .coin circle:first-child{fill:#f5c518}.sn-buy:disabled .coin circle+circle{stroke:#b38b00}
+.sn-buy.sub{background:var(--surface);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+.sn-buy:disabled{background:var(--chipbg);color:var(--muted);cursor:default}
+.sn-cats{display:flex;gap:6px}
+.sn-cats button{height:36px;padding:0 14px;border-radius:99px;border:0;background:var(--surface);color:var(--muted);font:inherit;font-family:var(--f-jp);font-weight:800;font-size:13px;cursor:pointer}
+.sn-cats button[aria-selected=true]{background:var(--fg);color:var(--bg)}
+.sn-shelf{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;scroll-padding-inline:16px;margin:0 -16px;padding:2px 16px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.sn-shelf::-webkit-scrollbar{display:none}
+.sn-shelf .sn-it{flex:none;width:92px;scroll-snap-align:start;padding:10px 4px 8px}
+.sn-shelf .sn-it .sh-pv{width:56px}
+.sn-shelf .sn-it.on{background:var(--green-s);box-shadow:inset 0 0 0 2px var(--green)}
+.sn-pr{font-size:11px}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -1482,8 +1504,9 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 <section class="bv navv shopnv" id="shopnv" role="dialog" aria-labelledby="snTitle" aria-hidden="true">
   <div class="bv-hero"><div class="sv-in"><div class="sv-bar"><span></span><h2 id="snTitle">ショップ</h2><span class="sn-coins"><svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f5c518"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#b38b00" stroke-width="1.6"/></svg><b id="snCoins">0</b></span></div></div></div>
   <div class="sv-in bv-body sn-body">
-    <div class="sh-stage sn-stage"><span class="sh-try">今のミーモ</span><button class="sn-dress" id="snDress">着替える</button><div class="sh-fig mfig" id="snFig"></div><i class="sh-floor"></i></div>
-    <div class="sn-items" id="snItems"></div>
+    <div class="sh-stage sn-stage"><span class="sh-try sn-tag" id="snTag">今のミーモ</span><button class="sn-reset" id="snReset" hidden>元に戻す</button><div class="sh-fig mfig" id="snFig"></div><i class="sh-floor"></i><div class="sn-act" id="snAct"></div></div>
+    <div class="sn-cats" id="snCats" role="tablist" aria-label="種類"></div>
+    <div class="sn-shelf" id="snItems"></div>
     <div class="sn-h"><b>広告を見てもらう</b><small>毎日リセット</small></div>
     <button class="sn-adc" data-ad="coin"><span class="sn-t"><svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f5c518"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#b38b00" stroke-width="1.6"/></svg><span><b>コイン</b><small id="adL-coin"></small></span></span><span class="sn-g"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>+20</span></button>
     <div class="sn-grid"><button class="sn-ad" data-ad="chat"><span class="sn-t"><b><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>AIチャット</b><small id="adL-chat"></small></span><span class="sn-g"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>+3回</span></button><button class="sn-ad" data-ad="photo"><span class="sn-t"><b><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/></svg>写真読み込み</b><small id="adL-photo"></small></span><span class="sn-g"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>+1回</span></button><button class="sn-ad" data-ad="gen"><span class="sn-t"><b><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3z"/></svg>AIで作成</b><small id="adL-gen"></small></span><span class="sn-g"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>+1回</span></button><button class="sn-ad" data-ad="img"><span class="sn-t"><b><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v14H4zM4 16l5-5 4 4 2-2 5 5"/></svg>画像追加</b><small id="adL-img"></small></span><span class="sn-g"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>+3枚</span></button></div>
@@ -2061,14 +2084,38 @@ function adSoon(k){toast(`<div><strong>広告はアプリ版で見られるよ�
 function limitCard(id,on,title,k,n){const b=$(id);if(!b)return;if(!on){b.innerHTML='';b.hidden=true;return}b.hidden=false;
   b.innerHTML=`<div class="lim"><div class="lim-h"><b>${title}</b><span>今日あと0回</span></div><div class="lim-b"><button class="lim-ad" data-ad="${k}">${'<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>'}広告で +1回</button><button class="lim-pm">${'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg>'}無制限にする</button></div><small>明日になると、また${n}回使えます。</small></div>`;
   b.querySelector('.lim-ad').onclick=()=>adSoon(k); b.querySelector('.lim-pm').onclick=openPrem}
+let snCat='head', snSel=null;
 function renderShopTab(){
-  $('snCoins').textContent=S.coins||0; const c=cur(); $('snFig').innerHTML=fig(c.skin,c.face,c.hat,c.neck);
-  const pick=ITEMS.filter(x=>x.type==='acc'&&!S.owned[x.id]).sort((a,b)=>a.price-b.price).slice(0,4);
-  const list=pick.length?pick:ITEMS.filter(x=>x.type==='acc').slice(0,4);
-  const pv=x=>x.slot==='head'?fig('','',x.id):x.slot==='neck'?fig('','','',x.id):fig('',x.id,'');
-  $('snItems').innerHTML=list.map(x=>`<button class="sn-it" data-it="${x.id}" aria-label="${esc(x.name)}"><span class="sh-pv mfig">${pv(x)}</span><span class="sn-nm">${esc(x.short||x.name)}</span><span class="sn-pr">${S.owned[x.id]?'持っている':'<svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f5c518"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#b38b00" stroke-width="1.6"/></svg>'+x.price}</span></button>`).join('');
-  $('snItems').querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>{const x=itemOf(b.dataset.it);shopCat=x.slot;shopSel=x.id;openShop()});
+  $('snCoins').textContent=S.coins||0;
+  const cats=SHOP_CATS.filter(([sl])=>ITEMS.some(it=>it.slot===sl));
+  if(!cats.some(c=>c[0]===snCat))snCat=cats[0][0];
+  const [slot,,key]=cats.find(c=>c[0]===snCat);
+  const list=ITEMS.filter(x=>x.slot===slot).sort((a,b)=>a.price-b.price), c=cur(), worn=c[key], coins=S.coins||0;
+  const it=list.find(x=>x.id===snSel)||null, own=it&&!!S.owned[it.id], on=it&&worn===it.id;
+  const look=it?{...c,[key]:it.id}:c;
+  $('snFig').innerHTML=fig(look.skin,look.face,look.hat,look.neck);
+  $('snTag').textContent=!it?'今のミーモ':on?`着ている：${it.name}`:`試着中：${it.name}`;
+  $('snTag').classList.toggle('on',!!it&&!on);
+  $('snReset').hidden=!it;
+  const C='<svg class="coin" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f5c518"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#b38b00" stroke-width="1.6"/></svg>';
+  $('snAct').innerHTML=!it?'':on?`<button class="sn-buy sub" id="snOff">はずす</button>`:own?`<button class="sn-buy" id="snWear">着る</button>`:coins>=it.price?`<button class="sn-buy" id="snBuy">${C}${it.price} で買う</button>`:`<button class="sn-buy" disabled>${C}あと ${it.price-coins} コイン</button>`;
+  $('snAct').hidden=!it;
+  $('snCats').innerHTML=cats.map(([sl,l])=>`<button role="tab" data-cat="${sl}" aria-selected="${sl===snCat}">${l}</button>`).join('');
+  const pv=x=>slot==='head'?fig('','',x.id):slot==='neck'?fig('','','',x.id):fig('',x.id,'');
+  $('snItems').innerHTML=list.map(x=>{const o=S.owned[x.id],w=worn===x.id;
+    return `<button class="sn-it ${x.id===snSel?'on':''}" data-it="${x.id}" aria-pressed="${x.id===snSel}" aria-label="${esc(x.name)}"><span class="sh-pv mfig">${pv(x)}</span><span class="sn-nm">${esc(x.short||x.name)}</span><span class="sn-pr">${w?'着ている':o?'持っている':C+x.price}</span></button>`}).join('');
+  $('snCats').querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{snCat=b.dataset.cat;snSel=null;renderShopTab();$('snItems').scrollLeft=0});
+  $('snItems').querySelectorAll('[data-it]').forEach(b=>b.onclick=()=>{const sl=$('snItems').scrollLeft;snSel=snSel===b.dataset.it?null:b.dataset.it;renderShopTab();$('snItems').scrollLeft=sl});
+  $('snReset').onclick=()=>{const sl=$('snItems').scrollLeft;snSel=null;renderShopTab();$('snItems').scrollLeft=sl};
   for(const k in AD_MAX){const el=$('adL-'+k);if(el)el.textContent=AD_MAX[k]?`今日あと${AD_MAX[k]}回`:'いつでも'}
+  const wear=id=>{if(key==='hat')S.hat=id;else if(key==='neck')S.neck=id;else S.wear=id};
+  const keep=fn=>()=>{const sl=$('snItems').scrollLeft;fn();renderShopTab();$('snItems').scrollLeft=sl};
+  const off=$('snOff'); if(off)off.onclick=keep(()=>{wear('');save();applyWear()});
+  const w=$('snWear'); if(w)w.onclick=keep(()=>{wear(it.id);save();applyWear();mascotSay&&mascotSay('tap')});
+  const bu=$('snBuy'); if(bu)bu.onclick=keep(()=>{
+    if(S.owned[it.id]||(S.coins||0)<it.price)return;
+    S.coins-=it.price; S.owned[it.id]=1; wear(it.id); save(); header(); applyWear(); fanfare&&fanfare();
+    toast(`<div><strong>${esc(it.name)}を買いました！</strong><span>そのまま着せたよ</span></div>`)});
 }
 let pmPlan='y';
 function openPrem(){const v=$('premv');v.classList.add('open');v.setAttribute('aria-hidden','false');document.body.classList.add('sv-lock');renderPrem();setTimeout(()=>$('pmClose').focus({preventScroll:true}),50)}
@@ -3065,7 +3112,7 @@ $('navNew').onclick=()=>{if(deckOpen())return;openDeckEdit('new')};
 $('navLib').onclick=()=>{renderLib();openNavView('libv');navOn('navLib')};
 $('navSet').onclick=()=>{renderAiStats();openNavView('setv');navOn('navSet')};
 $('navShop').onclick=()=>{renderShopTab();openNavView('shopnv');navOn('navShop')};
-$('snDress').onclick=()=>{shopSel=null;openShop()};$('snPrem').onclick=openPrem;
+$('snPrem').onclick=openPrem;
 document.querySelectorAll('#shopnv [data-ad]').forEach(b=>b.onclick=()=>adSoon(b.dataset.ad));
 $('pmClose').onclick=closePrem;document.querySelectorAll('.pm-plan').forEach(b=>b.onclick=()=>{pmPlan=b.dataset.plan;renderPrem()});
 const pmSoon=()=>toast('<div><strong>プレミアムはアプリ版で始められるようになります</strong><span>もう少し待っていてね</span></div>');$('pmGo').onclick=pmSoon;$('pmRestore').onclick=pmSoon;
