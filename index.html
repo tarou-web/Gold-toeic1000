@@ -1156,7 +1156,7 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 #v-mc .opts{gap:calc(8px*var(--mcf,1))}
 #v-mc .opt{font-size:calc(.95rem*var(--mcf,1));padding:calc(11px*var(--mcf,1)) 12px;line-height:1.3}
 #v-mc .opt .k{width:calc(26px*var(--mcf,1));height:calc(26px*var(--mcf,1))}
-.tabs,.dk-seg{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.tabs,.dk-seg,.bnav{touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .tabs button{transition:background .15s,color .15s}
 .scene{touch-action:pan-y}
 .swlab{position:absolute;top:22px;left:50%;z-index:8;transform:translateX(-50%) rotate(-6deg);padding:6px 18px;border-radius:14px;border:3px solid;font-family:var(--f-jp);font-weight:900;font-size:1.4rem;letter-spacing:.06em;opacity:0;pointer-events:none;background:var(--bg)}
@@ -3131,11 +3131,11 @@ function swipeCard(sc){
   sc.addEventListener('pointerup',end); sc.addEventListener('pointercancel',e=>{if(e.pointerId===id){id=null;if(drag){drag=false;reset(true)}}});
 }
 // ---- slide a finger along a segmented bar to switch (tabs, the add-screen methods)
-function slideBar(bar,pick,restore){
+function slideBar(bar,pick,restore,showFn){
   if(!bar)return;
   let on=false,moved=false,cur=null;
   const at=x=>{const r=bar.getBoundingClientRect();const el=document.elementFromPoint(Math.max(r.left+2,Math.min(r.right-2,x)),r.top+r.height/2);return el&&bar.contains(el)&&el.closest('button')};
-  const show=b=>bar.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  const show=showFn||(b=>bar.querySelectorAll('button').forEach(x=>x.setAttribute('aria-selected',x===b)));
   bar.addEventListener('pointerdown',e=>{on=true;moved=false;cur=at(e.clientX)});
   bar.addEventListener('pointermove',e=>{if(!on)return;const b=at(e.clientX);if(b&&b!==cur){if(!moved){try{bar.setPointerCapture(e.pointerId)}catch(_){}}moved=true;cur=b;show(b);typeof sTick==='function'&&sTick(true)}});
   const end=()=>{if(!on)return;on=false;if(moved&&cur){bar._skip=true;setTimeout(()=>bar._skip=false,50);pick(cur)}};
@@ -3144,6 +3144,8 @@ function slideBar(bar,pick,restore){
 }
 slideBar(document.querySelector('.tabs'),b=>{const t=b.id.slice(2);if(t!==tab)setTab(t);else b.setAttribute('aria-selected','true')},()=>setTab(tab));
 slideBar(document.querySelector('#deckv .dk-seg'),b=>setDm(b.dataset.dm),()=>setDm(dkMode));
+{const nb=document.querySelector('.bnav');let was=null;nb&&nb.addEventListener('pointerdown',()=>{was=nb.querySelector('button.on')},true);
+ slideBar(nb,b=>{if(!b.classList.contains('on')||b!==was)b.onclick&&b.onclick();else b.classList.add('on')},()=>{nb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===was))},b=>nb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)))}
 function qmodeSync(){
   const on=tab==='quiz'&&!!(LR&&LR.started), v=$('v-quiz');
   document.body.classList.toggle('qmode',on);
