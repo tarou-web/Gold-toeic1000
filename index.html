@@ -1356,6 +1356,13 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 #shopnv .sn-shelf .sn-it.on{background:var(--green-s)}
 #shopnv .sn-shelf .sn-nm{font-size:10px;white-space:nowrap}
 #shopnv .sn-shelf .sn-pr{font-size:10px}
+.jpw{position:relative;display:block;min-width:0}
+.jpw .aitag{position:absolute;right:8px;top:50%;transform:translateY(-50%);pointer-events:none}
+.jpw .aitag+*{display:none}
+.jpw:has(.aitag) input{padding-right:52px}
+.aitag{display:inline-block;padding:1px 6px;border-radius:6px;background:var(--green-s);color:var(--green);font-style:normal;font-size:10px;font-weight:800;font-family:var(--f-jp)}
+.ph-ainote{margin:6px 0 0;font-size:12px;color:var(--muted);line-height:1.6}
+@media (max-width:420px){.ph-row .jpw{grid-column:2}}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -2082,7 +2089,7 @@ async function readPhoto(file){
     photoCount();
     if(!d.cards.length){box.innerHTML='<p class="ph-err">英語が見つかりませんでした。文字が大きく、はっきり写るように撮ってみてください。</p>';return}
     const dk=edDeck(), have=new Set((dk&&dk.cards||[]).map(c=>c.en.toLowerCase()));
-    phCards=d.cards.map(c=>({en:c.en,jp:c.jp,on:!have.has(c.en.toLowerCase()),dup:have.has(c.en.toLowerCase())}));
+    phCards=d.cards.map(c=>({en:c.en,jp:c.jp,ai:!!c.ai,on:!have.has(c.en.toLowerCase()),dup:have.has(c.en.toLowerCase())}));
     phMade=false; renderPhoto();
   }catch(e){box.innerHTML=`<p class="ph-err">読み取れませんでした（${esc(String(e.message||e))}）。少し待ってからもう一度試してください。</p>`}
   finally{($('dkPhotoBtn').classList.remove('busy'),$('dkPhotoBtn2').classList.remove('busy'))}
@@ -2090,12 +2097,12 @@ async function readPhoto(file){
 function renderPhoto(){
   const box=$('dkPhoto'), n=phCards.filter(c=>c.on).length;
   box.innerHTML=`<div class="ph-head"><span>${phCards.length}組 ${phMade?'作りました':'見つかりました'}${phCards.some(c=>c.dup)?'（もう入っているものは外しています）':''}</span><button id="phAll">${n===phCards.length?'すべて外す':'すべて選ぶ'}</button></div>`+
-    phCards.map((c,i)=>`<div class="ph-row ${c.on?'':'off'}" data-i="${i}"><input type="checkbox" ${c.on?'checked':''} aria-label="追加する"><input type="text" class="en" value="${esc(c.en)}" aria-label="英語" autocapitalize="off" spellcheck="false"><input type="text" class="jp" value="${esc(c.jp)}" aria-label="日本語"></div>`).join('')+
+    phCards.map((c,i)=>`<div class="ph-row ${c.on?'':'off'}" data-i="${i}"><input type="checkbox" ${c.on?'checked':''} aria-label="追加する"><input type="text" class="en" value="${esc(c.en)}" aria-label="英語" autocapitalize="off" spellcheck="false"><span class="jpw"><input type="text" class="jp" value="${esc(c.jp)}" aria-label="日本語${c.ai?'（AIが付けた訳）':''}">${c.ai?'<i class="aitag" aria-hidden="true">AI訳</i>':''}</span></div>`).join('')+(phCards.some(c=>c.ai)?'<p class="ph-ainote"><i class="aitag">AI訳</i> は、写真に訳がなかったり読めなかったりしたので、AIが付けた訳です。違っていたら直してください。</p>':'')+
     `<div class="ph-acts"><button class="btn" id="phCancel">やめる</button><button class="btn ok" id="phAdd" ${n?'':'disabled'}>${n}枚 追加する</button></div>`;
   box.querySelectorAll('.ph-row').forEach(r=>{const c=phCards[+r.dataset.i];
     r.querySelector('[type=checkbox]').onchange=e=>{c.on=e.target.checked;renderPhoto()};
     r.querySelector('.en').oninput=e=>{c.en=e.target.value};
-    r.querySelector('.jp').oninput=e=>{c.jp=e.target.value}});
+    r.querySelector('.jp').oninput=e=>{c.jp=e.target.value;if(c.ai){c.ai=false;const t=r.querySelector('.aitag');if(t)t.remove()}}});
   $('phAll').onclick=()=>{const on=phCards.some(c=>!c.on);phCards.forEach(c=>c.on=on);renderPhoto()};
   $('phCancel').onclick=closePhoto;
   $('phAdd').onclick=()=>{

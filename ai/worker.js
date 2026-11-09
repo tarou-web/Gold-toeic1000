@@ -334,10 +334,31 @@ async function genCards(env, ask, n, exclude, deadline) {
 // ---------- 写真の読み取り ----------
 const PHOTO_PROMPT =
   "この写真は英語の単語帳・教科書・プリント・メモなどです。写っている英単語や英語のフレーズと、その日本語の意味を組にして読み取ってください。" +
-  "写真に日本語の意味が書いてあればそれを使い、書いていなければ TOEIC でよく使う意味を短く補ってください。" +
+  "写真に日本語の意味がはっきり書いてあればそれをそのまま使い、\"ai\": false にします。" +
+  "日本語の意味が書いていない（英語だけの写真）、文字がつぶれている・かすれている・切れていて読めない、一部しか読めない、のどれかなら、" +
+  "あなたが自然な日本語の意味を短く付けて \"ai\": true にします。意味はページの内容に合ったものにし、分からなければよく使う意味にします。" +
+  "日本語が読めないからといって、その英語を飛ばしてはいけません。" +
   "英語は写真のとおりに書き、番号・記号・発音記号・品詞の記号は入れません。例文だけの行や、ページ番号・見出しは入れません。" +
   "最大100組まで。英語が見つからなければ空の配列にします。" +
-  '答えは JSON だけで、形は {"cards":[{"en":"英語","jp":"日本語"}]} です。';
+  '答えは JSON だけで、形は {"cards":[{"en":"英語","jp":"日本語","ai":false}]} です。';
+
+// 日本語が空のカードに、まとめて訳を付ける（写真の AI が付け忘れたとき用）
+async function fillJapanese(env, list, deadline) {
+  const need = list.filter((c) => !c.jp).map((c) => c.en);
+  if (!need.length || Date.now() > deadline - 6000) return list;
+  const prompt = "次の英単語・英語のフレーズに、単語帳に書く短く自然な日本語の意味を付けてください。" +
+    '答えは JSON だけで、形は {"cards":[{"en":"英語","jp":"日本語"}]} です。\n' + JSON.stringify(need);
+  try {
+    const dl = Math.min(deadline, Date.now() + 15000), msgs = [{ role: "user", text: prompt }];
+    let r = await gemini(env, "あなたは英語の単語帳を作る手伝いをします。", msgs, dl);
+    if (!(r && r.ok && r.text)) r = await groq(env, "あなたは英語の単語帳を作る手伝いをします。", msgs, dl);
+    const t = String((r && r.text) || "").replace(/^```(json)?|```$/gm, "").trim();
+    const i = t.indexOf("{"), j = t.lastIndexOf("}");
+    const d = JSON.parse(i >= 0 ? t.slice(i, j + 1) : t);
+    const map = new Map((d.cards || []).map((c) => [String(c.en || "").trim().toLowerCase(), String(c.jp || "").trim().slice(0, 200)]));
+    return list.map((c) => (c.jp ? c : { ...c, jp: map.get(c.en.toLowerCase()) || "", ai: true }));
+  } catch { return list; }
+}
 
 async function photoCards(env, image, mime, deadline) {
   const tidy = (list) => {
@@ -345,8 +366,8 @@ async function photoCards(env, image, mime, deadline) {
     for (const c of Array.isArray(list) ? list : []) {
       const en = String((c && c.en) || "").trim().slice(0, 200), jp = String((c && c.jp) || "").trim().slice(0, 200);
       const k = en.toLowerCase();
-      if (!en || !jp || seen.has(k)) continue;
-      seen.add(k); out.push({ en, jp });
+      if (!en || seen.has(k)) continue;
+      seen.add(k); out.push(jp ? { en, jp, ai: !!(c && c.ai) } : { en, jp: "", ai: true });
       if (out.length >= 100) break;
     }
     return out;
@@ -375,7 +396,7 @@ async function photoCards(env, image, mime, deadline) {
       if (r.ok) {
         const parts = (r.data.candidates && r.data.candidates[0] && r.data.candidates[0].content && r.data.candidates[0].content.parts) || [];
         const cards = parse(parts.map((p) => p.text || "").join(""));
-        if (cards) return { ok: true, cards, provider: "gemini", model };
+        if (cards) return { ok: true, cards: (await fillJapanese(env, cards, deadline)).filter((c) => c.jp), provider: "gemini", model };
         last = { error: "読み取った結果の形がおかしかったです", status: 502 };
       } else last = r;
       if (r.status === 401 || r.status === 403) break;
@@ -398,7 +419,7 @@ async function photoCards(env, image, mime, deadline) {
       cool(model, r);
       if (r.ok) {
         const cards = parse(chatText(r.data));
-        if (cards) return { ok: true, cards, provider: "groq", model };
+        if (cards) return { ok: true, cards: (await fillJapanese(env, cards, deadline)).filter((c) => c.jp), provider: "groq", model };
       } else last = r;
     }
   }
