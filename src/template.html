@@ -1138,7 +1138,7 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 #v-mc .opt .k{width:calc(26px*var(--mcf,1));height:calc(26px*var(--mcf,1))}
 .tabs,.dk-seg,.bnav{touch-action:pan-y;user-select:none;-webkit-user-select:none}
 .tabs button{transition:background .15s,color .15s}
-.scene{touch-action:pan-y}
+.scene{touch-action:none;overscroll-behavior:none}
 .swlab{position:absolute;top:22px;left:50%;z-index:8;transform:translateX(-50%) rotate(-6deg);padding:6px 18px;border-radius:14px;border:3px solid;font-family:var(--f-jp);font-weight:900;font-size:1.4rem;letter-spacing:.06em;opacity:0;pointer-events:none;background:var(--bg)}
 .swlab.ok{color:var(--green);border-color:var(--green);left:auto;right:18px;transform:rotate(8deg)}
 .swlab.ng{color:var(--red-ink);border-color:var(--red-ink);left:18px;transform:rotate(-8deg)}
@@ -3097,7 +3097,7 @@ function swipeCard(sc){
   sc.addEventListener('pointerdown',e=>{if(judging||e.target.closest('button'))return;id=e.pointerId;x0=e.clientX;y0=e.clientY;dx=0;drag=false});
   sc.addEventListener('pointermove',e=>{
     if(e.pointerId!==id)return; const mx=e.clientX-x0,my=e.clientY-y0;
-    if(!drag){if(Math.abs(mx)>10&&Math.abs(mx)>Math.abs(my)*1.2){drag=true;try{sc.setPointerCapture(id)}catch(_){} sc.style.transition='none';showPeek()}else return}
+    if(!drag){if(Math.abs(mx)>8&&Math.abs(mx)>Math.abs(my)*.8){drag=true;try{sc.setPointerCapture(id)}catch(_){} sc.style.transition='none';showPeek()}else return}
     dx=mx; sc.style.transform=`translateX(${dx}px) rotate(${dx/22}deg)`;
     const ok=dx>0, k=Math.min(1,Math.abs(dx)/(sc.offsetWidth*.28));
     lab.textContent=ok?'覚えた':'まだ'; lab.className='swlab '+(ok?'ok':'ng'); lab.style.opacity=k;
@@ -3113,6 +3113,8 @@ function swipeCard(sc){
     const had=!!pk;
     setTimeout(()=>{reset(false);mark(ok,true);if(!had)sc.animate([{opacity:0,transform:'scale(.94)'},{opacity:1,transform:'none'}],{duration:220,easing:'ease-out'})},210);
   };
+  // keep the page itself still while a finger is on the card (iOS otherwise starts scrolling on a slightly diagonal swipe)
+  sc.addEventListener('touchmove',e=>{if(e.cancelable)e.preventDefault()},{passive:false});
   sc.addEventListener('pointerup',end); sc.addEventListener('pointercancel',e=>{if(e.pointerId===id){id=null;if(drag){drag=false;reset(true)}}});
 }
 // ---- slide a finger along a segmented bar to switch (tabs, the add-screen methods)
