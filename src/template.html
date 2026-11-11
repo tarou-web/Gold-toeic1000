@@ -792,6 +792,13 @@ header{gap:6px}
 .face .side{background:none;padding:0;letter-spacing:.14em;font-size:.68rem;color:var(--muted)}
 .back .side{background:none;color:#55555a}
 .face .tr .chip{font-size:.72rem;padding:4px 10px}
+.face .trr{display:flex;align-items:center;gap:2px}
+.favb{width:40px;height:40px;margin:-12px -12px -12px 0;padding:0;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.back .favb{color:#55555a}
+.favb svg,.lfav svg{fill:none;transition:transform .15s}
+.favb[aria-pressed=true],.lfav[aria-pressed=true]{color:#ff5a76!important}
+.favb[aria-pressed=true] svg,.lfav[aria-pressed=true] svg{fill:currentColor}
+.favb:active svg{transform:scale(1.25)}
 .chip.new{background:var(--chipbg);color:var(--fg);border:0}
 .chip.ok{background:var(--green-s);color:var(--green)}
 .chip.bad{background:var(--red-s);color:var(--red-ink)}
@@ -1628,7 +1635,7 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 const BUILTIN = __DATA__;
 let DATA = BUILTIN; // the cards of the deck being studied (built-in 金のフレーズ, or one of your own decks)
 const KEY='toeic1000-v1';
-let S={known:{},miss:{}};
+let S={known:{},miss:{},fav:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}catch(e){}
 S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}}; S.coins=S.coins||0; S.owned=S.owned||{}; S.wear=S.wear||''; S.skin=S.skin||''; S.hat=S.hat||''; S.neck=S.neck||''; S.cpd=S.cpd||{d:'',ids:{}};
 S.edits=S.edits&&typeof S.edits==='object'?S.edits:{};
@@ -1651,7 +1658,7 @@ function newKey(){const a=new Uint8Array(16);crypto.getRandomValues(a);return [.
 var syncTimer=null,syncBusy=false,syncDirty=false;
 function syncPayload(){
   const td=todayState();
-  return {points:S.points||0,goal:S.goal||10,todayKey:td.d,todayDone:Object.keys(td.done).length,todayPts:td.pts,todayDoneMap:td.done,streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},days:S.days||{},
+  return {points:S.points||0,goal:S.goal||10,todayKey:td.d,todayDone:Object.keys(td.done).length,todayPts:td.pts,todayDoneMap:td.done,streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},fav:S.fav||{},days:S.days||{},
     decks:S.decks||[],goldAdd:S.goldAdd||[],edits:S.edits||{},rv:S.rv||{},deck:S.deck||'gold',nid:S.nid||100001,ai:S.ai||{n:0,by:{},days:{}},coins:S.coins||0,bcoin:S.bcoin||{},bcoinInit:S.bcoinInit||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',hat:S.hat||'',neck:S.neck||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:S.updatedAt||Date.now(),tz:-new Date().getTimezoneOffset()};
 }
 function scheduleSync(){ if(!FB_ON||(!S.syncKey&&!AU))return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
@@ -1746,7 +1753,7 @@ function initAcct(){
 function applyCloud(d){
   // the database may return numbered maps as arrays with gaps; turn them back into plain maps
   const obj=x=>{const o={};if(x)for(const k of Object.keys(x))if(x[k]!=null)o[k]=x[k];return o};
-  Object.assign(S,{known:obj(d.known),miss:obj(d.miss),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},edits:obj(d.edits),rv:obj(d.rv),decks:Array.isArray(d.decks)?d.decks.filter(Boolean).map(x=>({...x,cards:(x.cards||[]).filter(Boolean)})):(S.decks||[]),deck:d.deck||'gold',goldAdd:Array.isArray(d.goldAdd)?d.goldAdd.filter(Boolean):(S.goldAdd||[]),nid:d.nid||S.nid||100001,ai:d.ai&&d.ai.n?{n:d.ai.n,by:obj(d.ai.by),days:obj(d.ai.days)}:(S.ai||{n:0,by:{},days:{}}),coins:d.coins||0,bcoin:obj(d.bcoin),bcoinInit:d.bcoinInit||1,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',hat:d.hat||'',neck:d.neck||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}}});
+  Object.assign(S,{known:obj(d.known),miss:obj(d.miss),fav:obj(d.fav),days:obj(d.days),streak:d.streak||0,last:d.last||'',xp:d.xp||0,points:d.points||0,goal:d.goal||10,td:{d:d.todayKey||'',pts:obj(d.todayPts),done:obj(d.todayDoneMap)},edits:obj(d.edits),rv:obj(d.rv),decks:Array.isArray(d.decks)?d.decks.filter(Boolean).map(x=>({...x,cards:(x.cards||[]).filter(Boolean)})):(S.decks||[]),deck:d.deck||'gold',goldAdd:Array.isArray(d.goldAdd)?d.goldAdd.filter(Boolean):(S.goldAdd||[]),nid:d.nid||S.nid||100001,ai:d.ai&&d.ai.n?{n:d.ai.n,by:obj(d.ai.by),days:obj(d.ai.days)}:(S.ai||{n:0,by:{},days:{}}),coins:d.coins||0,bcoin:obj(d.bcoin),bcoinInit:d.bcoinInit||1,coinGift1:d.coinGift1||S.coinGift1||0,owned:obj(d.owned),wear:d.wear||'',skin:d.skin||'',hat:d.hat||'',neck:d.neck||'',cpd:d.cpd&&d.cpd.d?{d:d.cpd.d,ids:obj(d.cpd.ids)}:{d:'',ids:{}}});
   S.updatedAt=d.updatedAt||Date.now();
   $('goal').value=String(S.goal);
   applyWear(); renderAiStats(); selectDeck(S.deck);
@@ -2593,10 +2600,13 @@ function saveCardEdit(){
   d.en=en;d.jp=jp;d.memo=memo; save(); const from=ceFrom; closeCardEdit(); refreshData(); if(from==='gold')renderDeckEdit(); if(from==='card'){const f=$('flip'); if(!f.classList.contains('turned'))flip()}
   toast('<div><strong>カードを保存しました</strong></div>');
 }
+function toggleFav(id){S.fav=S.fav||{};const on=!S.fav[id];if(on)S.fav[id]=1;else delete S.fav[id];save();
+  document.querySelectorAll(`[data-fav="${id}"],#scene [data-fav]`).forEach(b=>{if(b.closest('#scene')&&P[ci]&&P[ci].id!==id)return;b.setAttribute('aria-pressed',on)});
+  typeof sTick==='function'&&sTick(true); return on}
 function faceHTML(d,lang,isBack){
   const t=lang==='en'?d.en:d.jp;
   return `<span class="corner">No.${d.no||d.id}</span>
-    <span class="tr"><span class="stchip">${chip(d)}</span><span class="side">${lang==='en'?'ENGLISH':'日本語'}</span></span>
+    <span class="tr"><span class="stchip">${chip(d)}</span><span class="trr"><span class="side">${lang==='en'?'ENGLISH':'日本語'}</span><button class="favb" data-fav aria-label="お気に入り" aria-pressed="${!!(S.fav||{})[d.id]}"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button></span></span>
     ${isBack?'':`<button class="shufb" data-shuf aria-label="シャッフル" title="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3c4 0 6 10 10 10h5"/><path d="M3 17h3c1.5 0 2.7-1.4 3.7-3.2M14.3 10.2C15.3 8.4 16.5 7 18 7h3"/><path d="M18 4l3 3-3 3M18 14l3 3-3 3"/></svg></button>`}
     <button class="expb" data-exp aria-label="${bigCard?'カードを小さくする':'カードを大きくする'}">${bigCard?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>'}</button>
     ${!isBack&&d.img?`<img class="cimg" src="${esc(d.img)}" alt="" loading="lazy">`:''}
@@ -2626,7 +2636,7 @@ function buildCard(){
    </div>
    </div>`;
   swipeCard($('scene'));
-  $('scene').onclick=e=>{if(swiped){swiped=false;return}if(e.target.closest('[data-edit-card]')){e.stopPropagation();openCardEdit(P[ci]);return}if(e.target.closest('[data-exp]')){e.stopPropagation();sZoom(!bigCard);setBigCard(!bigCard);return}if(e.target.closest('[data-shuf]')){e.stopPropagation();sShuffle();reshuffle();return}const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
+  $('scene').onclick=e=>{if(swiped){swiped=false;return}if(e.target.closest('[data-fav]')){e.stopPropagation();toggleFav(P[ci].id);return}if(e.target.closest('[data-edit-card]')){e.stopPropagation();openCardEdit(P[ci]);return}if(e.target.closest('[data-exp]')){e.stopPropagation();sZoom(!bigCard);setBigCard(!bigCard);return}if(e.target.closest('[data-shuf]')){e.stopPropagation();sShuffle();reshuffle();return}const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
   $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1); $('bigAsk').onclick=()=>$('mascot').click(); renderBigTop();
   $('yes').onclick=()=>mark(true); $('no').onclick=()=>mark(false);
   fillCard();
@@ -3022,7 +3032,7 @@ function hideSheet(){const sh=$('sheet');sh.classList.remove('show');document.bo
 // ---- list
 let LIM=150;
 // ---- list sort
-const LSORTS=[['no','番号順'],['new','新しく追加した順'],['old','古く追加した順'],['az','ABC順（英語）'],['kana','あいうえお順（日本語）'],['todo','覚えていないものから'],['weak','苦手な順']];
+const LSORTS=[['no','番号順'],['new','新しく追加した順'],['old','古く追加した順'],['az','ABC順（英語）'],['kana','あいうえお順（日本語）'],['todo','覚えていないものから'],['weak','苦手な順'],['fav','お気に入りだけ']];
 let lsort=(prefs.lsort&&LSORTS.some(x=>x[0]===prefs.lsort))?prefs.lsort:'no';
 const jaColl=new Intl.Collator('ja'), enColl=new Intl.Collator('en',{sensitivity:'base'});
 function sortRows(r){
@@ -3030,6 +3040,7 @@ function sortRows(r){
   const cmp={no:(x,y)=>(x.no||x.id)-(y.no||y.id), new:(x,y)=>(y.no||y.id)-(x.no||x.id), old:(x,y)=>(x.no||x.id)-(y.no||y.id),
     az:(x,y)=>enColl.compare(x.en,y.en), kana:(x,y)=>jaColl.compare(x.jp,y.jp),
     todo:(x,y)=>st(x)-st(y)||(x.no||x.id)-(y.no||y.id), weak:(x,y)=>(S.miss[y.id]||0)-(S.miss[x.id]||0)||(x.no||x.id)-(y.no||y.id)}[lsort];
+  if(lsort==='fav')return r.filter(d=>(S.fav||{})[d.id]);
   return lsort==='no'?r:r.slice().sort(cmp);
 }
 function renderLsMenu(){
@@ -3041,16 +3052,17 @@ var lfilt='all';
 function renderList(){
   const q=$('q').value.trim().toLowerCase();
   const [a,b]=$('range').value.split('-').map(Number);
-  const base=(q?DATA:DATA.slice(a,b)).filter(d=>!q||d.en.toLowerCase().includes(q)||d.jp.includes(q));
+  const base=(q||lsort==='fav'?DATA:DATA.slice(a,b)).filter(d=>(!q||d.en.toLowerCase().includes(q)||d.jp.includes(q))&&(lsort!=='fav'||(S.fav||{})[d.id]));
   const isWeak=d=>S.miss[d.id]&&!S.known[d.id], cnt={all:base.length,weak:base.filter(isWeak).length,ok:base.filter(d=>S.known[d.id]).length};
   $('lchips').innerHTML=[['all','すべて'],['weak','苦手'],['ok','覚えた']].map(([k,l])=>`<button data-lf="${k}" aria-pressed="${lfilt===k}">${l} ${cnt[k]}</button>`).join('');
   $('lchips').querySelectorAll('[data-lf]').forEach(b=>b.onclick=()=>{lfilt=b.dataset.lf;LIM=150;renderList()});
   const rows=sortRows(base.filter(d=>lfilt==='all'||(lfilt==='weak'?isWeak(d):S.known[d.id])));
-  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t" data-ed="${d.id}"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.memo?`<span class="j">📝 ${esc(d.memo)}</span>`:''}${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><div class="acts"><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button><span class="lbtns"><button class="led" data-ed="${d.id}" aria-label="直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="led ldel" data-del="${d.id}" aria-label="消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></span></div></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):'<div class="empty" style="border:0">見つかりませんでした。</div>';
+  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t" data-ed="${d.id}"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.memo?`<span class="j">📝 ${esc(d.memo)}</span>`:''}${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><div class="acts"><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button><span class="lbtns"><button class="led lfav" data-fav="${d.id}" aria-label="お気に入り" aria-pressed="${!!(S.fav||{})[d.id]}"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button><button class="led" data-ed="${d.id}" aria-label="直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="led ldel" data-del="${d.id}" aria-label="消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></span></div></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):(lsort==='fav'?'<div class="empty" style="border:0">お気に入りはまだありません。<br>カードの右上のハートを押すと、ここに集まります。</div>':'<div class="empty" style="border:0">見つかりませんでした。</div>');
   $('listbox').querySelectorAll('button[data-id]').forEach(b=>b.onclick=()=>{const id=+b.dataset.id;if(S.known[id])delete S.known[id];else S.known[id]=1;save();header();b.innerHTML=chip(DATA.find(x=>x.id===id))});
   $('listbox').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
     if(!b.classList.contains('arm')){$('listbox').querySelectorAll('.ldel.arm').forEach(x=>{x.classList.remove('arm');x.innerHTML=x._svg});b._svg=b.innerHTML;b.classList.add('arm');b.textContent='消す？';clearTimeout(b._t);b._t=setTimeout(()=>{if(b.isConnected&&b.classList.contains('arm')){b.classList.remove('arm');b.innerHTML=b._svg}},3000);return}
     const id=+b.dataset.del,d=DATA.find(x=>x.id===id); if(d)removeCard(d)});
+  $('listbox').querySelectorAll('[data-fav]').forEach(b=>b.onclick=e=>{e.stopPropagation();const on=toggleFav(+b.dataset.fav);if(!on&&lsort==='fav')renderList()});
   $('listbox').querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{const id=+b.dataset.ed;openCardEdit(DATA.find(x=>x.id===id),'list')});
   const m=$('more'); if(m) m.onclick=()=>{LIM+=300;renderList()};
 }
