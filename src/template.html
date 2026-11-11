@@ -1277,6 +1277,27 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .gstk{min-width:0}
 .gzone .mascot{width:78px;right:-8px;top:-12px}
 .gzone .hanger{right:-12px;top:72px;width:28px;height:28px}
+/* home top 案2: numbers on one line, a thin goal bar, a big Meemo standing beside both */
+header .stats{justify-content:flex-start;gap:12px;padding-right:96px;font-size:.95rem;white-space:nowrap}
+header .stats>*{flex:none}
+header .stat.know{order:3}
+header .stat.pts{order:4;margin:-8px 0}
+header .stat.pts img{width:30px;height:30px}
+header .kbar{display:none}
+.gzone{gap:12px}
+#goalbox{height:52px;margin-right:100px!important;padding:0 14px 0 5px!important;border-radius:99px;gap:10px;--gb:var(--green-s)}
+#goalbox::after{display:none}
+#goalbox .gring{width:42px;height:42px}
+#goalbox .gring b{width:30px;height:30px;font-size:13px}
+#goalbox .gring b small{font-size:9px;margin-top:2px}
+#goalbox .gtx{flex-direction:row;align-items:baseline;gap:8px}
+#goalbox .gtx>b{font-size:15px;flex:none}
+#goalbox .gtx>span:not(.gstk){font-size:12px}
+#goalbox .gstk{display:none}
+.gzone .mascot{width:80px;right:-4px;top:-62px}
+header{margin-top:14px}
+.gzone .hanger{right:-8px;top:26px;width:28px;height:28px}
+.gzone .mbub{right:100px;top:-46px}
 .cardcol{position:relative}
 .cardcol>.scene{z-index:2}
 .peek{position:absolute;z-index:1;pointer-events:none;transform:scale(.92);opacity:.5;transform-origin:50% 60%;border-radius:26px}
@@ -2399,7 +2420,7 @@ function header(){
   {const d=Math.min(dc,g), left=Math.max(0,g-dc), st=curStreak();
   $('goalNum').innerHTML=`${d}<small>/${g}</small>`; $('goalRing').style.setProperty('--p',(ok?100:d/g*100)+'%');
   $('goalTxt').textContent=ok?'達成！すごい':dc===0?'今日もやろう！':left<=g/2?'あと少し！':'その調子！';
-  $('goalSub').textContent=ok?'今日の目標クリア':`目標まで あと${left}問`;
+  $('goalSub').textContent=ok?'今日の目標クリア':`あと${left}問`;
   $('goalStk').textContent=ok?`${st}日連続 達成中`:st?`達成で${st+1}日連続`:'達成で記録スタート';
   $('goalbox').setAttribute('aria-label',`今日の目標 ${d}/${g}問`);}
   $('goalbox').classList.toggle('done',ok);
