@@ -1,6 +1,9 @@
-import json
+import json,sys,os
 t=open('src/template.html',encoding='utf-8').read()
-d=open('src/data.json',encoding='utf-8').read()
+# release build: the original starter deck replaces the 金のフレーズ data (run with "release", or create src/RELEASE)
+RELEASE='release' in sys.argv or os.path.exists('src/RELEASE')
+d=open('src/data-original.json' if RELEASE else 'src/data.json',encoding='utf-8').read()
+deckname='ミーモの基本フレーズ' if RELEASE else '金のフレーズ'
 i=t.index('<div class="wrap">')
 headpart,bodypart=t[:i],t[i:]
 headpart=headpart.replace('<meta name="claude:viewport-fit-sides" content="cover">\n','')
@@ -28,7 +31,7 @@ html=f"""<!doctype html>
 <link rel="icon" href="icon-192-2.png">
 {reset}{headpart}</head>
 <body>
-{bodypart.replace('__DATA__',d)}
+{bodypart.replace('__DATA__',d).replace('__DECKNAME__',deckname)}
 <script>
 if('serviceWorker' in navigator){{
   const had=!!navigator.serviceWorker.controller; let reloaded=false;

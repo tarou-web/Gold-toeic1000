@@ -1,0 +1,20 @@
+:root{--bg:#18181a;--surface:#232326;--line:#34343a;--fg:#f4f4f2;--muted:#b4b4b9;--accent:#f5c518;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:'M PLUS Rounded 1c','Hiragino Maru Gothic ProN','Hiragino Sans',sans-serif;font-weight:500;line-height:1.8;-webkit-text-size-adjust:100%}
+main{max-width:680px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 24px) max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px))}
+.back{display:inline-flex;align-items:center;gap:6px;min-height:44px;color:var(--fg);text-decoration:none;font-weight:800;font-size:.95rem}
+.back:hover{color:var(--accent)}
+h1{font-size:1.6rem;font-weight:800;line-height:1.4;margin:12px 0 4px;text-wrap:balance}
+.date{color:var(--muted);font-size:.85rem;margin:0 0 24px}
+h2{font-size:1.1rem;font-weight:800;margin:32px 0 8px;padding-top:16px;border-top:1px solid var(--line)}
+p,li{font-size:.95rem}
+ul,ol{padding-left:1.4em}
+li{margin:4px 0}
+.box{background:var(--surface);border-radius:16px;padding:16px 18px;margin:16px 0}
+.box p{margin:0}
+a{color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:.9rem;margin:8px 0}
+th,td{text-align:left;vertical-align:top;padding:10px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:800;white-space:nowrap}
+.tbl{overflow-x:auto}
+td:first-child{min-width:7.5em;font-weight:800}

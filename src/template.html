@@ -286,6 +286,11 @@ body.sv-lock{overflow:hidden}
 .acct-in{font:inherit;font-size:16px;color:var(--fg);background:var(--bg2);border:2px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;box-sizing:border-box}
 .acct-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .acct-btns .btn{padding:10px 8px;font-size:.92rem}
+.acct-link.del{color:var(--muted);margin-top:14px;text-decoration:underline}
+.adel{margin-top:10px;background:var(--surface);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.adel[hidden]{display:none}
+.adel p{margin:0;font-size:.85rem;color:var(--muted);line-height:1.6}
+.btn.danger{background:#d93a3a;border-color:#d93a3a;color:#fff}
 .acct-link{align-self:flex-start;font:inherit;font-size:.82rem;font-weight:800;color:var(--accent-ink);background:none;border:0;padding:2px 0;cursor:pointer}
 #acctIn b{color:var(--fg)}
 #acctOut,#acctIn{display:flex;flex-direction:column;gap:8px}
@@ -1085,6 +1090,17 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .setbody{gap:6px}
 .sgl{margin:12px 4px 0;font-family:var(--f-jp);font-size:.75rem;font-weight:800;color:var(--muted)}
 .sgroup{background:var(--surface);border-radius:20px;display:flex;flex-direction:column;overflow:hidden}
+.lib-guide{margin-top:4px;background:var(--surface);border:2px dashed var(--line);border-radius:22px;padding:18px 16px;display:flex;flex-direction:column;gap:6px}
+.lib-guide b{font-size:1.05rem}
+.lib-guide p{margin:0 0 8px;color:var(--muted);font-size:.85rem}
+.lg-btns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.lg-btns button{font:inherit;border:0;border-radius:16px;background:var(--surface2,#1f1f22);color:var(--fg);padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;min-height:44px}
+.lg-btns button svg{color:var(--accent,#f5c518)}
+.lg-btns button span{font-weight:800;font-size:.85rem}
+.lg-btns button small{color:var(--muted);font-size:.66rem;line-height:1.3;text-align:center}
+.slink{color:var(--fg);text-decoration:none}
+.slink:last-child{border-bottom:0}
+#contactSoon{font-size:.8rem;color:var(--muted);margin-right:6px}
 .srow{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:54px;padding:0 16px;border-bottom:1px solid var(--line2);font-family:var(--f-jp);font-size:.95rem;cursor:pointer}
 .srow:last-child{border-bottom:0}
 .sval{position:relative;display:flex;align-items:center;gap:6px;color:var(--muted)}
@@ -1618,6 +1634,16 @@ header .kbar{display:none}
       <button class="acct-link" id="acForgot">パスワードを忘れたとき</button>
     </div>
     <p class="sync-msg" id="acMsg" role="status"></p>
+    <div id="acDelBox" hidden>
+      <button class="acct-link del" id="acDelOpen">アカウントを削除する</button>
+      <div class="adel" id="acDelPane" hidden>
+        <b>アカウントを削除しますか？</b>
+        <p>アカウントと、クラウドに保存した学習の記録・自分で作った単語帳・カードの画像がすべて消えます。この端末の記録も消えて、最初の状態に戻ります。元には戻せません。</p>
+        <label class="ctl" for="acDelPass">確認のため、パスワードを入れてください</label>
+        <input class="acct-in" id="acDelPass" type="password" autocomplete="current-password" placeholder="パスワード">
+        <div class="acct-btns"><button class="btn" id="acDelCancel">やめる</button><button class="btn danger" id="acDelGo">削除する</button></div>
+      </div>
+    </div>
   </section>
   <h2 class="sgl" id="prefTitle">基本の設定</h2>
   <div class="sgroup">
@@ -1652,12 +1678,20 @@ header .kbar{display:none}
       </div>
     </details>
   </div>
+  <h2 class="sgl" id="aboutTitle">このアプリについて</h2>
+  <div class="sgroup">
+    <a class="srow slink" href="privacy.html"><span>プライバシーポリシー</span><span class="sval"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></a>
+    <a class="srow slink" href="terms.html"><span>利用規約</span><span class="sval"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></a>
+    <a class="srow slink" id="contactRow" href="#" target="_blank" rel="noopener"><span>お問い合わせ</span><span class="sval"><span id="contactSoon">準備中</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></a>
+  </div>
   </div>
 </section>
+<script src="contact.js"></script>
 
 
 <script>
 const BUILTIN = __DATA__;
+const BUILTIN_NAME = '__DECKNAME__';
 let DATA = BUILTIN; // the cards of the deck being studied (built-in 金のフレーズ, or one of your own decks)
 const KEY='toeic1000-v1';
 let S={known:{},miss:{},fav:{}};
@@ -1666,7 +1700,7 @@ S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.g
 S.edits=S.edits&&typeof S.edits==='object'?S.edits:{};
 S.decks=(Array.isArray(S.decks)?S.decks:[]).filter(d=>d&&(d.cards||[]).length); S.deck=S.deck||'gold'; if(S.deck!=='gold'&&!S.decks.some(d=>d.id===S.deck))S.deck='gold';
 var dkId=null, dkDraft=null, libSel=null, libArm=false; S.nid=S.nid||100001; S.goldAdd=Array.isArray(S.goldAdd)?S.goldAdd.filter(Boolean):[];
-const GOLDDK={id:'gold',name:'金のフレーズ',builtin:1,get cards(){return S.goldAdd},set cards(v){S.goldAdd=v}};
+const GOLDDK={id:'gold',name:BUILTIN_NAME,builtin:1,get cards(){return S.goldAdd},set cards(v){S.goldAdd=v}};
 if(!S.bcoin){S.bcoin={};}
 if(!S.bcoinInit){for(const b of [0,10,30,50,100,150,200,250,300,350,400,450,500,600,700,800,900,1000,1500,2000,2500,3000,3500,4000,4500,5000,6000,7000,8000,9000,10000])if(b<=(S.points||0))S.bcoin[b]=1;S.bcoinInit=1}
 // one-time gift: answers made before the shop existed
@@ -1675,7 +1709,7 @@ function resetProgress(){S.known={};S.miss={};S.points=0;S.xp=0;S.td={d:'',pts:{
 if(!S.reset1){resetProgress();S.reset1=1;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 // fill in days from an existing streak recorded before the calendar existed
 if(S.last&&!Object.keys(S.days).length){const [y,m,d]=S.last.split('-').map(Number);for(let i=0;i<Math.max(1,S.streak);i++){const x=new Date(y,m-1,d-i);S.days[dkey(x)]=1}}
-function save(){S.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){};scheduleSync()}
+function save(){if(window.__meemoryWiped)return;S.updatedAt=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){};scheduleSync()}
 // ---- cloud sync (Firebase Realtime Database, REST) ----
 var FB_URL='https://phrase1000-default-rtdb.asia-southeast1.firebasedatabase.app'.replace(/\/+$/,'');
 var FB_ON=/^https:\/\//.test(FB_URL);
@@ -1686,7 +1720,7 @@ function syncPayload(){
   return {points:S.points||0,goal:S.goal||10,todayKey:td.d,todayDone:Object.keys(td.done).length,todayPts:td.pts,todayDoneMap:td.done,streak:S.streak||0,last:S.last||'',xp:S.xp||0,known:S.known||{},miss:S.miss||{},fav:S.fav||{},days:S.days||{},
     decks:S.decks||[],goldAdd:S.goldAdd||[],edits:S.edits||{},rv:S.rv||{},deck:S.deck||'gold',nid:S.nid||100001,ai:S.ai||{n:0,by:{},days:{}},coins:S.coins||0,bcoin:S.bcoin||{},bcoinInit:S.bcoinInit||0,coinGift1:S.coinGift1||0,owned:S.owned||{},wear:S.wear||'',skin:S.skin||'',hat:S.hat||'',neck:S.neck||'',cpd:S.cpd||{d:'',ids:{}},knownCount:Object.keys(S.known||{}).length,total:DATA.length,updatedAt:S.updatedAt||Date.now(),tz:-new Date().getTimezoneOffset()};
 }
-function scheduleSync(){ if(!FB_ON||(!S.syncKey&&!AU))return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
+function scheduleSync(){ if(window.__meemoryWiped||!FB_ON||(!S.syncKey&&!AU))return; syncDirty=true; clearTimeout(syncTimer); syncTimer=setTimeout(pushSync,4000) }
 async function pushSync(keepalive){
   if(!FB_ON||!S.syncKey||!syncDirty||syncBusy)return;
   syncBusy=true; syncDirty=false;
@@ -1740,6 +1774,7 @@ function acMsg(t,bad){const m=$('acMsg');if(!m)return;m.textContent=t||'';m.clas
 function renderAcct(){
   const box=$('acct'); if(!box)return; box.hidden=!AUTH_ON||!FB_ON;
   $('acctOut').hidden=!!AU; $('acctIn').hidden=!AU; if(AU)$('acWho').textContent=AU.email;
+  $('acDelBox').hidden=!AU; if(!AU)$('acDelPane').hidden=true;
 }
 // after logging in: an empty account gets this phone's record; otherwise the newer of the two wins
 async function acctAfterLogin(isNew){
@@ -1749,7 +1784,9 @@ async function acctAfterLogin(isNew){
   else{await acctPush();acMsg(has?'この端末の記録のほうが新しいので、アカウントに保存しました。':'この端末の記録をアカウントに保存しました。')}
   S.syncedAt=Date.now(); try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){} syncStatus();
 }
-function initAcct(){
+function initContact(){const a=$('contactRow');if(!a)return;const u=window.MEEMORY_CONTACT_URL||'';
+  if(u){a.href=u;$('contactSoon').hidden=true}else a.onclick=e=>{e.preventDefault();toast('<div><strong>お問い合わせフォームは準備中です</strong></div>')}}
+function initAcct(){initContact();
   renderAcct(); if(!AUTH_ON||!FB_ON)return;
   const go=async(kind)=>{
     const email=$('acEmail').value.trim(), password=$('acPass').value;
@@ -1771,6 +1808,29 @@ function initAcct(){
   $('acLogout').onclick=async()=>{ if(!outArm){outArm=true;$('acLogout').textContent='もう一度押すとログアウト';return}
     outArm=false;$('acLogout').textContent='ログアウト'; try{syncDirty=true;await acctPush()}catch(e){}
     AU=null; auSave(); renderAcct(); acMsg('ログアウトしました。この端末の記録はそのまま残っています。')};
+  // delete the account: sign in again with the password (a fresh token), wipe the cloud copies and card images, then the account itself and this phone
+  $('acDelOpen').onclick=()=>{$('acDelPane').hidden=false;$('acDelOpen').hidden=true;$('acDelPass').focus()};
+  $('acDelCancel').onclick=()=>{$('acDelPane').hidden=true;$('acDelOpen').hidden=false;$('acDelPass').value='';acMsg('')};
+  $('acDelGo').onclick=async()=>{
+    const pw=$('acDelPass').value; if(!AU)return;
+    if(!pw){acMsg('パスワードを入れてください。',1);$('acDelPass').focus();return}
+    $('acDelGo').disabled=$('acDelCancel').disabled=true; acMsg('削除しています…');
+    try{
+      const d=await authCall('accounts:signInWithPassword',{email:AU.email,password:pw,returnSecureToken:true});
+      const t=d.idToken, uid=d.localId;
+      const imgs=new Set(); const add=c=>{if(c&&c.imgId)imgs.add(c.imgId)};
+      (S.decks||[]).forEach(dk=>(dk.cards||[]).forEach(add)); (S.goldAdd||[]).forEach(add); Object.values(S.edits||{}).forEach(add);
+      await Promise.all([...imgs].map(id=>fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'imgdel',id})}).catch(()=>{})));
+      const r1=await fetch(`${FB_URL}/users/${uid}.json?auth=${t}`,{method:'DELETE'}); if(!r1.ok)throw new Error('記録を消せませんでした（'+r1.status+'）。少し待ってからもう一度試してください。');
+      if(S.syncKey)await fetch(`${FB_URL}/progress/${S.syncKey}.json`,{method:'DELETE'}).catch(()=>{});
+      await authCall('accounts:delete',{idToken:t});
+      AU=null; auSave();
+      try{Object.keys(localStorage).filter(k=>k.startsWith(KEY)).forEach(k=>localStorage.removeItem(k))}catch(e){}
+      clearTimeout(syncTimer); syncDirty=false; window.__meemoryWiped=true;
+      acMsg('アカウントを削除しました。最初の画面に戻ります。');
+      setTimeout(()=>location.reload(),1600);
+    }catch(e){acMsg(String(e.message||e),1);$('acDelGo').disabled=$('acDelCancel').disabled=false}
+  };
   // on opening: if another phone saved newer progress to the account, take it
   if(AU)acctPull().then(c=>{if(c&&c.known!==undefined&&(c.updatedAt||0)>(S.updatedAt||0))applyCloud(c);else{syncDirty=true;scheduleSync()}}).catch(()=>{});
 }
@@ -1809,7 +1869,7 @@ function initSync(){
     if(!rArmed){rArmed=true;$('resetBtn').textContent='もう一度押すとリセット';$('resetMsg').textContent='元に戻せません。よければもう一度押してください。';return}
     resetProgress();save();header();refresh(true);rArmed=false;$('resetBtn').textContent='リセットする';$('resetMsg').textContent='リセットしました。連続日数はそのままです。';
   };
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){clearTimeout(syncTimer);pushSync(true)}});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&!window.__meemoryWiped){clearTimeout(syncTimer);pushSync(true)}});
   if(FB_ON&&!S.syncedAt){syncDirty=true;setTimeout(pushSync,1500)}
 }
 const $=id=>document.getElementById(id);
@@ -1992,7 +2052,7 @@ function selectDeck(id,quiet){
 }
 function renderDeckBar(){
   const sel=$('deck'); if(!sel)return;
-  sel.innerHTML=`<option value="gold">金のフレーズ（${goldCards().length}）</option>`+S.decks.map(d=>`<option value="${d.id}">${esc(d.name||'名前なし')}（${(d.cards||[]).length}）</option>`).join('');
+  sel.innerHTML=`<option value="gold">${BUILTIN_NAME}（${goldCards().length}）</option>`+S.decks.map(d=>`<option value="${d.id}">${esc(d.name||'名前なし')}（${(d.cards||[]).length}）</option>`).join('');
   sel.value=S.deck; $('deckEdit').hidden=S.deck==='gold';
 }
 
@@ -2215,10 +2275,12 @@ function renderLib(){
   const sel=libSel; $('libSel').textContent=sel?'キャンセル':'選択'; $('libSel').hidden=!S.decks.length&&!sel;
   $('libNew').hidden=!!sel; $('libSelBar').hidden=!sel; $('libv').classList.toggle('selmode',!!sel);
   if(sel){$('libDel').disabled=!sel.size;$('libDel').textContent=libArm?`もう一度押すと${sel.size}個削除`:`削除（${sel.size}）`;$('libAll').textContent=sel.size===S.decks.length?'選択をはずす':'すべて選択'}
-  const all=[{id:'gold',name:'金のフレーズ',cards:goldCards(),builtin:1},...S.decks.map(d=>({...d,cards:d.cards||[]}))];
+  const all=[{id:'gold',name:BUILTIN_NAME,cards:goldCards(),builtin:1},...S.decks.map(d=>({...d,cards:d.cards||[]}))];
   $('libList').innerHTML=all.map(d=>{const n=d.cards.length,k=d.cards.reduce((a,c)=>a+(S.known[c.id]?1:0),0),cur=S.deck===d.id;
     if(sel)return `<div class="lib-item ${d.builtin?'nosel':''} ${sel.has(d.id)?'picked':''}" role="checkbox" aria-checked="${sel.has(d.id)}" tabindex="0" data-pick="${d.builtin?'':d.id}"><span class="li-check" aria-hidden="true"></span><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚${d.builtin?' ・ 消せません':''}</small></div></div>`;
     return `<div class="lib-item ${cur?'cur':''}" role="button" tabindex="0" data-deck="${d.id}"><span class="li-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚${cur?'<span class="li-cur">勉強中</span>':''}</small><div class="li-bar"><i style="width:${n?k/n*100:0}%"></i></div></div><button class="li-edit" data-edit="${d.id}" aria-label="${esc(d.name||'名前なし')}を編集"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div>`}).join('');
+  if(!sel&&!S.decks.length)$('libList').insertAdjacentHTML('beforeend',`<div class="lib-guide"><b>自分の単語帳を作ろう</b><p>覚えたい単語を、好きな方法で入れられます。</p><div class="lg-btns"><button data-mk="photo"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>写真から</span><small>教科書やプリントを撮る</small></button><button data-mk="ai"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg><span>AIにおまかせ</span><small>テーマを伝えるだけ</small></button><button data-mk="one"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><span>自分で入力</span><small>1語ずつ入れる</small></button></div></div>`);
+  $('libList').querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>{openDeckEdit('new');setDm(b.dataset.mk)});
   $('libList').querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>{const id=el.dataset.pick;if(!id)return;sel.has(id)?sel.delete(id):sel.add(id);libArm=false;renderLib()});
   $('libList').querySelectorAll('[data-deck]').forEach(el=>el.onclick=e=>{const ed=e.target.closest('[data-edit]');if(ed){e.stopPropagation();openDeckEdit(ed.dataset.edit);return}selectDeck(el.dataset.deck);goHome()});
 }
