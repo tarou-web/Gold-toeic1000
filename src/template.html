@@ -414,10 +414,10 @@ body.has-hat .tracklabel{padding-right:80px}
 .lib-item.cur{border-color:var(--accent-line)}
 .lib-item .li-main{flex:1;min-width:0}
 .lib-item b{display:block;font-family:var(--f-jp);font-weight:800;font-size:1.05rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lib-item small{display:block;color:var(--muted);font-weight:700;font-size:.8rem;margin-top:2px}
+.lib-item small{display:flex;align-items:center;color:var(--muted);font-weight:700;font-size:.8rem;margin-top:2px}
 .lib-item .li-bar{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}
 .lib-item .li-bar i{display:block;height:100%;background:var(--green)}
-.lib-item .li-edit{flex:0 0 auto;font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.8rem;padding:8px 12px;border-radius:12px;border:2px solid var(--line);background:none;color:var(--accent-ink);cursor:pointer}
+.lib-item .li-edit{flex:0 0 auto;font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.8rem;width:42px;height:42px;padding:0;display:grid;place-items:center;border-radius:12px;border:2px solid var(--line);background:none;color:var(--fg);cursor:pointer}
 .lib-bar{grid-template-columns:84px 1fr 84px!important}
 .lib-sel{justify-self:end;font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.9rem;color:#fff;background:rgba(255,255,255,.18);border:0;border-radius:12px;padding:8px 12px;cursor:pointer;white-space:nowrap}
 .lib-sel[hidden]{display:none}
@@ -949,7 +949,7 @@ body.cardbig .row .btn{height:58px}
 .li-ic{width:46px;height:46px;border-radius:14px;flex:0 0 auto;display:grid;place-items:center;background:var(--chipbg);color:#c9c9cc}
 .lib-item.cur .li-ic{background:var(--green);color:var(--on-green)}
 .lib-item .li-bar{background:var(--chipbg)}
-.lib-item .li-cur{font-size:.7rem;padding:3px 9px;border-radius:99px;background:var(--green-s);color:var(--green)}
+.lib-item .li-cur{display:inline-block;margin-left:8px;vertical-align:1px;font-size:.68rem;line-height:1.5;padding:1px 8px;border-radius:99px;background:var(--green-s);color:var(--green)}
 .lib-item .li-edit{border:1px solid var(--line);color:var(--fg)}
 #libNew{background:transparent;border:1px dashed #55555a;color:var(--fg)}
 /* settings */
@@ -2186,7 +2186,7 @@ function renderLib(){
   const all=[{id:'gold',name:'金のフレーズ',cards:goldCards(),builtin:1},...S.decks.map(d=>({...d,cards:d.cards||[]}))];
   $('libList').innerHTML=all.map(d=>{const n=d.cards.length,k=d.cards.reduce((a,c)=>a+(S.known[c.id]?1:0),0),cur=S.deck===d.id;
     if(sel)return `<div class="lib-item ${d.builtin?'nosel':''} ${sel.has(d.id)?'picked':''}" role="checkbox" aria-checked="${sel.has(d.id)}" tabindex="0" data-pick="${d.builtin?'':d.id}"><span class="li-check" aria-hidden="true"></span><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚${d.builtin?' ・ 消せません':''}</small></div></div>`;
-    return `<div class="lib-item ${cur?'cur':''}" role="button" tabindex="0" data-deck="${d.id}"><span class="li-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚</small><div class="li-bar"><i style="width:${n?k/n*100:0}%"></i></div></div>${cur?'<span class="li-cur">勉強中</span>':''}<button class="li-edit" data-edit="${d.id}">編集</button></div>`}).join('');
+    return `<div class="lib-item ${cur?'cur':''}" role="button" tabindex="0" data-deck="${d.id}"><span class="li-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><div class="li-main"><b>${esc(d.name||'名前なし')}</b><small>${n}枚${cur?'<span class="li-cur">勉強中</span>':''}</small><div class="li-bar"><i style="width:${n?k/n*100:0}%"></i></div></div><button class="li-edit" data-edit="${d.id}" aria-label="${esc(d.name||'名前なし')}を編集"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div>`}).join('');
   $('libList').querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>{const id=el.dataset.pick;if(!id)return;sel.has(id)?sel.delete(id):sel.add(id);libArm=false;renderLib()});
   $('libList').querySelectorAll('[data-deck]').forEach(el=>el.onclick=e=>{const ed=e.target.closest('[data-edit]');if(ed){e.stopPropagation();openDeckEdit(ed.dataset.edit);return}selectDeck(el.dataset.deck);goHome()});
 }
