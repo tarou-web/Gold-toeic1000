@@ -1110,6 +1110,13 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .setbody{gap:6px}
 .sgl{margin:12px 4px 0;font-family:var(--f-jp);font-size:.75rem;font-weight:800;color:var(--muted)}
 .sgroup{background:var(--surface);border-radius:20px;display:flex;flex-direction:column;overflow:hidden}
+.ph-wait.multi{flex-wrap:wrap}
+.ph-thumbs{display:flex;gap:6px;width:100%;overflow-x:auto}
+.ph-thumbs .pt{position:relative;width:44px;height:44px;flex:none;border-radius:10px;overflow:hidden;background:var(--surface2,#2f2f34);opacity:.55}
+.ph-thumbs .pt img{width:100%;height:100%;object-fit:cover}
+.ph-thumbs .pt.ok{opacity:1;box-shadow:0 0 0 2px var(--accent,#f5c518)}
+.ph-thumbs .pt.bad{opacity:.3}
+.ph-err.soft{color:var(--muted)}
 .lib-guide{margin-top:4px;background:var(--surface);border:2px dashed var(--line);border-radius:22px;padding:18px 16px;display:flex;flex-direction:column;gap:6px}
 .lib-guide b{font-size:1.05rem}
 .lib-guide p{margin:0 0 8px;color:var(--muted);font-size:.85rem}
@@ -1559,7 +1566,7 @@ header .kbar{display:none}
       <div class="dk-pane dk-photo" data-pane="photo" hidden>
         <div class="dk-two2">
           <label class="btn photo-btn" id="dkPhotoBtn"><input type="file" id="dkPhotoIn" accept="image/*" capture="environment" hidden><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>撮る</label>
-          <label class="btn photo-btn" id="dkPhotoBtn2"><input type="file" id="dkPhotoIn2" accept="image/*" hidden><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 16l5-5 4 4 2-2 5 5"/></svg>アルバムから</label>
+          <label class="btn photo-btn" id="dkPhotoBtn2"><input type="file" id="dkPhotoIn2" accept="image/*" multiple hidden><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 16l5-5 4 4 2-2 5 5"/></svg>アルバムから</label>
         </div>
         <div class="lim-box" id="phLim"></div>
         <p class="ph-note">単語帳やプリントを撮ると、AIが英語と日本語を読み取ります。<b id="phLeft"></b></p>
@@ -2167,28 +2174,51 @@ async function shrinkPhoto(file){
     const d=c.toDataURL('image/jpeg',.85); return {data:d.split(',')[1],thumb:d};
   }finally{URL.revokeObjectURL(url)}
 }
-async function readPhoto(file){
+// read one or more photos (the album lets you pick several, up to what is left today); results are merged into one list
+async function readPhotos(files){
   const box=$('dkPhoto'); box.hidden=false;
-  if(photoUsed()>=PHOTO_LIMIT){box.innerHTML=`<p class="ph-err">写真の読み取りは1日${PHOTO_LIMIT}回までです。明日また使ってね。</p>`;$('dkPhotoIn').value='';return} $('dkPhotoBtn').classList.add('busy');$('dkPhotoBtn2').classList.add('busy');
-  let shot;
-  try{shot=await shrinkPhoto(file)}catch(e){box.innerHTML='<p class="ph-err">この写真は開けませんでした。別の写真で試してください。</p>';($('dkPhotoBtn').classList.remove('busy'),$('dkPhotoBtn2').classList.remove('busy'));return}
-  box.innerHTML=`<div class="ph-wait"><img src="${shot.thumb}" alt=""><span class="spin"></span><span>ミーモが写真を読んでいます…<br><small>10〜30秒ほどかかります</small></span></div>`;
-  try{
-    const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'photo',image:shot.data,mime:'image/jpeg'})});
-    const d=await r.json().catch(()=>({}));
-    if(d.limit){box.innerHTML=`<p class="ph-err">${esc(d.error||'今日の写真の読み取りはここまでです')}</p>`;return}
-    if(!r.ok||!Array.isArray(d.cards))throw new Error(d.error||('エラー '+r.status));
-    photoCount();
-    if(!d.cards.length){box.innerHTML='<p class="ph-err">英語が見つかりませんでした。文字が大きく、はっきり写るように撮ってみてください。</p>';return}
-    const dk=edDeck(), have=new Set((dk&&dk.cards||[]).map(c=>c.en.toLowerCase()));
-    phCards=d.cards.map(c=>({en:c.en,jp:c.jp,ai:!!c.ai,on:!have.has(c.en.toLowerCase()),dup:have.has(c.en.toLowerCase())}));
-    phMade=false; renderPhoto();
-  }catch(e){box.innerHTML=`<p class="ph-err">読み取れませんでした（${esc(String(e.message||e))}）。少し待ってからもう一度試してください。</p>`}
-  finally{($('dkPhotoBtn').classList.remove('busy'),$('dkPhotoBtn2').classList.remove('busy'))}
+  const left=Math.max(0,PHOTO_LIMIT-photoUsed());
+  if(!left){box.innerHTML=`<p class="ph-err">写真の読み取りは1日${PHOTO_LIMIT}回までです。明日また使ってね。</p>`;return}
+  const list=[...files].slice(0,left), skipped=files.length-list.length;
+  const busy=on=>{$('dkPhotoBtn').classList.toggle('busy',on);$('dkPhotoBtn2').classList.toggle('busy',on)};
+  busy(true);
+  const shots=[];
+  for(const f of list){try{shots.push(await shrinkPhoto(f))}catch(e){shots.push(null)}}
+  let done=0; const st=shots.map(x=>x?'wait':'bad');
+  const paint=()=>{box.innerHTML=`<div class="ph-wait multi"><div class="ph-thumbs">${shots.map((x,i)=>x?`<span class="pt ${st[i]}"><img src="${x.thumb}" alt=""></span>`:`<span class="pt bad"></span>`).join('')}</div><span class="spin"></span><span>ミーモが写真を読んでいます…（${done}/${shots.length}枚）<br><small>${shots.length>1?'1枚あたり10〜30秒ほど。同時に読み進めます':'10〜30秒ほどかかります'}</small></span></div>`};
+  paint();
+  const results=new Array(shots.length).fill(null); let limitMsg='', errs=0, idx=0;
+  const one=async i=>{
+    const shot=shots[i]; if(!shot){errs++;return}
+    if(limitMsg){st[i]='bad';return}
+    try{
+      const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'photo',image:shot.data,mime:'image/jpeg'})});
+      const d=await r.json().catch(()=>({}));
+      if(d.limit){limitMsg=d.error||'今日の写真の読み取りはここまでです';st[i]='bad';return}
+      if(!r.ok||!Array.isArray(d.cards))throw new Error(d.error||('エラー '+r.status));
+      photoCount(); results[i]=d.cards; st[i]='ok';
+    }catch(e){errs++;st[i]='bad'}
+    finally{done++;paint()}
+  };
+  const worker=async()=>{while(idx<shots.length){const i=idx++;await one(i)}};
+  try{await Promise.all([worker(),worker(),worker()])}finally{busy(false)}
+  const dk=edDeck(), have=new Set((dk&&dk.cards||[]).map(c=>c.en.toLowerCase())), seen=new Set();
+  phCards=[];
+  for(const cards of results)for(const c of (cards||[])){const k=String(c.en||'').trim().toLowerCase();if(!k||seen.has(k))continue;seen.add(k);
+    phCards.push({en:c.en,jp:c.jp,ai:!!c.ai,on:!have.has(k),dup:have.has(k)})}
+  const notes=[];
+  if(skipped>0)notes.push(`今日読み取れるのはあと${left}枚なので、最初の${left}枚だけ読みました。`);
+  if(errs)notes.push(`${errs}枚は読み取れませんでした。`);
+  if(limitMsg)notes.push(limitMsg);
+  phNote=notes.join(' ');
+  if(!phCards.length){box.innerHTML=`<p class="ph-err">${results.some(x=>x)?'英語が見つかりませんでした。文字が大きく、はっきり写るように撮ってみてください。':'読み取れませんでした。少し待ってからもう一度試してください。'}${phNote?'<br>'+esc(phNote):''}</p>`;phNote='';return}
+  phMade=false; renderPhoto();
 }
+function readPhoto(file){return readPhotos([file])}
+let phNote='';
 function renderPhoto(){
   const box=$('dkPhoto'), n=phCards.filter(c=>c.on).length;
-  box.innerHTML=`<div class="ph-head"><span>${phCards.length}組 ${phMade?'作りました':'見つかりました'}${phCards.some(c=>c.dup)?'（もう入っているものは外しています）':''}</span><button id="phAll">${n===phCards.length?'すべて外す':'すべて選ぶ'}</button></div>`+
+  box.innerHTML=(phNote?`<p class="ph-err soft">${esc(phNote)}</p>`:'')+`<div class="ph-head"><span>${phCards.length}組 ${phMade?'作りました':'見つかりました'}${phCards.some(c=>c.dup)?'（もう入っているものは外しています）':''}</span><button id="phAll">${n===phCards.length?'すべて外す':'すべて選ぶ'}</button></div>`+
     phCards.map((c,i)=>`<div class="ph-row ${c.on?'':'off'}" data-i="${i}"><input type="checkbox" ${c.on?'checked':''} aria-label="追加する"><input type="text" class="en" value="${esc(c.en)}" aria-label="英語" autocapitalize="off" spellcheck="false"><span class="jpw"><input type="text" class="jp" value="${esc(c.jp)}" aria-label="日本語${c.ai?'（AIが付けた訳）':''}">${c.ai?'<i class="aitag" aria-hidden="true">AI訳</i>':''}</span></div>`).join('')+(phCards.some(c=>c.ai)?'<p class="ph-ainote"><i class="aitag">AI訳</i> は、写真に訳がなかったり読めなかったりしたので、AIが付けた訳です。違っていたら直してください。</p>':'')+
     `<div class="ph-acts"><button class="btn" id="phCancel">やめる</button><button class="btn ok" id="phAdd" ${n?'':'disabled'}>${n}枚 追加する</button></div>`;
   box.querySelectorAll('.ph-row').forEach(r=>{const c=phCards[+r.dataset.i];
@@ -2205,7 +2235,7 @@ function renderPhoto(){
     if(!$('dkName').value.trim())setTimeout(()=>$('dkName').focus(),300);
   };
 }
-function closePhoto(){phCards=[];phTitle='';const b=$('dkPhoto');b.hidden=true;b.innerHTML='';$('dkPhotoIn').value=''}
+function closePhoto(){phCards=[];phTitle='';phNote='';const b=$('dkPhoto');b.hidden=true;b.innerHTML='';$('dkPhotoIn').value=''}
 // ---- AI makes a deck
 const GEN_LIMIT=2;
 const GEN_CHIPS=[['toeic600','TOEIC 600点'],['toeic730','TOEIC 730点'],['toeic860','TOEIC 860点'],['bizmail','ビジネスメール'],['meeting','会議の英語'],['eiken2','英検2級'],['eikenp1','英検準1級'],['travel','海外旅行']];
@@ -2230,7 +2260,7 @@ async function makeDeck(preset,label){
     if(free&&!d.cached)genCount();
     const have=new Set(mine.map(x=>x.toLowerCase()));
     phCards=d.cards.map(c=>({en:c.en,jp:c.jp,on:!have.has(c.en.toLowerCase()),dup:have.has(c.en.toLowerCase())}));
-    phMade=true; phTitle=d.title||label||''; renderPhoto(); if(free)$('genIn').value='';
+    phMade=true; phNote=''; phTitle=d.title||label||''; renderPhoto(); if(free)$('genIn').value='';
   }catch(e){box.innerHTML=`<p class="ph-err">作れませんでした（${esc(String(e.message||e))}）。少し待ってからもう一度試してください。</p>`}
   finally{$('dkGenBtn').classList.remove('busy')}
 }
@@ -3315,7 +3345,7 @@ const dkAdd=()=>{const en=$('dkEn').value.trim(),jp=$('dkJp').value.trim(); if(!
   if(addCards([[en,jp,$('dkMemo').value]])){$('dkEn').value='';$('dkJp').value='';$('dkMemo').value='';$('dkEn').focus();toast('<div><strong>カードを追加しました</strong></div>')}else toast('<div><strong>同じカードがもうあります</strong></div>')};
 $('dkAddBtn').onclick=dkAdd;
 document.querySelectorAll('.dk-seg [data-dm]').forEach(b=>b.onclick=()=>{setDm(b.dataset.dm);if(b.dataset.dm==='one')$('dkEn').focus({preventScroll:true})});
-$('dkPhotoIn2').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(f)readPhoto(f)};
+$('dkPhotoIn2').onchange=e=>{const fs=[...(e.target.files||[])];e.target.value='';if(fs.length)readPhotos(fs)};
 $('genGo').onclick=()=>makeDeck(null);
 $('genIn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();makeDeck(null)}});
 $('dkPhotoIn').onchange=e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(f)readPhoto(f)};
