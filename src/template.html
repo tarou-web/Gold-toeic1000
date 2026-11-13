@@ -811,6 +811,10 @@ header{gap:6px}
 .face .shufb,.face .expb,.face .editb{width:44px;height:44px;bottom:14px;border-radius:14px;border:1px solid var(--line);border-bottom-width:1px;background:transparent;color:var(--muted)}
 .face .shufb,.face .editb{left:14px}.face .expb{right:14px}
 .back .expb,.back .shufb,.back .editb{background:transparent!important;border-color:rgba(40,45,50,.2)!important;color:#1a1a1a!important}
+.face .askb{position:absolute;right:66px;bottom:14px;width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:transparent;color:var(--accent,#f5c518);display:grid;place-items:center;padding:0;cursor:pointer;z-index:2;-webkit-tap-highlight-color:transparent}
+.face .askb:active svg{transform:scale(1.2)}
+.face .askb svg{transition:transform .15s}
+.back .askb{border-color:rgba(40,45,50,.2);color:#7a5c00}
 .face .tap{bottom:28px;font-size:.72rem}
 .front .say{border:1px solid var(--line);border-bottom-width:1px;background:transparent;color:var(--muted)}
 .back .say{border:1px solid rgba(40,45,50,.2);border-bottom-width:1px;background:transparent;color:#3a3a3e}
@@ -1329,7 +1333,7 @@ header .kbar{display:none}
 .cardcol>.scene{z-index:2}
 .peek{position:absolute;z-index:1;pointer-events:none;transform:scale(.92);opacity:.5;transform-origin:50% 60%;border-radius:26px}
 .peek .face{position:absolute;inset:0}
-.peek .shufb,.peek .expb{visibility:hidden}
+.peek .shufb,.peek .expb,.peek .askb{visibility:hidden}
 /* shop tab 案3: try on in the stage, buy from the stage, items on a sideways shelf */
 #shopnv .sn-stage{height:250px;padding-bottom:66px}
 #shopnv .sn-stage .sh-fig{width:120px}
@@ -2338,6 +2342,8 @@ function renderAiStats(){
 }
 const AI_NAME={gemini:'Gemini',groq:'Groq',workersAI:'Cloudflare Workers AI'};
 let askY=0, askCard=null, askMsgs=[], askBusy=false; const askCache={};
+const ASK_FREE={id:'__free',en:'',jp:'',free:1};
+function screenCard(){return (tab==='quiz'&&lrCard())||(tab==='mc'&&MQ[mi])||P[ci]||null}
 function mdLite(t){
   // tables (| a | b |) → one bullet per row; <br> → line break
   t=t.split('\n').filter(l=>!/^\s*\|?\s*:?-{2,}/.test(l)).map(l=>{
@@ -2352,10 +2358,14 @@ function mdLite(t){
 }
 function renderAsk(){
   const log=$('askLog');
-  log.innerHTML=`<div class="qchips">${ASK_CHIPS.map(([l],i)=>`<button data-q="${i}">${l}</button>`).join('')}</div>`+
+  const sc=askCard.free&&screenCard();
+  log.innerHTML=(askCard.free?(sc?`<div class="qchips"><button data-oncard>今のカード「${esc(sc.en.length>24?sc.en.slice(0,24)+'…':sc.en)}」について聞く</button></div>`:'')
+    :`<div class="qchips">${ASK_CHIPS.map(([l],i)=>`<button data-q="${i}">${l}</button>`).join('')}</div>`)+
+    (askCard.free&&!askMsgs.length?'<div class="msg ai">英語のことなら、なんでも聞いてね！<br>単語の意味や例文、文法、勉強のしかたも答えるよ。</div>':'')+
     askMsgs.map(m=>`<div class="msg ${m.role==='user'?'me':'ai'} ${m.err?'err':''}">${m.role==='user'?esc(m.text):mdLite(m.text)}${m.by?`<small class="aiby">${m.saved?'保存した答え ・ ':''}${AI_NAME[m.by]||esc(m.by)}${m.model?` ・ ${esc(m.model.replace(/^@cf\//,''))}`:''}</small>`:''}</div>`).join('')+
     (askBusy?'<div class="msg ai"><span class="dots"><span></span><span></span><span></span></span></div>':'');
   log.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>askSend(ASK_CHIPS[+b.dataset.q][1]));
+  const oc=log.querySelector('[data-oncard]'); if(oc)oc.onclick=()=>{const d=screenCard();if(d)openAsk(d)};
   $('askSend').disabled=askBusy; renderAskLeft();
   // keep the newest question at the top of the screen so the answer can be read from its first line
   if(askMsgs.length||askBusy)requestAnimationFrame(()=>{const v=$('askv');const qs=log.querySelectorAll('.msg.me');const q=qs[qs.length-1];
@@ -2397,7 +2407,10 @@ async function askSend(q){
 function openAsk(d){
   if(!d)return; sAsk(); askCard=d; askMsgs=askCache[d.id]||[];
   {const c=cur(); $('askFig').innerHTML=fig(c.skin,c.face,c.hat,c.neck);}
-  $('askEn').innerHTML=d.en.split(/(\s+)/).map(w=>/\S/.test(w)?`<span class="w">${esc(w)}</span>`:w).join(''); $('askJp').textContent=d.jp;
+  if(d.free){$('askEn').textContent='ミーモ';$('askJp').textContent='英語のこと、なんでも聞いてね';}
+  else{$('askEn').innerHTML=d.en.split(/(\s+)/).map(w=>/\S/.test(w)?`<span class="w">${esc(w)}</span>`:w).join(''); $('askJp').textContent=d.jp;}
+  $('askv').classList.toggle('free',!!d.free);
+  $('askIn').placeholder=d.free?'ミーモに質問する':'このフレーズについて質問する';
   renderAsk(); renderAiStats(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); document.body.classList.add('sv-lock'); askY=scrollY; document.body.style.top=(-askY)+'px'; document.body.classList.add('ask-lock'); fitAsk();
 }
 // keep the chat header still and lift only the input bar above the keyboard (iOS pans the page otherwise)
@@ -2725,6 +2738,7 @@ function faceHTML(d,lang,isBack){
   return `<span class="corner">No.${d.no||d.id}</span>
     <span class="tr"><span class="stchip">${chip(d)}</span><span class="trr"><span class="side">${lang==='en'?'ENGLISH':'日本語'}</span><button class="favb" data-fav aria-label="お気に入り" aria-pressed="${!!(S.fav||{})[d.id]}"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button></span></span>
     ${isBack?'':`<button class="shufb" data-shuf aria-label="シャッフル" title="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3c4 0 6 10 10 10h5"/><path d="M3 17h3c1.5 0 2.7-1.4 3.7-3.2M14.3 10.2C15.3 8.4 16.5 7 18 7h3"/><path d="M18 4l3 3-3 3M18 14l3 3-3 3"/></svg></button>`}
+    <button class="askb" data-ask aria-label="このカードをミーモに聞く"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M10 3.5c.5 3.6 2.4 5.5 6 6-3.6.5-5.5 2.4-6 6-.5-3.6-2.4-5.5-6-6 3.6-.5 5.5-2.4 6-6z"/><path d="M18 13.5c.25 1.8 1.2 2.75 3 3-1.8.25-2.75 1.2-3 3-.25-1.8-1.2-2.75-3-3 1.8-.25 2.75-1.2 3-3z"/></svg></button>
     <button class="expb" data-exp aria-label="${bigCard?'カードを小さくする':'カードを大きくする'}">${bigCard?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>'}</button>
     ${!isBack&&d.img?`<img class="cimg" src="${esc(d.img)}" alt="" loading="lazy">`:''}
     <div class="txt ${lang}">${esc(t)}</div>
@@ -2753,7 +2767,7 @@ function buildCard(){
    </div>
    </div>`;
   swipeCard($('scene'));
-  $('scene').onclick=e=>{if(swiped){swiped=false;return}if(e.target.closest('[data-fav]')){e.stopPropagation();toggleFav(P[ci].id);return}if(e.target.closest('[data-edit-card]')){e.stopPropagation();openCardEdit(P[ci]);return}if(e.target.closest('[data-exp]')){e.stopPropagation();sZoom(!bigCard);setBigCard(!bigCard);return}if(e.target.closest('[data-shuf]')){e.stopPropagation();sShuffle();reshuffle();return}const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
+  $('scene').onclick=e=>{if(swiped){swiped=false;return}if(e.target.closest('[data-fav]')){e.stopPropagation();toggleFav(P[ci].id);return}if(e.target.closest('[data-edit-card]')){e.stopPropagation();openCardEdit(P[ci]);return}if(e.target.closest('[data-ask]')){e.stopPropagation();openAsk(P[ci]);return}if(e.target.closest('[data-exp]')){e.stopPropagation();sZoom(!bigCard);setBigCard(!bigCard);return}if(e.target.closest('[data-shuf]')){e.stopPropagation();sShuffle();reshuffle();return}const s=e.target.closest('[data-say]');if(s){e.stopPropagation();speak(P[ci].en);return}flip()};
   $('prev').onclick=()=>go(-1); $('next').onclick=()=>go(1); $('bigAsk').onclick=()=>$('mascot').click(); renderBigTop();
   $('yes').onclick=()=>mark(true); $('no').onclick=()=>mark(false);
   fillCard();
@@ -3366,7 +3380,7 @@ document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('cedit').hidden){closeCardEdit();return}if(bigCard)setBigCard(false);closeOpt();if(deckOpen()){closeDeckEdit();navOn('navHome')}if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
 applyWear(); renderAiStats();
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
-$('mascot').onclick=()=>{const d=(tab==='quiz'&&lrCard())||(tab==='mc'&&MQ[mi])||P[ci]||DATA[0];if(d)openAsk(d);else openDeckEdit(S.deck==='gold'?'new':S.deck)};
+$('mascot').onclick=()=>openAsk(ASK_FREE);
 $('goal').value=String(S.goal);
 $('goal').onchange=()=>{S.goal=+$('goal').value;if(checkGoal())celebrateGoal();save();header()};
 $('fireBtn').onclick=openStreak; $('svClose').onclick=closeStreak;
