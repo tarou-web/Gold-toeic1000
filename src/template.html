@@ -1132,6 +1132,10 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .bv.sw-out-l,.bv.sw-out-r{transform:none}
 body.sw-anim{overflow-x:hidden}
 @media (prefers-reduced-motion:reduce){.sw-in-r,.sw-in-l,.sw-out-l,.sw-out-r{animation:none}.sw-out-l,.sw-out-r{visibility:hidden!important}}
+/* while a bottom-nav screen is open, the home page underneath is hidden so it never shows through or scrolls behind */
+body.navopen .wrap{visibility:hidden}
+body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
+.bv{overscroll-behavior:contain}
 .slink{color:var(--fg);text-decoration:none}
 .slink:last-child{border-bottom:0}
 #contactSoon{font-size:.8rem;color:var(--muted);margin-right:6px}
@@ -3352,6 +3356,8 @@ $('navNew').onclick=()=>{if(deckOpen())return;openDeckEdit('new')};
 $('navLib').onclick=()=>{renderLib();openNavView('libv');navOn('navLib')};
 $('navSet').onclick=()=>{renderAiStats();openNavView('setv');navOn('navSet')};
 $('navShop').onclick=()=>{renderShopTab();openNavView('shopnv');navOn('navShop')};
+{const ids=['libv','setv','shopnv','deckv'];const sync=()=>document.body.classList.toggle('navopen',ids.some(id=>$(id).classList.contains('open')));
+  const mo=new MutationObserver(sync);ids.forEach(id=>mo.observe($(id),{attributes:true,attributeFilter:['class']}));sync();}
 // swipe left/right on a bottom-nav screen to move to the neighbouring screen, with a slide in that direction
 (function(){
   const ORDER=['navHome','navLib','navNew','navShop','navSet'];

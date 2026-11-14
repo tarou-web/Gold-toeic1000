@@ -1,5 +1,5 @@
 // Network first for the app itself so updates show right away; cached copy when offline.
-const CACHE='meemory-v188';
+const CACHE='meemory-v189';
 const CORE=['./','index.html','manifest.webmanifest','apple-touch-icon-2.png','icon-192-2.png','icon-512-2.png','mascot.png','contact.js','mascot-silver.png','mascot-gold.png','mascot-bone.png','acc-pumpkin.png','mascot-robot.png','mascot-zombie.png','mascot-sakura.png','mascot-galaxy.png','mascot-macho.png','mascot-macho-silver.png','mascot-macho-gold.png','mascot-ice.png','mascot-lava.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
