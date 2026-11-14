@@ -1111,6 +1111,14 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .lg-btns button svg{color:var(--accent,#f5c518)}
 .lg-btns button span{font-weight:800;font-size:.85rem}
 .lg-btns button small{color:var(--muted);font-size:.66rem;line-height:1.3;text-align:center}
+/* sliding highlight for the home tabs and the add-screen methods: one pill that glides to the chosen button */
+.tabs,.dk-seg{position:relative}
+.seg-ind{position:absolute;left:0;top:0;height:0;border-radius:12px;background:var(--fg);pointer-events:none;z-index:0;transition:transform .32s cubic-bezier(.3,1.25,.5,1),width .32s cubic-bezier(.3,1.25,.5,1)}
+.seg-ind.noanim{transition:none}
+.tabs.has-ind button,.dk-seg.has-ind button{position:relative;z-index:1}
+.tabs.has-ind button[aria-selected=true],.dk-seg.has-ind button[aria-selected=true]{background:transparent!important}
+.tabs.has-ind button,.dk-seg.has-ind button{transition:color .25s}
+@media (prefers-reduced-motion:reduce){.seg-ind{transition:none}}
 .slink{color:var(--fg);text-decoration:none}
 .slink:last-child{border-bottom:0}
 #contactSoon{font-size:.8rem;color:var(--muted);margin-right:6px}
@@ -3279,6 +3287,16 @@ function slideBar(bar,pick,restore,showFn){
   bar.addEventListener('pointerup',end);bar.addEventListener('pointercancel',()=>{on=false;if(moved)restore()});
   bar.addEventListener('click',e=>{if(bar._skip){e.stopPropagation();e.preventDefault()}},true);
 }
+function segInd(bar){
+  if(!bar)return; const ind=document.createElement('span'); ind.className='seg-ind noanim'; ind.setAttribute('aria-hidden','true');
+  bar.prepend(ind); bar.classList.add('has-ind');
+  const place=()=>{const b=bar.querySelector('[aria-selected=true]'); if(!b||!b.offsetWidth){ind.style.opacity=0;return}
+    ind.style.opacity=1; ind.style.width=b.offsetWidth+'px'; ind.style.height=b.offsetHeight+'px'; ind.style.transform=`translate(${b.offsetLeft}px,${b.offsetTop}px)`};
+  place(); requestAnimationFrame(()=>requestAnimationFrame(()=>ind.classList.remove('noanim')));
+  new MutationObserver(place).observe(bar,{subtree:true,attributes:true,attributeFilter:['aria-selected']});
+  if(window.ResizeObserver)new ResizeObserver(()=>{ind.classList.add('noanim');place();requestAnimationFrame(()=>ind.classList.remove('noanim'))}).observe(bar);
+}
+segInd(document.querySelector('.tabs')); segInd(document.querySelector('#deckv .dk-seg'));
 slideBar(document.querySelector('.tabs'),b=>{const t=b.id.slice(2);if(t!==tab)setTab(t);else b.setAttribute('aria-selected','true')},()=>setTab(tab));
 slideBar(document.querySelector('#deckv .dk-seg'),b=>setDm(b.dataset.dm),()=>setDm(dkMode));
 {const nb=document.querySelector('.bnav');let was=null;nb&&nb.addEventListener('pointerdown',()=>{was=nb.querySelector('button.on')},true);
