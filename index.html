@@ -1139,6 +1139,19 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 .tabs.has-ind button[aria-selected=true],.dk-seg.has-ind button[aria-selected=true]{background:transparent!important}
 .tabs.has-ind button,.dk-seg.has-ind button{transition:color .25s}
 @media (prefers-reduced-motion:reduce){.seg-ind{transition:none}}
+/* bottom-nav screens: switch instantly from the nav; a sideways swipe slides to the neighbouring screen */
+.bv.navv,.bv.deckv{transition:none}
+@keyframes swInR{from{transform:translateX(100%)}to{transform:none}}
+@keyframes swInL{from{transform:translateX(-100%)}to{transform:none}}
+@keyframes swOutL{from{transform:none}to{transform:translateX(-100%)}}
+@keyframes swOutR{from{transform:none}to{transform:translateX(100%)}}
+.sw-in-r{animation:swInR .3s cubic-bezier(.2,.8,.2,1)}
+.sw-in-l{animation:swInL .3s cubic-bezier(.2,.8,.2,1)}
+.sw-out-l,.sw-out-r{visibility:visible!important;pointer-events:none;animation:swOutL .3s cubic-bezier(.2,.8,.2,1) forwards}
+.sw-out-r{animation-name:swOutR}
+.bv.sw-out-l,.bv.sw-out-r{transform:none}
+body.sw-anim{overflow-x:hidden}
+@media (prefers-reduced-motion:reduce){.sw-in-r,.sw-in-l,.sw-out-l,.sw-out-r{animation:none}.sw-out-l,.sw-out-r{visibility:hidden!important}}
 .slink{color:var(--fg);text-decoration:none}
 .slink:last-child{border-bottom:0}
 #contactSoon{font-size:.8rem;color:var(--muted);margin-right:6px}
@@ -2113,7 +2126,7 @@ function openDeckEdit(id){
   closePhoto(); setDm('one'); renderPhotoLeft(); $('dkName').value=dk.name||'';$('dkName').readOnly=id==='gold'; $('dkBulk').value=''; $('dkBulkMsg').textContent='';
   renderDeckEdit();
   const v=$('deckv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); document.body.classList.add('sv-lock');
-  setTimeout(()=>{(dk.name?$('dkEn'):$('dkName')).focus({preventScroll:true})},350);
+  if(!window.__swNav)setTimeout(()=>{(dk.name?$('dkEn'):$('dkName')).focus({preventScroll:true})},350);
 }
 function closeDeckEdit(){
   commitDraft();
@@ -3361,6 +3374,33 @@ $('navNew').onclick=()=>{if(deckOpen())return;openDeckEdit('new')};
 $('navLib').onclick=()=>{renderLib();openNavView('libv');navOn('navLib')};
 $('navSet').onclick=()=>{renderAiStats();openNavView('setv');navOn('navSet')};
 $('navShop').onclick=()=>{renderShopTab();openNavView('shopnv');navOn('navShop')};
+// swipe left/right on a bottom-nav screen to move to the neighbouring screen, with a slide in that direction
+(function(){
+  const ORDER=['navHome','navLib','navNew','navShop','navSet'];
+  const viewOf=id=>({navHome:document.querySelector('.wrap'),navLib:$('libv'),navNew:$('deckv'),navShop:$('shopnv'),navSet:$('setv')})[id];
+  const curNav=()=>{const b=document.querySelector('.bnav button.on');return b?b.id:'navHome'};
+  const overlayOpen=()=>['askv','shopv','premv'].some(id=>{const v=$(id);return v&&v.classList.contains('open')})||($('wardrobe')&&!$('wardrobe').hidden)||document.querySelector('.sheet.open,.optsheet.open,dialog[open]');
+  const SKIP='#scene,.tabs,.bnav,.dk-seg,input,textarea,select,[contenteditable],.sn-shelf,.ph-thumbs,#askv,#shopv,.wardrobe,.modal,.sheet';
+  const scrollsX=el=>{for(let e=el;e&&e!==document.body;e=e.parentElement){const cs=getComputedStyle(e);if(/(auto|scroll)/.test(cs.overflowX)&&e.scrollWidth>e.clientWidth+2)return true}return false};
+  let sx=0,sy=0,st=0,ok=false;
+  document.addEventListener('touchstart',e=>{ok=false;if(e.touches.length!==1)return;const t=e.target;
+    if(t.closest&&t.closest(SKIP))return; if(overlayOpen())return; if(scrollsX(t))return;
+    ok=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;st=Date.now()},{passive:true});
+  document.addEventListener('touchend',e=>{if(!ok)return;ok=false;const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;
+    if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*1.6||Date.now()-st>700)return;
+    const i=ORDER.indexOf(curNav()), j=i+(dx<0?1:-1); if(j<0||j>=ORDER.length)return;
+    go(ORDER[i],ORDER[j],dx<0?'l':'r')},{passive:true});
+  function go(from,to,dir){
+    const fv=viewOf(from), reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.__swNav=1; try{$(to).onclick()}finally{window.__swNav=0}
+    if(curNav()!==to||reduce)return;
+    const tv=viewOf(to); document.body.classList.add('sw-anim');
+    if(fv){fv.classList.remove('sw-in-l','sw-in-r');fv.classList.add(dir==='l'?'sw-out-l':'sw-out-r')}
+    if(tv){tv.classList.remove('sw-out-l','sw-out-r');void tv.offsetWidth;tv.classList.add(dir==='l'?'sw-in-r':'sw-in-l')}
+    setTimeout(()=>{[fv,tv].forEach(v=>v&&v.classList.remove('sw-in-l','sw-in-r','sw-out-l','sw-out-r'));document.body.classList.remove('sw-anim')},320);
+  }
+})();
+
 $('snPrem').onclick=openPrem;
 document.querySelectorAll('#shopnv [data-ad]').forEach(b=>b.onclick=()=>adSoon(b.dataset.ad));
 $('pmClose').onclick=closePrem;document.querySelectorAll('.pm-plan').forEach(b=>b.onclick=()=>{pmPlan=b.dataset.plan;renderPrem()});
