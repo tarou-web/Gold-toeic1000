@@ -1496,7 +1496,7 @@ header .kbar{display:none}
   <div class="tabs" role="tablist">
     <button role="tab" id="t-card" aria-selected="true">カード</button>
     <button role="tab" id="t-mc" aria-selected="false">4択</button>
-    <button role="tab" id="t-quiz" aria-selected="false">学習</button>
+    <button role="tab" id="t-quiz" aria-selected="false">復習</button>
     <button role="tab" id="t-test" aria-selected="false">テスト</button>
     <button role="tab" id="t-list" aria-selected="false">一覧</button>
   </div>
@@ -2973,9 +2973,9 @@ function renderQuiz0(){
     const due=QP.filter(x=>LR.due&&LR.due[x.id]).length, weak=QP.filter(x=>!(LR.due&&LR.due[x.id])&&S.miss[x.id]&&!S.known[x.id]).length;
     const fresh=QP.filter(x=>!(LR.due&&LR.due[x.id])&&!S.known[x.id]&&!S.miss[x.id]).length, rest=QP.length-due-weak-fresh, cont=LR.step>0;
     v.innerHTML=`<div class="lstart">
-      <div class="ls-h"><img src="mascot.png" alt=""><div><b>${cont?'続きから学習しよう':'今日のラウンド'}</b><small>${cont?`${QP.length}枚中 ${done}枚 覚えたところ`:`${QP.length}枚を覚えきるまで続けます`}</small></div></div>
+      <div class="ls-h"><img src="mascot.png" alt=""><div><b>${cont?'続きから復習しよう':'今日のラウンド'}</b><small>${cont?`${QP.length}枚中 ${done}枚 覚えたところ`:`${QP.length}枚を覚えきるまで続けます`}</small></div></div>
       <div class="ls-n">${[[due,'復習'],[weak,'苦手'],[fresh,'新しい'],[rest,'おさらい']].filter(x=>x[0]).map(([n,l])=>`<div><b>${n}</b><span>${l}</span></div>`).join('')}</div>
-      <button class="btn ok" id="lsGo">${cont?'続きから始める':'学習を始める'}</button>
+      <button class="btn ok" id="lsGo">${cont?'続きから始める':'復習を始める'}</button>
     </div>`;
     $('lsGo').onclick=()=>{LR.started=true;scrollTo(0,0);renderQuiz();const q=v.firstElementChild;if(q){q.classList.add('qfade')}};
     return;
@@ -3164,7 +3164,7 @@ function renderTest(){
     $('tStart').onclick=()=>{startTest();if(!TT.qs.length){TT=null;toast('<div><strong>この形で出せる問題がありません</strong><span>ほかの形も入れてください</span></div>');return}renderTest();scrollTo(0,0)};return}
   const g=TT.graded, okN=g?TT.qs.filter(testOk).length:0, n=TT.qs.length, pct=Math.round(okN/n*100);
   const head=g?`<div class="tscore ${pct>=80?'good':''}"><b>${pct}<small>点</small></b><span>${n}問中 ${okN}問 正解</span>
-      <div class="tbtns">${okN<n?`<button class="btn ok" id="tLearn">間違えた${n-okN}枚を学習する</button>`:''}<button class="btn" id="tNew">もう一度テスト</button></div></div>`
+      <div class="tbtns">${okN<n?`<button class="btn ok" id="tLearn">間違えた${n-okN}枚を復習する</button>`:''}<button class="btn" id="tNew">もう一度テスト</button></div></div>`
     :`<div class="tbar"><button class="tx" id="tQuit" aria-label="テストをやめる"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><span class="tt">テスト</span><span id="tCount"></span></div><div class="tdots" id="tDots" style="grid-template-columns:repeat(${n},minmax(0,1fr))">${TT.qs.map(()=>'<i></i>').join('')}</div>`;
   v.innerHTML=`<div class="quiz ttest">${head}${TT.qs.map((q,i)=>{const d=q.d,a=TT.ans[i],ok=g&&testOk(q);
     let body='';
