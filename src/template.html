@@ -811,11 +811,13 @@ header{gap:6px}
 .face .shufb,.face .expb,.face .editb{width:44px;height:44px;bottom:14px;border-radius:14px;border:1px solid var(--line);border-bottom-width:1px;background:transparent;color:var(--muted)}
 .face .shufb,.face .editb{left:14px}.face .expb{right:14px}
 .back .expb,.back .shufb,.back .editb{background:transparent!important;border-color:rgba(40,45,50,.2)!important;color:#1a1a1a!important}
-.face .askb{position:absolute;right:66px;bottom:14px;width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:transparent;color:var(--accent,#f5c518);display:grid;place-items:center;padding:0;cursor:pointer;z-index:2;-webkit-tap-highlight-color:transparent}
+.face .askb{position:absolute;right:66px;bottom:14px;width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:transparent;color:#f5c518;display:grid;place-items:center;padding:0;cursor:pointer;z-index:2;-webkit-tap-highlight-color:transparent}
 .face .askb:active svg{transform:scale(1.2)}
 .face .askb svg{transition:transform .15s}
 .back .askb{border-color:rgba(40,45,50,.2);color:#7a5c00}
 .face .tap{bottom:28px;font-size:.72rem}
+/* keep the hint between the left button and the ask/expand buttons on the right */
+.face .tap{left:66px;right:118px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .front .say{border:1px solid var(--line);border-bottom-width:1px;background:transparent;color:var(--muted)}
 .back .say{border:1px solid rgba(40,45,50,.2);border-bottom-width:1px;background:transparent;color:#3a3a3e}
 .face .memo{display:flex;align-items:center;gap:6px;background:rgba(40,45,50,.08);color:#3a3a3e}
