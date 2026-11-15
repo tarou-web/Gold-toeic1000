@@ -1137,7 +1137,7 @@ body.navopen .wrap{visibility:hidden}
 body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .bv{overscroll-behavior:contain}
 /* bottom menu: a floating rounded bar, icons only (Instagram style); the chosen screen gets a grey pill */
-.bnav{left:14px;right:14px;bottom:calc(8px + env(safe-area-inset-bottom,0px));border-radius:999px;background:rgba(30,30,34,.94);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid #3a3a40!important;padding:6px!important;box-shadow:0 10px 28px rgba(0,0,0,.55);gap:2px}
+.bnav{left:14px;right:14px;bottom:max(8px,calc(env(safe-area-inset-bottom,0px) - 14px));border-radius:999px;background:rgba(30,30,34,.94);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid #3a3a40!important;padding:6px!important;box-shadow:0 10px 28px rgba(0,0,0,.55);gap:2px}
 .bnav button{border-radius:999px;height:52px!important;color:#f4f4f2!important;transition:background .2s,color .2s}
 .bnav button span{display:none}
 .bnav button svg{width:27px!important;height:27px!important}
