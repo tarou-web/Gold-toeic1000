@@ -1156,6 +1156,16 @@ body.sw-anim{overflow-x:hidden}
 body.navopen .wrap{visibility:hidden}
 body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .bv{overscroll-behavior:contain}
+/* bottom menu: a floating rounded bar, icons only (Instagram style); the chosen screen gets a grey pill */
+.bnav{left:14px;right:14px;bottom:calc(8px + env(safe-area-inset-bottom,0px));border-radius:999px;background:rgba(30,30,34,.94);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid #3a3a40!important;padding:6px!important;box-shadow:0 10px 28px rgba(0,0,0,.55);gap:2px}
+.bnav button{border-radius:999px;height:52px!important;color:#f4f4f2!important;transition:background .2s,color .2s}
+.bnav button span{display:none}
+.bnav button svg{width:27px!important;height:27px!important}
+.bnav button.on{background:#46464c!important;color:#fff!important;box-shadow:none!important}
+.bnav button.navplus .np{background:none!important;color:inherit!important;width:auto!important;height:auto!important;box-shadow:none!important}
+.bnav button.navplus .np svg{width:28px!important;height:28px!important}
+.bv.navv,.bv.deckv{bottom:0!important;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+.sheet:not(.show){visibility:hidden}
 .slink{color:var(--fg);text-decoration:none}
 .slink:last-child{border-bottom:0}
 #contactSoon{font-size:.8rem;color:var(--muted);margin-right:6px}
@@ -3248,7 +3258,7 @@ function renderList(){
 }
 
 // shrink the card (only as much as needed) so the まだ / 覚えた buttons stay above the bottom menu
-function setBnavH(){const n=document.querySelector('.bnav');if(n)document.documentElement.style.setProperty('--bnavh',n.getBoundingClientRect().height+'px')}
+function setBnavH(){const n=document.querySelector('.bnav');if(n)document.documentElement.style.setProperty('--bnavh',Math.max(0,document.documentElement.clientHeight-n.getBoundingClientRect().top)+'px')}
 function fitCard(){setBnavH();
   if(bigCard){const f=$('flip');if(f){f.style.height='';f.style.minHeight=''}return}
   const f=$('flip'), y=$('yes'), nav=document.querySelector('.bnav'); if(!f||!y||!nav||!f.offsetParent)return;
