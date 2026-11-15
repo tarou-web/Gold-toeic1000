@@ -1157,13 +1157,15 @@ body.navopen .wrap{visibility:hidden}
 body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .bv{overscroll-behavior:contain}
 /* bottom menu: a floating rounded bar, icons only (Instagram style); the chosen screen gets a grey pill */
-.bnav{left:14px;right:14px;bottom:max(8px,calc(env(safe-area-inset-bottom,0px) - 14px));border-radius:999px;background:rgba(30,30,34,.94);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid #3a3a40!important;padding:6px!important;box-shadow:0 10px 28px rgba(0,0,0,.55);gap:2px}
-.bnav button{border-radius:999px;height:52px!important;color:#f4f4f2!important;transition:background .2s,color .2s}
+.bnav{left:14px;right:14px;bottom:max(8px,calc(env(safe-area-inset-bottom,0px) - 14px));border-radius:999px;background:rgba(30,30,34,.94);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid #3a3a40!important;padding:4px!important;box-shadow:0 10px 28px rgba(0,0,0,.55);gap:2px}
+.bnav button{border-radius:999px;height:44px!important;position:relative;z-index:1;color:#f4f4f2!important;transition:background .2s,color .2s}
 .bnav button span{display:none}
-.bnav button svg{width:27px!important;height:27px!important}
-.bnav button.on{background:#46464c!important;color:#fff!important;box-shadow:none!important}
+.bnav button svg{width:25px!important;height:25px!important}
+.bnav button.on{background:transparent!important;color:#fff!important;box-shadow:none!important}
+.bnav .seg-ind{background:#46464c;border-radius:999px}
+.bnav{position:fixed}
 .bnav button.navplus .np{background:none!important;color:inherit!important;width:auto!important;height:auto!important;box-shadow:none!important}
-.bnav button.navplus .np svg{width:28px!important;height:28px!important}
+.bnav button.navplus .np svg{width:26px!important;height:26px!important}
 .bv.navv,.bv.deckv{bottom:0!important;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .sheet:not(.show){visibility:hidden}
 .slink{color:var(--fg);text-decoration:none}
@@ -3336,16 +3338,16 @@ function slideBar(bar,pick,restore,showFn){
   bar.addEventListener('pointerup',end);bar.addEventListener('pointercancel',()=>{on=false;if(moved)restore()});
   bar.addEventListener('click',e=>{if(bar._skip){e.stopPropagation();e.preventDefault()}},true);
 }
-function segInd(bar){
+function segInd(bar,sel='[aria-selected=true]',attr='aria-selected'){
   if(!bar)return; const ind=document.createElement('span'); ind.className='seg-ind noanim'; ind.setAttribute('aria-hidden','true');
   bar.prepend(ind); bar.classList.add('has-ind');
-  const place=()=>{const b=bar.querySelector('[aria-selected=true]'); if(!b||!b.offsetWidth){ind.style.opacity=0;return}
+  const place=()=>{const b=bar.querySelector(sel); if(!b||!b.offsetWidth){ind.style.opacity=0;return}
     ind.style.opacity=1; ind.style.width=b.offsetWidth+'px'; ind.style.height=b.offsetHeight+'px'; ind.style.transform=`translate(${b.offsetLeft}px,${b.offsetTop}px)`};
   place(); requestAnimationFrame(()=>requestAnimationFrame(()=>ind.classList.remove('noanim')));
-  new MutationObserver(place).observe(bar,{subtree:true,attributes:true,attributeFilter:['aria-selected']});
+  new MutationObserver(place).observe(bar,{subtree:true,attributes:true,attributeFilter:[attr]});
   if(window.ResizeObserver)new ResizeObserver(()=>{ind.classList.add('noanim');place();requestAnimationFrame(()=>ind.classList.remove('noanim'))}).observe(bar);
 }
-segInd(document.querySelector('.tabs')); segInd(document.querySelector('#deckv .dk-seg'));
+segInd(document.querySelector('.tabs')); segInd(document.querySelector('#deckv .dk-seg')); segInd(document.querySelector('.bnav'),'button.on','class');
 slideBar(document.querySelector('.tabs'),b=>{const t=b.id.slice(2);if(t!==tab)setTab(t);else b.setAttribute('aria-selected','true')},()=>setTab(tab));
 slideBar(document.querySelector('#deckv .dk-seg'),b=>setDm(b.dataset.dm),()=>setDm(dkMode));
 {const nb=document.querySelector('.bnav');let was=null;nb&&nb.addEventListener('pointerdown',()=>{was=nb.querySelector('button.on')},true);
