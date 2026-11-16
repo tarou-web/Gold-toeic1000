@@ -3306,7 +3306,8 @@ function renderList(){
 
 // shrink the card (only as much as needed) so the まだ / 覚えた buttons stay above the bottom menu
 function setBnavH(){const n=document.querySelector('.bnav');if(n)document.documentElement.style.setProperty('--bnavh',Math.max(0,document.documentElement.clientHeight-n.getBoundingClientRect().top)+'px')}
-function fitCard(){setBnavH();
+function fitCard(){if(document.body.classList.contains('ask-lock'))return; // the page is pinned under the chat sheet; measuring now would shrink the card
+  setBnavH();
   if(bigCard){const f=$('flip');if(f){f.style.height='';f.style.minHeight=''}return}
   const f=$('flip'), y=$('yes'), nav=document.querySelector('.bnav'); if(!f||!y||!nav||!f.offsetParent)return;
   // measure against the menu bar itself (iPhone home-screen apps can report a wrong window height)
