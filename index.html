@@ -1168,6 +1168,11 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .bnav button.navplus .np svg{width:26px!important;height:26px!important}
 .bv.navv,.bv.deckv{bottom:0!important;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
 .sheet:not(.show){visibility:hidden}
+.say{display:inline-flex;align-items:center;gap:6px}
+.say .spk,#qsay .spk{flex:none}
+.say .spk{width:23px;height:23px}
+#qsay{display:grid;place-items:center}
+#qsay .spk{width:27px;height:27px}
 .slink{color:var(--fg);text-decoration:none}
 .slink:last-child{border-bottom:0}
 #contactSoon{font-size:.8rem;color:var(--muted);margin-right:6px}
@@ -2804,7 +2809,7 @@ function faceHTML(d,lang,isBack){
     ${!isBack&&d.img?`<img class="cimg" src="${esc(d.img)}" alt="" loading="lazy">`:''}
     <div class="txt ${lang}">${esc(t)}</div>
     ${lang==='jp'&&d.g&&d.g.length?`<div class="gloss">${d.g.map(([w,m])=>`<div><b>${esc(w)}</b><span>${esc(m)}</span></div>`).join('')}</div>`:''}
-    ${lang==='en'?`<button class="say" data-say>🔊 発音を聞く</button>`:''}
+    ${lang==='en'?`<button class="say" data-say><svg class="spk" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18.3 6.6a7.8 7.8 0 0 1 0 10.8"/></svg><span>発音を聞く</span></button>`:''}
     ${isBack&&d.memo?`<div class="memo"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg>${esc(d.memo)}</div>`:''}
     ${isBack?`<button class="editb" data-edit-card aria-label="このカードを直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>`:''}
     ${isBack&&d.fix?`<div class="fixnote">元の表記を修正: ${esc(d.fix)}</div>`:''}
@@ -3074,7 +3079,7 @@ function showSheet(ok,title,sub,d,next){
   const sh=$('sheet');
   sh.className='sheet '+(ok?'good':'miss');
   $('sheetin').innerHTML=`<div class="msg"><img class="smas" src="mascot.png" alt=""><div><h3>${title}</h3>${sub?`<p>${sub}</p>`:''}</div></div>
-    <div class="acts"><button class="btn blue" id="qsay">🔊</button><button class="btn ${ok?'ok':'red'}" id="qnext">続ける</button></div>`;
+    <div class="acts"><button class="btn blue" id="qsay" aria-label="発音を聞く"><svg class="spk" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18.3 6.6a7.8 7.8 0 0 1 0 10.8"/></svg></button><button class="btn ${ok?'ok':'red'}" id="qnext">続ける</button></div>`;
   void sh.offsetWidth; sh.classList.add('show'); document.body.classList.add('sheet-open');
   $('qsay').onclick=()=>speak(d.en);
   const n=$('qnext'); n.onclick=()=>{hideSheet();(next||renderQuiz)()}; n.focus({preventScroll:true});
