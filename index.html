@@ -1186,7 +1186,6 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .ask-grab{position:sticky;top:0;z-index:3;display:flex;justify-content:center;padding:10px 0 6px;background:var(--bg);cursor:grab;touch-action:none}
 .ask-grab i{width:40px;height:5px;border-radius:99px;background:#5a5a60}
 #askv .bv-hero{padding-top:0}
-body.ask-lock .bnav,body.ask-closing .bnav{visibility:hidden}
 #askv .sv-bar{padding-block:0 6px}
 #askv .sv-x{width:36px;height:36px;font-size:14px;opacity:.75}
 .slink{color:var(--fg);text-decoration:none}
@@ -2496,7 +2495,7 @@ function openAsk(d){
   else{$('askEn').innerHTML=d.en.split(/(\s+)/).map(w=>/\S/.test(w)?`<span class="w">${esc(w)}</span>`:w).join(''); $('askJp').textContent=d.jp;}
   $('askv').classList.toggle('free',!!d.free);
   $('askIn').placeholder=d.free?'ミーモに質問する':'このフレーズについて質問する';
-  renderAsk(); renderAiStats(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); $('askDim').classList.add('on'); document.body.classList.add('sv-lock'); askY=scrollY; document.body.style.top=`calc(${-askY}px + env(safe-area-inset-top,0px))`; document.body.classList.add('ask-lock'); fitAsk();
+  renderAsk(); renderAiStats(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); $('askDim').classList.add('on'); document.body.classList.add('sv-lock'); askY=scrollY; clearTimeout(openAsk.lockT); openAsk.lockT=setTimeout(()=>{if(!v.classList.contains('open'))return; askY=scrollY; document.body.style.top=`calc(${-askY}px + env(safe-area-inset-top,0px))`; document.body.classList.add('ask-lock'); fitAsk()},400); fitAsk();
 }
 // keep the chat header still and lift only the input bar above the keyboard (iOS pans the page otherwise)
 function fitAsk(){
@@ -2512,7 +2511,7 @@ function fitAsk(){
   $('askLog').style.minHeight=(v.clientHeight-fh-v.querySelector('.bv-hero').offsetHeight-$('askGrab').offsetHeight+2)+'px';
 }
 if(window.visualViewport){visualViewport.addEventListener('resize',fitAsk);visualViewport.addEventListener('scroll',fitAsk)}
-function closeAsk(){document.body.classList.add('ask-closing');clearTimeout(closeAsk.t);closeAsk.t=setTimeout(()=>document.body.classList.remove('ask-closing'),420);$('askProxy').blur();document.body.classList.remove('ask-lock');document.body.style.top='';scrollTo(0,askY||0);const v=$('askv');v.style.cssText='';$('askFoot').style.cssText='';v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');$('askDim').classList.remove('on');$('askDim').style.opacity='';document.body.classList.remove('sv-lock');$('askIn').blur()}
+function closeAsk(){clearTimeout(openAsk.lockT);$('askProxy').blur();document.body.classList.remove('ask-lock');document.body.style.top='';scrollTo(0,askY||0);const v=$('askv');v.style.cssText='';$('askFoot').style.cssText='';v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');$('askDim').classList.remove('on');$('askDim').style.opacity='';document.body.classList.remove('sv-lock');$('askIn').blur()}
 
 // pull the chat sheet down to close it (from the handle or the header, or anywhere once the chat is scrolled to the top)
 (function(){
