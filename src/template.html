@@ -2421,9 +2421,9 @@ function mdLite(t){
 function renderAsk(){
   const log=$('askLog');
   const sc=askCard.free&&screenCard();
-  log.innerHTML=(askCard.free?(sc?`<div class="qchips"><button data-oncard>今のカード「${esc(sc.en.length>24?sc.en.slice(0,24)+'…':sc.en)}」について聞く</button></div>`:'')
+  log.innerHTML=(askCard.free?''
     :`<div class="qchips">${ASK_CHIPS.map(([l],i)=>`<button data-q="${i}">${l}</button>`).join('')}</div>`)+
-    (askCard.free&&!askMsgs.length?'<div class="msg ai">英語のことなら、なんでも聞いてね！<br>単語の意味や例文、文法、勉強のしかたも答えるよ。</div>':'')+
+
     askMsgs.map(m=>`<div class="msg ${m.role==='user'?'me':'ai'} ${m.err?'err':''}">${m.role==='user'?esc(m.text):mdLite(m.text)}${m.by?`<small class="aiby">${m.saved?'保存した答え ・ ':''}${AI_NAME[m.by]||esc(m.by)}${m.model?` ・ ${esc(m.model.replace(/^@cf\//,''))}`:''}</small>`:''}</div>`).join('')+
     (askBusy?'<div class="msg ai"><span class="dots"><span></span><span></span><span></span></span></div>':'');
   log.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>askSend(ASK_CHIPS[+b.dataset.q][1]));
