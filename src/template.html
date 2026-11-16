@@ -1166,6 +1166,7 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .ask-grab{position:sticky;top:0;z-index:3;display:flex;justify-content:center;padding:10px 0 6px;background:var(--bg);cursor:grab;touch-action:none}
 .ask-grab i{width:40px;height:5px;border-radius:99px;background:#5a5a60}
 #askv .bv-hero{padding-top:0}
+body.ask-lock .bnav,body.ask-closing .bnav{visibility:hidden}
 #askv .sv-bar{padding-block:0 6px}
 #askv .sv-x{width:36px;height:36px;font-size:14px;opacity:.75}
 .slink{color:var(--fg);text-decoration:none}
@@ -2489,7 +2490,7 @@ function fitAsk(){
   $('askLog').style.minHeight=(v.clientHeight-fh-v.querySelector('.bv-hero').offsetHeight-$('askGrab').offsetHeight+2)+'px';
 }
 if(window.visualViewport){visualViewport.addEventListener('resize',fitAsk);visualViewport.addEventListener('scroll',fitAsk)}
-function closeAsk(){$('askProxy').blur();document.body.classList.remove('ask-lock');document.body.style.top='';scrollTo(0,askY||0);const v=$('askv');v.style.cssText='';$('askFoot').style.cssText='';v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');$('askDim').classList.remove('on');$('askDim').style.opacity='';document.body.classList.remove('sv-lock');$('askIn').blur()}
+function closeAsk(){document.body.classList.add('ask-closing');clearTimeout(closeAsk.t);closeAsk.t=setTimeout(()=>document.body.classList.remove('ask-closing'),420);$('askProxy').blur();document.body.classList.remove('ask-lock');document.body.style.top='';scrollTo(0,askY||0);const v=$('askv');v.style.cssText='';$('askFoot').style.cssText='';v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');$('askDim').classList.remove('on');$('askDim').style.opacity='';document.body.classList.remove('sv-lock');$('askIn').blur()}
 
 // pull the chat sheet down to close it (from the handle or the header, or anywhere once the chat is scrolled to the top)
 (function(){
