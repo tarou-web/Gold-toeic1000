@@ -855,6 +855,8 @@ body.cardbig .bigtop{display:flex;align-items:center;gap:12px;margin-bottom:2px}
 .bgt{display:flex;flex-direction:column;gap:2px;min-width:0}.bgt b{font-size:13px;font-weight:800}.bgt small{font-size:11px;color:var(--muted);font-weight:700}
 .bigask{display:flex;align-items:center;gap:8px;height:64px;padding:0 16px 0 6px;border-radius:22px;border:1px solid var(--line);background:var(--surface);color:var(--fg);text-align:left;font-family:var(--f-jp);cursor:pointer;flex:none}
 .bigask img{width:50px;height:60px;object-fit:contain}
+.bigask .bigfig{width:42px;height:60px;flex:none;margin-left:4px}
+.bigask .bigfig img{width:100%;height:100%}
 .bigask span{display:flex;flex-direction:column;gap:2px}.bigask b{font-size:14px;font-weight:800}.bigask small{font-size:11px;color:var(--muted);font-weight:700}
 body.cardbig .gzone{display:none}
 body.cardbig .bnav{visibility:visible;pointer-events:auto}
@@ -2076,6 +2078,7 @@ function applyWear(){
   m.querySelector('.mfig').innerHTML=fig(sk,c.face,c.hat,c.neck);
   if(sk)m.classList.add('s-'+sk);
   const ai=$('askImg'); if(ai){ai.src=skinImg(sk)}
+  const bf=document.querySelector('#bigAsk .bigfig'); if(bf)bf.innerHTML=fig(sk,c.face,c.hat,c.neck);
   document.body.classList.toggle('has-hat',!!c.hat);
   $('hangerBtn').hidden=!Object.keys(S.owned).length;
 }
@@ -2822,7 +2825,7 @@ function buildCard(){
   const v=$('v-card');
   if(!P.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。<br>下の「出題」や「範囲」を変えてみてください。</div>';return}
   v.innerHTML=`<div class="cardcol">
-   <div class="bigtop"><div class="bgoal"><span class="bring" id="bRing"><b id="bRingN"></b></span><span class="bgt"><b>今日の目標</b><small id="bRingSub"></small></span></div><button class="bigask" id="bigAsk" aria-label="ミーモに聞く"><img src="mascot.png" alt=""><span><b>ミーモに聞く</b><small>意味・例文・覚え方</small></span></button></div>
+   <div class="bigtop"><div class="bgoal"><span class="bring" id="bRing"><b id="bRingN"></b></span><span class="bgt"><b>今日の目標</b><small id="bRingSub"></small></span></div><button class="bigask" id="bigAsk" aria-label="ミーモに聞く"><span class="mfig bigfig">${(()=>{const c=cur();return fig(c.skin,c.face,c.hat,c.neck)})()}</span><span><b>ミーモに聞く</b><small>意味・例文・覚え方</small></span></button></div>
    <div class="scene" id="scene" tabindex="0" role="button" aria-label="カードを回転させる">
      <div class="flip" id="flip"><div class="face front" id="front"></div><div class="face back" id="back"></div></div>
      <div class="swlab" id="swl" aria-hidden="true"></div>
