@@ -515,8 +515,7 @@ body.has-hat .tracklabel{padding-right:80px}
 .ask-card .af img{width:100%;display:block}
 .ask-card .af .m-glass,.ask-card .af .m-acc{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .ask{overscroll-behavior:none}
-body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden;bottom:0;min-height:100%}
-html:has(body.ask-lock){height:100%;overflow:hidden}
+body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .ask-card .en .w{cursor:pointer;border-radius:6px;transition:background .2s}
 .ask-card .en .w.copied{animation:wpop .9s ease-out}
 @keyframes wpop{0%,30%{background:rgba(255,255,255,.55)}100%{background:transparent}}
@@ -2474,7 +2473,7 @@ function openAsk(d){
   else{$('askEn').innerHTML=d.en.split(/(\s+)/).map(w=>/\S/.test(w)?`<span class="w">${esc(w)}</span>`:w).join(''); $('askJp').textContent=d.jp;}
   $('askv').classList.toggle('free',!!d.free);
   $('askIn').placeholder=d.free?'ミーモに質問する':'このフレーズについて質問する';
-  renderAsk(); renderAiStats(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); $('askDim').classList.add('on'); document.body.classList.add('sv-lock'); askY=scrollY; clearTimeout(openAsk.lockT); openAsk.lockT=setTimeout(()=>{if(!v.classList.contains('open'))return; askY=scrollY; document.body.style.top=`calc(${-askY}px + env(safe-area-inset-top,0px))`; document.body.classList.add('ask-lock'); fitAsk()},400); fitAsk();
+  renderAsk(); renderAiStats(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); $('askDim').classList.add('on'); document.body.classList.add('sv-lock'); askY=scrollY; clearTimeout(openAsk.lockT); openAsk.lockT=setTimeout(()=>{if(!v.classList.contains('open'))return; askY=scrollY; document.body.style.top=`calc(${-askY}px + env(safe-area-inset-top,0px))`; const nav=document.querySelector('.bnav'),foot=$('askFoot'),n0=nav.getBoundingClientRect().bottom,f0=foot.getBoundingClientRect().bottom; document.body.classList.add('ask-lock'); fitAsk(); lockFix(nav,foot,n0,f0)},400); fitAsk();
 }
 // keep the chat header still and lift only the input bar above the keyboard (iOS pans the page otherwise)
 function fitAsk(){
@@ -2490,7 +2489,12 @@ function fitAsk(){
   $('askLog').style.minHeight=(v.clientHeight-fh-v.querySelector('.bv-hero').offsetHeight-$('askGrab').offsetHeight+2)+'px';
 }
 if(window.visualViewport){visualViewport.addEventListener('resize',fitAsk);visualViewport.addEventListener('scroll',fitAsk)}
-function closeAsk(){clearTimeout(openAsk.lockT);$('askProxy').blur();document.body.classList.remove('ask-lock');document.body.style.top='';scrollTo(0,askY||0);const v=$('askv');v.style.cssText='';$('askFoot').style.cssText='';v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');$('askDim').classList.remove('on');$('askDim').style.opacity='';document.body.classList.remove('sv-lock');$('askIn').blur()}
+function lockFix(nav,foot,n0,f0){const go=()=>{if(!document.body.classList.contains('ask-lock'))return;
+    const dn=nav.getBoundingClientRect().bottom-n0, df=foot.getBoundingClientRect().bottom-f0;
+    if(Math.abs(dn)>.5)nav.style.marginBottom=(dn+(parseFloat(nav.style.marginBottom)||0))+'px';
+    if(Math.abs(df)>.5&&!foot.classList.contains('kb'))foot.style.bottom=(df+(parseFloat(foot.style.bottom)||0))+'px'};
+  requestAnimationFrame(go); setTimeout(go,120); setTimeout(go,400)}
+function closeAsk(){clearTimeout(openAsk.lockT);const nv=document.querySelector('.bnav'); if(nv)nv.style.marginBottom='';$('askProxy').blur();document.body.classList.remove('ask-lock');document.body.style.top='';scrollTo(0,askY||0);const v=$('askv');v.style.cssText='';$('askFoot').style.cssText='';v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');$('askDim').classList.remove('on');$('askDim').style.opacity='';document.body.classList.remove('sv-lock');$('askIn').blur()}
 
 // pull the chat sheet down to close it (from the handle or the header, or anywhere once the chat is scrolled to the top)
 (function(){
