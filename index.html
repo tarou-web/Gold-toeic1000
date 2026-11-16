@@ -1179,6 +1179,13 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .face .sayb .spk{width:24px;height:24px}
 .face .sayb:active .spk{transform:scale(1.15)}
 .back .sayb{color:#55555a}
+/* Meemo chat as a bottom sheet: dim above it (tap to close), a grab handle you pull down to close */
+#askv{top:calc(env(safe-area-inset-top,0px) + 44px);border-radius:26px 26px 0 0;border-top:1px solid #34343a;box-shadow:0 -12px 40px rgba(0,0,0,.6)}
+.askdim{position:fixed;inset:0;z-index:59;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .3s}
+.askdim.on{opacity:1;pointer-events:auto}
+.ask-grab{position:sticky;top:0;z-index:3;display:flex;justify-content:center;padding:10px 0 6px;background:var(--bg);cursor:grab;touch-action:none}
+.ask-grab i{width:40px;height:5px;border-radius:99px;background:#5a5a60}
+#askv .sv-x{width:36px;height:36px;font-size:14px;opacity:.75}
 .slink{color:var(--fg);text-decoration:none}
 .slink:last-child{border-bottom:0}
 #contactSoon{font-size:.8rem;color:var(--muted);margin-right:6px}
@@ -1596,7 +1603,9 @@ header .kbar{display:none}
       <p class="pm-note">無料期間が終わると自動で続きます。App Storeの設定からいつでも解約できます。</p>
     </div>
   </section>
+  <div class="askdim" id="askDim" aria-hidden="true"></div>
   <section class="bv ask" id="askv" role="dialog" aria-modal="true" aria-labelledby="askTitle" aria-hidden="true">
+    <div class="ask-grab" id="askGrab" aria-hidden="true"><i></i></div>
     <div class="bv-hero"><div class="sv-in">
       <div class="sv-bar"><button class="sv-x" id="askClose" aria-label="閉じる">✕</button><h2 id="askTitle">ミーモに聞く</h2><span></span></div>
       <div class="ask-card"><div class="af" id="askFig" aria-hidden="true"></div><div><div class="en" id="askEn"></div><div class="jp" id="askJp"></div></div></div>
@@ -2484,7 +2493,7 @@ function openAsk(d){
   else{$('askEn').innerHTML=d.en.split(/(\s+)/).map(w=>/\S/.test(w)?`<span class="w">${esc(w)}</span>`:w).join(''); $('askJp').textContent=d.jp;}
   $('askv').classList.toggle('free',!!d.free);
   $('askIn').placeholder=d.free?'ミーモに質問する':'このフレーズについて質問する';
-  renderAsk(); renderAiStats(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); document.body.classList.add('sv-lock'); askY=scrollY; document.body.style.top=(-askY)+'px'; document.body.classList.add('ask-lock'); fitAsk();
+  renderAsk(); renderAiStats(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); $('askDim').classList.add('on'); document.body.classList.add('sv-lock'); askY=scrollY; document.body.style.top=(-askY)+'px'; document.body.classList.add('ask-lock'); fitAsk();
 }
 // keep the chat header still and lift only the input bar above the keyboard (iOS pans the page otherwise)
 function fitAsk(){
@@ -2497,10 +2506,33 @@ function fitAsk(){
   f.classList.toggle('kb',typing&&kb>60);
   f.style.transform=kb>60?`translateY(${-kb}px)`:'';
   const fh=f.offsetHeight; v.style.paddingBottom=(fh+(kb>60?kb:0))+'px';
-  $('askLog').style.minHeight=(H-fh-v.querySelector('.bv-hero').offsetHeight+2)+'px';
+  $('askLog').style.minHeight=(v.clientHeight-fh-v.querySelector('.bv-hero').offsetHeight-$('askGrab').offsetHeight+2)+'px';
 }
 if(window.visualViewport){visualViewport.addEventListener('resize',fitAsk);visualViewport.addEventListener('scroll',fitAsk)}
-function closeAsk(){$('askProxy').blur();document.body.classList.remove('ask-lock');document.body.style.top='';scrollTo(0,askY||0);const v=$('askv');v.style.cssText='';$('askFoot').style.cssText='';v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');document.body.classList.remove('sv-lock');$('askIn').blur()}
+function closeAsk(){$('askProxy').blur();document.body.classList.remove('ask-lock');document.body.style.top='';scrollTo(0,askY||0);const v=$('askv');v.style.cssText='';$('askFoot').style.cssText='';v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');$('askDim').classList.remove('on');$('askDim').style.opacity='';document.body.classList.remove('sv-lock');$('askIn').blur()}
+
+// pull the chat sheet down to close it (from the handle or the header, or anywhere once the chat is scrolled to the top)
+(function(){
+  const v=$('askv'), foot=$('askFoot'), dim=$('askDim');
+  dim.onclick=()=>closeAsk();
+  let y0=0,t0=0,dy=0,armed=false,drag=false;
+  const set=(y,anim)=>{const tr=anim?'transform .25s cubic-bezier(.2,.8,.2,1)':'none';
+    v.style.transition=tr; v.style.transform=y?`translateY(${y}px)`:'';
+    foot.style.transition=tr; foot.style.transform=y?`translateY(${y}px)`:'';
+    dim.style.transition=anim?'opacity .25s':'none'; dim.style.opacity=y?String(Math.max(0,1-y/(v.offsetHeight||600))):''};
+  v.addEventListener('touchstart',e=>{if(!v.classList.contains('open')||e.touches.length!==1)return;
+    const onTop=e.target.closest('#askGrab,.bv-hero'); armed=!!onTop||v.scrollTop<=0; drag=false; dy=0;
+    y0=e.touches[0].clientY; t0=Date.now();
+    if(onTop&&(document.activeElement===$('askIn')))$('askIn').blur();},{passive:true});
+  v.addEventListener('touchmove',e=>{if(!armed)return;dy=e.touches[0].clientY-y0;
+    if(!drag){if(dy>8&&(v.scrollTop<=0||e.target.closest('#askGrab,.bv-hero')))drag=true;else if(dy<-4){armed=false;return}else return}
+    if(e.cancelable)e.preventDefault(); set(Math.max(0,dy),false)},{passive:false});
+  const end=()=>{if(!drag){armed=false;return}drag=armed=false;
+    const fast=dy/(Date.now()-t0)>0.6;
+    if(dy>140||(fast&&dy>40)){set(v.offsetHeight,true);setTimeout(()=>{v.style.transition='none';foot.style.transition='none';closeAsk();requestAnimationFrame(()=>{v.style.transition='';foot.style.transition=''})},250)}
+    else{set(0,true);setTimeout(()=>{v.style.transition='';foot.style.transition='';dim.style.transition=''},260)}};
+  v.addEventListener('touchend',end); v.addEventListener('touchcancel',end);
+})();
 function openWardrobe(){renderWardrobe();$('wardrobe').hidden=false;$('hangerBtn').setAttribute('aria-expanded','true')}
 function closeWardrobe(){$('wardrobe').hidden=true;$('hangerBtn').setAttribute('aria-expanded','false')}
 const PARROT_FACE=`<svg class="bface" viewBox="0 0 100 100" aria-hidden="true">
