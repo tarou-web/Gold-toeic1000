@@ -535,7 +535,7 @@ body.has-hat .tracklabel{padding-right:80px}
 .ask-card .af img{width:100%;display:block}
 .ask-card .af .m-glass,.ask-card .af .m-acc{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .ask{overscroll-behavior:none}
-body.ask-lock{position:fixed;left:0;right:0;width:100%;overflow:visible!important}
+html.ask-open,html.ask-open body{overflow:hidden;overscroll-behavior:none}
 .ask-card .en .w{cursor:pointer;border-radius:6px;transition:background .2s}
 .ask-card .en .w.copied{animation:wpop .9s ease-out}
 @keyframes wpop{0%,30%{background:rgba(255,255,255,.55)}100%{background:transparent}}
@@ -2495,7 +2495,7 @@ function openAsk(d){
   else{$('askEn').innerHTML=d.en.split(/(\s+)/).map(w=>/\S/.test(w)?`<span class="w">${esc(w)}</span>`:w).join(''); $('askJp').textContent=d.jp;}
   $('askv').classList.toggle('free',!!d.free);
   $('askIn').placeholder=d.free?'ミーモに質問する':'このフレーズについて質問する';
-  renderAsk(); renderAiStats(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); $('askDim').classList.add('on'); document.body.classList.add('sv-lock'); askY=scrollY; clearTimeout(openAsk.lockT); openAsk.lockT=setTimeout(()=>{if(!v.classList.contains('open'))return; askY=scrollY; document.body.style.top=`calc(${-askY}px + env(safe-area-inset-top,0px))`; const nav=document.querySelector('.bnav'),foot=$('askFoot'),n0=nav.getBoundingClientRect().bottom,f0=foot.getBoundingClientRect().bottom; document.body.classList.add('ask-lock'); fitAsk(); lockFix(nav,foot,n0,f0)},400); fitAsk();
+  renderAsk(); renderAiStats(); const v=$('askv'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); $('askFoot').classList.add('show'); $('askDim').classList.add('on'); document.body.classList.add('sv-lock'); askY=scrollY; document.documentElement.classList.add('ask-open'); fitAsk();
 }
 // keep the chat header still and lift only the input bar above the keyboard (iOS pans the page otherwise)
 function fitAsk(){
@@ -2503,7 +2503,7 @@ function fitAsk(){
   const v=$('askv'); if(!v.classList.contains('open'))return;
   const vv=window.visualViewport, H=document.documentElement.clientHeight;
   const kb=vv?Math.max(0,Math.round(H-vv.height-vv.offsetTop)):0;
-  if(vv&&vv.offsetTop>0&&document.body.classList.contains('ask-lock'))scrollTo(0,0);
+  if(Math.abs(scrollY-askY)>1)scrollTo(0,askY); // the keyboard may scroll the page behind; put it back
   const f=$('askFoot'), typing=document.activeElement===$('askIn')||document.activeElement===$('askProxy');
   f.classList.toggle('kb',typing&&kb>60);
   f.style.transform=kb>60?`translateY(${-kb}px)`:'';
@@ -2511,17 +2511,13 @@ function fitAsk(){
   $('askLog').style.minHeight=(v.clientHeight-fh-v.querySelector('.bv-hero').offsetHeight-$('askGrab').offsetHeight+2)+'px';
 }
 if(window.visualViewport){visualViewport.addEventListener('resize',fitAsk);visualViewport.addEventListener('scroll',fitAsk)}
-function lockFix(nav,foot,n0,f0){const go=()=>{if(!document.body.classList.contains('ask-lock'))return;
-    const dn=nav.getBoundingClientRect().bottom-n0, df=foot.getBoundingClientRect().bottom-f0;
-    if(Math.abs(dn)>.5)nav.style.marginBottom=(dn+(parseFloat(nav.style.marginBottom)||0))+'px';
-    if(Math.abs(df)>.5&&!foot.classList.contains('kb'))foot.style.bottom=(df+(parseFloat(foot.style.bottom)||0))+'px'};
-  requestAnimationFrame(go); setTimeout(go,120); setTimeout(go,400)}
-function closeAsk(){clearTimeout(openAsk.lockT);const nv=document.querySelector('.bnav'); if(nv)nv.style.marginBottom='';$('askProxy').blur();document.body.classList.remove('ask-lock');document.body.style.top='';scrollTo(0,askY||0);const v=$('askv');v.style.cssText='';$('askFoot').style.cssText='';v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');$('askDim').classList.remove('on');$('askDim').style.opacity='';document.body.classList.remove('sv-lock');$('askIn').blur()}
+addEventListener('scroll',()=>{if($('askv').classList.contains('open')&&Math.abs(scrollY-askY)>1)scrollTo(0,askY)},{passive:true});
+function closeAsk(){$('askProxy').blur();document.documentElement.classList.remove('ask-open');const v=$('askv');v.style.cssText='';$('askFoot').style.cssText='';v.classList.remove('open');v.setAttribute('aria-hidden','true');$('askFoot').classList.remove('show');$('askDim').classList.remove('on');$('askDim').style.opacity='';document.body.classList.remove('sv-lock');$('askIn').blur()}
 
 // pull the chat sheet down to close it (from the handle or the header, or anywhere once the chat is scrolled to the top)
 (function(){
   const v=$('askv'), foot=$('askFoot'), dim=$('askDim');
-  dim.onclick=()=>closeAsk();
+  dim.onclick=()=>closeAsk(); dim.addEventListener('touchmove',e=>{if(e.cancelable)e.preventDefault()},{passive:false});
   let y0=0,t0=0,dy=0,armed=false,drag=false;
   const set=(y,anim)=>{const tr=anim?'transform .25s cubic-bezier(.2,.8,.2,1)':'none';
     v.style.transition=tr; v.style.transform=y?`translateY(${y}px)`:'';
@@ -3311,7 +3307,7 @@ function renderList(){
 
 // shrink the card (only as much as needed) so the まだ / 覚えた buttons stay above the bottom menu
 function setBnavH(){const n=document.querySelector('.bnav');if(n)document.documentElement.style.setProperty('--bnavh',Math.max(0,document.documentElement.clientHeight-n.getBoundingClientRect().top)+'px')}
-function fitCard(){if(document.body.classList.contains('ask-lock'))return; // the page is pinned under the chat sheet; measuring now would shrink the card
+function fitCard(){if(document.documentElement.classList.contains('ask-open'))return; // the page is pinned under the chat sheet; measuring now would shrink the card
   setBnavH();
   if(bigCard){const f=$('flip');if(f){f.style.height='';f.style.minHeight=''}return}
   const f=$('flip'), y=$('yes'), nav=document.querySelector('.bnav'); if(!f||!y||!nav||!f.offsetParent)return;
