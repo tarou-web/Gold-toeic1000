@@ -1173,6 +1173,10 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .say .spk{width:23px;height:23px}
 #qsay{display:grid;place-items:center}
 #qsay .spk{width:27px;height:27px}
+.face .sayb{width:40px;height:40px;margin:-12px 6px -12px 0;padding:0;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.face .sayb .spk{width:24px;height:24px}
+.face .sayb:active .spk{transform:scale(1.15)}
+.back .sayb{color:#55555a}
 .slink{color:var(--fg);text-decoration:none}
 .slink:last-child{border-bottom:0}
 #contactSoon{font-size:.8rem;color:var(--muted);margin-right:6px}
@@ -2802,14 +2806,13 @@ function toggleFav(id){S.fav=S.fav||{};const on=!S.fav[id];if(on)S.fav[id]=1;els
 function faceHTML(d,lang,isBack){
   const t=lang==='en'?d.en:d.jp;
   return `<span class="corner">No.${d.no||d.id}</span>
-    <span class="tr"><span class="stchip">${chip(d)}</span><span class="trr"><span class="side">${lang==='en'?'ENGLISH':'日本語'}</span><button class="favb" data-fav aria-label="お気に入り" aria-pressed="${!!(S.fav||{})[d.id]}"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button></span></span>
+    <span class="tr"><span class="stchip">${chip(d)}</span><span class="trr">${lang==='en'?`<button class="sayb" data-say aria-label="発音を聞く"><svg class="spk" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18.3 6.6a7.8 7.8 0 0 1 0 10.8"/></svg></button>`:''}<button class="favb" data-fav aria-label="お気に入り" aria-pressed="${!!(S.fav||{})[d.id]}"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button></span></span>
     ${isBack?'':`<button class="shufb" data-shuf aria-label="シャッフル" title="シャッフル"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3c4 0 6 10 10 10h5"/><path d="M3 17h3c1.5 0 2.7-1.4 3.7-3.2M14.3 10.2C15.3 8.4 16.5 7 18 7h3"/><path d="M18 4l3 3-3 3M18 14l3 3-3 3"/></svg></button>`}
     <button class="askb" data-ask aria-label="このカードをミーモに聞く"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12 2.5C12.7 8.3 15.7 11.3 21.5 12 15.7 12.7 12.7 15.7 12 21.5 11.3 15.7 8.3 12.7 2.5 12 8.3 11.3 11.3 8.3 12 2.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></button>
     <button class="expb" data-exp aria-label="${bigCard?'カードを小さくする':'カードを大きくする'}">${bigCard?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>'}</button>
     ${!isBack&&d.img?`<img class="cimg" src="${esc(d.img)}" alt="" loading="lazy">`:''}
     <div class="txt ${lang}">${esc(t)}</div>
     ${lang==='jp'&&d.g&&d.g.length?`<div class="gloss">${d.g.map(([w,m])=>`<div><b>${esc(w)}</b><span>${esc(m)}</span></div>`).join('')}</div>`:''}
-    ${lang==='en'?`<button class="say" data-say><svg class="spk" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18.3 6.6a7.8 7.8 0 0 1 0 10.8"/></svg><span>発音を聞く</span></button>`:''}
     ${isBack&&d.memo?`<div class="memo"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg>${esc(d.memo)}</div>`:''}
     ${isBack?`<button class="editb" data-edit-card aria-label="このカードを直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button>`:''}
     ${isBack&&d.fix?`<div class="fixnote">元の表記を修正: ${esc(d.fix)}</div>`:''}
