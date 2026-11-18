@@ -1197,7 +1197,7 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .rvg-note{margin:6px 0 0;font-size:.72rem;color:var(--muted);font-weight:800}
 .rvg-empty{margin:8px 0;font-size:.85rem;color:var(--muted);font-weight:800;line-height:1.6}
 .rvg-fh{margin-top:6px;display:flex;justify-content:space-between;align-items:center;font-size:.76rem;font-weight:800;color:var(--muted)}
-.rvg-eye{min-height:34px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--green);font:inherit;font-size:.76rem;font-weight:800;display:flex;align-items:center;gap:4px;cursor:pointer}
+.rvg-eye{white-space:nowrap;flex:none;min-height:34px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--green);font:inherit;font-size:.76rem;font-weight:800;display:flex;align-items:center;gap:4px;cursor:pointer}
 .rvg-list{max-height:150px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin-top:4px;border-top:1px solid var(--line)}
 .rvg-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);min-height:40px}
 .rvg-row:last-of-type{border-bottom:0}
@@ -1209,10 +1209,13 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .mt{width:56px;height:6px;border-radius:3px;background:var(--line);overflow:hidden;display:flex;flex:none}
 .mt i{display:block;height:100%}.mt i.risk{background:#ff9f0a}.mt i.soon{background:#b8931a}.mt i.ok{background:#f5c518}
 .rvg-all{width:100%;min-height:42px;border:0;border-top:1px solid var(--line);background:none;color:var(--green);font:inherit;font-weight:800;font-size:.82rem;cursor:pointer;margin-top:2px}
+.rvg-cap{margin:0 0 8px;font-size:.78rem;font-weight:800;color:var(--muted)}
+.rvg-stats b small{font-size:.7rem;margin-left:1px}
+.rvg-fh small{font-weight:700;margin-left:2px}
 .rvg-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center}
 .rvg-stats div{background:var(--bg);border-radius:14px;padding:8px 0;display:flex;flex-direction:column}
 .rvg-stats span{font-size:.7rem;color:var(--muted);font-weight:800}.rvg-stats b{font-size:1.35rem;font-weight:900}.rvg-stats b.y{color:#f5c518}
-.rvg-bars{margin-top:14px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end;height:196px}
+.rvg-bars{margin-top:12px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end;height:186px}
 .rvg-bars div{display:flex;flex-direction:column;align-items:center;gap:4px}
 .rvg-bars i{display:block;width:100%;border-radius:8px;background:#4a4a50}.rvg-bars i.on{background:#f5c518}
 .rvg-bars .v{font-size:.75rem;font-weight:800;color:var(--muted)}.rvg-bars .d{font-size:.7rem;font-weight:800;color:var(--muted)}
@@ -3166,7 +3169,7 @@ const isDue=d=>{const rv=(S.rv||{})[d.id];return !!rv&&dayNo()>=rv[0]+rv[1]};
 // A card answered on day rv[0] with a gap of rv[1] days is taken to be ~85% remembered on its due day,
 // and to fade the same way before and after it (longer gaps = slower fading).
 const RV_R=.85;
-function recallOf(id,day){const rv=(S.rv||{})[id];if(!rv)return null;const t=Math.max(0,(day??dayNo())-rv[0]);return Math.pow(RV_R,t/Math.max(1,rv[1]))}
+function recallOf(id,day){const rv=(S.rv||{})[id];if(!rv)return null;const t=Math.max(0,(day??dayNo())-rv[0]);if(!rv[1])return .4*Math.pow(RV_R,t); /* last answer was wrong */ return Math.pow(RV_R,t/rv[1])}
 // cards marked 覚えた that have no review record yet count as mostly remembered (no date to fade from)
 function memNow(day){let sum=0,n=0;for(const d of DATA){const r=recallOf(d.id,day);if(r==null){if(S.known[d.id]){n++;sum+=.8}continue}n++;sum+=r}return{sum:Math.round(sum),n}}
 const mhKey=()=>KEY+'-mh-'+(S.deck||'gold');
@@ -3202,7 +3205,7 @@ function rvgMem(){
   const rows=fg.map(([d,r])=>{const p=Math.round(r*100),c=pctCls(r);
     return `<div class="rvg-row">${RVSHOW?`<div class="w"><b>${esc(d.en)}</b><small>${esc(d.jp)}</small></div>`:`<div class="w hid" aria-label="かくれています"><i></i><i></i></div>`}<span class="pc ${c}">${p}%</span><span class="mt"><i class="${c}" style="width:${p}%"></i></span></div>`}).join('');
   return `<div class="rvg-top"><span>いま覚えている（推定）</span><span><b>${now.sum}</b> 枚</span></div>${svg}
-    <div class="rvg-fh"><span>忘れかけているカード ${fg.length}枚</span>${fg.length?`<button class="rvg-eye" data-rvshow aria-pressed="${RVSHOW}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>${RVSHOW?'かくす':'単語を見る'}</button>`:''}</div>
+    <div class="rvg-fh"><span>忘れかけ ${fg.length}枚<small>（70%より下）</small></span>${fg.length?`<button class="rvg-eye" data-rvshow aria-pressed="${RVSHOW}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>${RVSHOW?'かくす':'単語を見る'}</button>`:''}</div>
     ${fg.length?`<div class="rvg-list">${rows}</div>`:`<p class="rvg-note">いまは、忘れかけているカードはありません</p>`}`;
 }
 function rvgPlan(){
@@ -3210,8 +3213,10 @@ function rvgPlan(){
   for(const d of DATA){const rv=(S.rv||{})[d.id];if(!rv)continue;const k=rv[0]+rv[1]-t;if(k<=0)n[0]++;else if(k<7)n[k]++}
   const mx=Math.max(1,...n),wd='日月火水木金土',tw=new Date().getDay();
   const bars=n.map((v,k)=>`<div><span class="v">${v}</span><i style="height:${Math.max(3,Math.round(v/mx*150))}px" class="${k?'':'on'}"></i><span class="d">${k?wd[(tw+k)%7]:'今日'}</span></div>`).join('');
-  return `<div class="rvg-stats"><div><span>今日</span><b class="y">${n[0]}</b></div><div><span>明日</span><b>${n[1]}</b></div><div><span>7日間</span><b>${n.reduce((a,b)=>a+b,0)}</b></div></div>
-    <div class="rvg-bars" role="img" aria-label="これからの復習 ${n.map((v,k)=>(k?wd[(tw+k)%7]:'今日')+v+'枚').join(' ')}">${bars}</div>`;
+  return `<p class="rvg-cap">復習する日が来るカードの枚数</p>
+    <div class="rvg-stats"><div><span>今日やる</span><b class="y">${n[0]}<small>枚</small></b></div><div><span>明日</span><b>${n[1]}<small>枚</small></b></div><div><span>7日間の合計</span><b>${n.reduce((a,b)=>a+b,0)}<small>枚</small></b></div></div>
+    <div class="rvg-bars" role="img" aria-label="これからの復習 ${n.map((v,k)=>(k?wd[(tw+k)%7]:'今日')+v+'枚').join(' ')}">${bars}</div>
+    <p class="rvg-note">今日の分には、まちがえたカードと、予定の日を過ぎたカードも入っています</p>`;
 }
 function rvgLvl(){
   const c={s:0,f:0,l:0,n:0};
