@@ -3363,10 +3363,12 @@ function renderQuiz0(){
     v.innerHTML=`<div class="quiz" style="display:flex;flex-direction:column;gap:10px">${head}
      <h2 class="ask">${je?'正しい英語を選んでください':'正しい意味を選んでください'}</h2>${bubble(je?d.jp:d.en,je?'jp':'en')}
      <div class="opts">${opts.map((o,i)=>`<button class="opt ${je?'':'jp'}" data-id="${o.id}"><span class="k">${i+1}</span><span>${esc(je?o.en:o.jp)}</span></button>`).join('')}</div>
+     <div class="mc-tm" aria-hidden="true"><i></i></div><p class="mc-fb" aria-live="polite"></p>
      <button class="qskip" id="qskip">わからない</button></div>`;
-    const mark=()=>{v.querySelector(`.opt[data-id="${d.id}"]`).classList.add('right');v.querySelectorAll('.opt').forEach(x=>x.disabled=true);$('qskip').disabled=true};
-    v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(answered)return;const ok=+b.dataset.id===d.id;if(!ok)b.classList.add('wrong');mark();lrJudge(d,ok,`正解：${esc(je?d.en:d.jp)}`)});
-    $('qskip').onclick=()=>{if(answered)return;mark();lrJudge(d,false,`正解：${esc(je?d.en:d.jp)}`)};
+    // same as the 4択 tab: colour the choices, then move on by itself (tap again to skip)
+    const mark=b=>{v.querySelector(`.opt[data-id="${d.id}"]`).classList.add('right');v.querySelectorAll('.opt').forEach(x=>{if(!x.classList.contains('right')&&x!==b)x.classList.add('dim')});$('qskip').disabled=true};
+    v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(answered){lrNext();return}const ok=+b.dataset.id===d.id;if(!ok)b.classList.add('wrong');mark(b);lrJudge(d,ok,`正解：${esc(je?d.en:d.jp)}`,true)});
+    $('qskip').onclick=()=>{if(answered)return;mark(null);lrJudge(d,false,`正解：${esc(je?d.en:d.jp)}`,true)};
   }else if(kind==='order'){
     const words=enTiles(d.en);
     let tiles=cache&&cache.tiles;
@@ -3405,7 +3407,8 @@ function renderQuiz0(){
     setTimeout(()=>inp.focus({preventScroll:true}),60);
   }
 }
-function lrJudge(d,ok,sub){
+function lrNext(){clearTimeout(mT);if(tab==='quiz')renderQuiz()}
+function lrJudge(d,ok,sub,auto){
   answered=true; LR.step++; LR.q.shift();
   const later=(id,gap)=>LR.q.splice(Math.min(gap,LR.q.length),0,id);
   let title;
@@ -3418,8 +3421,14 @@ function lrJudge(d,ok,sub){
     sub=(sub||'')+'<br><small>あとでもう一度出ます</small>';
   }
   sfx(ok); buzz(ok); save(); header(); mascotSay(ok?'ok':'ng');
-  showSheet(ok,title,sub,d);
   const v=$('v-quiz');
+  if(auto){
+    const ms_=ok?800:1600, q=v.querySelector('.quiz'), fb=v.querySelector('.mc-fb'), tm=v.querySelector('.mc-tm');
+    q&&q.classList.add(ok?'ans-ok':'ans-ng');
+    if(fb)fb.innerHTML=(ok?`<b>${esc(title)}</b><small>もう一度押すとすぐ次へ</small>`:`<b>${sub.split('<br>')[0]}</b><small>あとでもう一度出ます</small>`);
+    if(tm){tm.style.setProperty('--d',ms_+'ms');void tm.offsetWidth;tm.classList.add('go')}
+    clearTimeout(mT); mT=setTimeout(lrNext,ms_); return}
+  showSheet(ok,title,sub,d);
   requestAnimationFrame(()=>{const r=v.querySelector('.opt.right,.ordans,.qin'),sh=$('sheet');if(!r)return;const over=r.getBoundingClientRect().bottom-(sh.getBoundingClientRect().top-12);if(over>0)scrollBy({top:over,behavior:'smooth'})});
 }
 function showSheet(ok,title,sub,d,next){
