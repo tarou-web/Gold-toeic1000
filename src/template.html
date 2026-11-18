@@ -1181,6 +1181,30 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .rd-row .nx{font-size:.7rem;font-weight:800;color:var(--muted);flex:none}.rd-row .nx.o{color:#ff9f0a;font-weight:900}
 .rd-say{width:40px;height:40px;border:0;background:none;color:var(--muted);display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer;border-radius:10px}
 .rd-btns{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+/* 4択: auto-advance feedback */
+.opt.dim{opacity:.45}
+.mc-tm{height:4px;border-radius:999px;background:var(--line);overflow:hidden;opacity:0;transition:opacity .15s}
+.mc-tm i{display:block;height:100%;background:var(--green);transform:scaleX(0);transform-origin:left center}
+.ans-ng .mc-tm i{background:var(--red)}
+.mc-tm.go{opacity:1}.mc-tm.go i{animation:mcfill var(--d,800ms) linear forwards}
+@keyframes mcfill{to{transform:scaleX(1)}}
+.mc-fb{margin:0;min-height:1.3em;display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.85rem}
+.mc-fb b{font-weight:900;color:var(--green-ink)}.ans-ng .mc-fb b{color:var(--red-ink)}
+.mc-fb small{font-size:.7rem;color:var(--muted);font-weight:700;white-space:nowrap;flex:none}
+/* 4択 done */
+.mcd-h{display:flex;align-items:center;gap:14px}
+.qd-ring.sm{width:64px;height:64px}.qd-ring.sm span{width:50px;height:50px;padding-top:15px;font-size:1rem}
+.mcd-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.mcd-t h2{margin:0;font-family:var(--f-jp);font-weight:900;font-size:1.35rem;color:#f5c518}
+.mcd-t small{font-size:.8rem;color:var(--muted);font-weight:700}.mcd-t small b{color:var(--fg)}
+.mcd-t .rd-c{margin-top:4px}
+.rd-c .r{background:var(--red-s);color:var(--red-ink)}
+.mcdone .rd-list{max-height:280px}
+.rd-row .mk.r{background:var(--red);color:#18181a}
+.mc-r.ng{background:var(--red-s);align-items:flex-start;padding-top:8px;padding-bottom:8px}
+.mc-r.ng .mk{margin-top:3px}
+.mc-r .w2{flex:1;min-width:0}
+.mc-r .mine{margin-top:2px;font-size:.75rem;font-weight:800;color:var(--red-ink)}
 .rd-btns .btn{min-height:52px;width:100%}
 .rvg{margin-top:10px;background:var(--surface);border-radius:22px;padding:10px 14px 12px}
 .rvg-seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:3px;border-radius:12px;background:var(--bg)}
@@ -3388,8 +3412,8 @@ function showSheet(ok,title,sub,d,next){
 
 // ---- 4択クイズ: 10 quick questions with tricky wrong choices
 const MC_N=10;
-let MQ=[],mi=0,ms={r:0,n:0,res:{}},manswered=false,mOpts=null;
-function startMc(){MQ=shuf(pool()).slice(0,MC_N);mi=0;ms={r:0,n:0,res:{}};mOpts=null}
+let MQ=[],mi=0,ms={r:0,n:0,res:{},pick:{}},manswered=false,mOpts=null; var mT=0;
+function startMc(){clearTimeout(mT);MQ=shuf(pool()).slice(0,MC_N);mi=0;ms={r:0,n:0,res:{},pick:{}};mOpts=null}
 function renderMc(){ try{ return renderMc0() } finally { qmodeSync(); fitMc() } }
 // shrink the 4択 text only as much as needed so all four choices stay above the bottom menu
 function fitMc(){
@@ -3403,14 +3427,21 @@ function renderMc0(){
   const v=$('v-mc');
   if(!MQ.length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
   if(DATA.length<4){v.innerHTML='<div class="empty">4択クイズは、単語帳にカードが4枚以上あると使えます。</div>';return}
+  clearTimeout(mT);
   if(mi>=MQ.length){
-    const acc=Math.round(ms.r/Math.max(1,ms.n)*100);
-    v.innerHTML=`<div class="done qdone">
-      <div class="qd-card"><div class="qd-ring" style="--p:${acc}"><span>${acc}<small>%</small></span></div><div class="qd-t"><h2>クイズ完了！</h2><span>${ms.n}問中 ${ms.r}問 正解</span></div></div>
-      <button class="btn ok" id="mAgain">次のクイズへ</button>
-      <div class="qd-h"><span>このクイズで出た単語</span><span>× ${ms.n-ms.r}問</span></div>
-      <div class="qrev">${MQ.map(d=>{const ok=ms.res[d.id];return `<div class="qrev-r ${ok?'ok':'ng'}"><span class="m">${ok?'○':'×'}</span><div><div class="e">${esc(d.en)}</div><div class="j">${esc(d.jp)}</div></div></div>`}).join('')}</div></div>`;
-    fanfare(); $('mAgain').onclick=()=>{startMc();renderMc()};return}
+    const acc=Math.round(ms.r/Math.max(1,ms.n)*100), ng=ms.n-ms.r;
+    const spk='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h3l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>';
+    const mkY='<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>', mkX='<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    // missed questions first, each with what was chosen
+    const list=MQ.filter(d=>d.id in ms.res).sort((a,b)=>(ms.res[a.id]?1:0)-(ms.res[b.id]?1:0));
+    const rows=list.map(d=>{const ok=ms.res[d.id],mine=ms.pick[d.id];
+      return `<div class="rd-row mc-r${ok?'':' ng'}"><i class="mk ${ok?'y':'r'}" aria-label="${ok?'正解':'まちがえ'}">${ok?mkY:mkX}</i><div class="w2"><div class="w"><b>${esc(d.en)}</b><span>${esc(d.jp)}</span></div>${ok||mine==null?'':`<div class="mine">あなたの答え：<s>${esc(mine)}</s></div>`}</div><button class="rd-say" data-say-id="${esc(String(d.id))}" aria-label="${esc(d.en)} の発音を聞く">${spk}</button></div>`}).join('');
+    v.innerHTML=`<div class="rdone mcdone">
+      <div class="mcd-h"><div class="qd-ring sm" style="--p:${acc}"><span>${acc}<small>%</small></span></div><div class="mcd-t"><h2>クイズ完了！</h2><small>${ms.n}問中 <b>${ms.r}問</b> 正解</small><div class="rd-c"><span class="y">正解 ${ms.r}</span>${ng?`<span class="r">まちがえ ${ng}</span>`:''}</div></div></div>
+      <div class="rd-box"><div class="rd-bh"><span>このクイズで出た単語 ${list.length}</span><span>${list.length>5?'枠の中をスクロール':''}</span></div><div class="rd-list">${rows}</div></div>
+      <div class="rd-btns"><button class="btn" id="mQuit">おわる</button><button class="btn ok" id="mAgain">次のクイズへ</button></div></div>`;
+    v.querySelector('.rd-list').onclick=e=>{const b=e.target.closest('[data-say-id]');if(!b)return;const d=MQ.find(x=>String(x.id)===b.dataset.sayId);d&&speak(d.en)};
+    fanfare(); $('mAgain').onclick=()=>{startMc();scrollTo(0,0);renderMc()}; $('mQuit').onclick=()=>{startMc();scrollTo(0,0);setTab('card')};return}
   const d=MQ[mi], je=$('dir').value==='je';
   let opts=mOpts&&mOpts.mi===mi&&mOpts.id===d.id?mOpts.list:null;
   if(!opts){opts=shuf([d,...trickyOpts(d,je)]);mOpts={mi,id:d.id,list:opts}}
@@ -3421,18 +3452,25 @@ function renderMc0(){
    <div class="bubble"><div class="dot"><svg viewBox="0 0 24 24"><path fill="var(--green)" d="M4 5a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-6l-5 4v-4a2 2 0 0 1-2-2z"/></svg></div>
      <div class="say-box"><div class="txt ${je?'jp':'en'}" style="font-size:1.12rem">${esc(je?d.jp:d.en)}</div></div></div>
    <div class="opts">${opts.map((o,i)=>`<button class="opt ${je?'':'jp'}" data-id="${o.id}"><span class="k">${i+1}</span><span>${esc(je?o.en:o.jp)}</span></button>`).join('')}</div>
+   <div class="mc-tm" aria-hidden="true"><i></i></div><p class="mc-fb" aria-live="polite"></p>
    </div>`;
   v.querySelectorAll('.opt').forEach(b=>b.onclick=()=>mcAnswer(b,d,je));
 }
+function mcNext(){clearTimeout(mT);if(!manswered)return;manswered=false;mi++;renderMc()}
 function mcAnswer(b,d,je){
-  if(manswered)return; manswered=true;
+  if(manswered){mcNext();return} manswered=true;
   const v=$('v-mc'); const ok=+b.dataset.id===d.id; ms.n++; ms.res[d.id]=ok;
+  if(!ok){const o=DATA.find(x=>String(x.id)===b.dataset.id);ms.pick[d.id]=o?(je?o.en:o.jp):b.textContent}
   review(d.id,ok); if(ok){ms.r++;S.known[d.id]=1;studied(10);credit(d.id,false);earnCoin(d.id)}else{b.classList.add('wrong');S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}
   v.querySelector(`.opt[data-id="${d.id}"]`).classList.add('right');
-  v.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+  v.querySelectorAll('.opt').forEach(x=>{if(!x.classList.contains('right')&&x!==b)x.classList.add('dim')});
   sfx(ok); buzz(ok); save(); header(); mascotSay(ok?'ok':'ng');
-  showSheet(ok,ok?CHEER[Math.random()*CHEER.length|0]:'不正解',ok?'':`正解：${esc(je?d.en:d.jp)}`,d,()=>{mi++;renderMc()});
-  requestAnimationFrame(()=>{const r=v.querySelector('.opt.right'),sh=$('sheet');if(!r)return;const over=r.getBoundingClientRect().bottom-(sh.getBoundingClientRect().top-12);if(over>0)scrollBy({top:over,behavior:'smooth'})});
+  // no sheet: colour the choices, then move on by itself (tap again to skip)
+  const ms_=ok?800:1600, q=v.querySelector('.quiz'), fb=v.querySelector('.mc-fb'), tm=v.querySelector('.mc-tm');
+  q&&q.classList.add(ok?'ans-ok':'ans-ng');
+  if(fb)fb.innerHTML=(ok?`<b>${esc(CHEER[Math.random()*CHEER.length|0])}</b>`:`<b>正解：${esc(je?d.en:d.jp)}</b>`)+'<small>もう一度押すとすぐ次へ</small>';
+  if(tm){tm.style.setProperty('--d',ms_+'ms');void tm.offsetWidth;tm.classList.add('go')}
+  mT=setTimeout(mcNext,ms_);
 }
 
 // ---- テスト: all questions on one page, mixed types, graded at the end
@@ -3673,7 +3711,7 @@ function qmodeSync(){
 function setTab(t){
   if(tab==='quiz'&&t!=='quiz'&&LR)LR.started=false;
   if(t!=='card'&&bigCard){bigCard=false;document.body.classList.remove('cardbig');document.documentElement.classList.remove('noscroll')}
-  tab=t; hideSheet(); if(t!=='test'&&document.body.classList.contains('testing')){document.body.classList.remove('testing');document.documentElement.classList.remove('noscroll')}
+  tab=t; hideSheet(); try{clearTimeout(mT); if(manswered&&t!=='mc'){manswered=false;mi++}}catch(e){} if(t!=='test'&&document.body.classList.contains('testing')){document.body.classList.remove('testing');document.documentElement.classList.remove('noscroll')}
   for(const x of ['card','quiz','mc','test','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
   savePrefs(); refresh(false); qmodeSync(); requestAnimationFrame(fitCard);
 }
