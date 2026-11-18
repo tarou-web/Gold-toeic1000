@@ -730,7 +730,11 @@ body.czmode .wrap{padding-bottom:300px!important}
 .czr.r2{grid-template-columns:repeat(9,minmax(0,1fr));padding:0 17px}
 .czr.r3{grid-template-columns:repeat(7,minmax(0,1fr)) 1.6fr;padding:0 17px}
 .czk{height:48px;border:0;border-radius:10px;background:#3d3d42;color:var(--fg);font:inherit;font-size:21px;font-weight:800;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
-.czk:active{background:#5a5a60}
+.czk{position:relative}
+.czk.pr{background:#6a6a70}
+.czk.pr[data-k]::after{content:attr(data-k);position:absolute;left:50%;bottom:calc(100% + 4px);transform:translateX(-50%);width:calc(100% + 16px);min-width:44px;height:58px;border-radius:12px;background:#f2f2f3;color:#18181a;font-size:30px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.45);pointer-events:none;z-index:2}
+.czbx i.pop{animation:czpop .22s ease-out}
+@keyframes czpop{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
 .czk.del{background:#2c2c30}
 .czskip{min-height:48px;margin:2px 4px 0}
 .czq.czdone .czkb{display:none}
@@ -3421,11 +3425,15 @@ function renderQuiz0(){
     const fin=(ok,near)=>{if(answered)return;v.querySelector('.czq').classList.add('czdone');
       bx.forEach((b,i)=>{b.textContent=W[i];b.classList.add(ok?'ok':(normAns(typed[i]||'')===normAns(W[i])?'ok':'ng'))});
       lrJudge(d,ok,ok?(near?`つづりに注意：${esc(cl.word)}`:''):`正解：${clozeAns(cl)}`)};
-    const press=c=>{if(answered)return;const i=typed.findIndex(t=>!t);if(i<0)return;typed[i]=c;draw();
+    const press=c=>{if(answered)return;const i=typed.findIndex(t=>!t);if(i<0)return;typed[i]=c;draw();bx[i].classList.remove('pop');void bx[i].offsetWidth;bx[i].classList.add('pop');
       if(typed.every(t=>t)){setTimeout(()=>{if(answered)return;const k=clozeOk(typed.join(''),cl);fin(k>0,k===1)},180)}};
     const del=()=>{if(answered)return;for(let i=n-1;i>=0;i--)if(!fixed(i)&&typed[i]){typed[i]='';break}draw()};
     v.querySelectorAll('.czk[data-k]').forEach(b=>b.onclick=()=>press(b.dataset.k));
     $('czdel').onclick=del;
+    // show which key was pressed: a big letter pops up above the key while the finger is on it
+    v.querySelectorAll('.czk').forEach(b=>{let t=0;const up=()=>{clearTimeout(t);t=setTimeout(()=>b.classList.remove('pr'),90)};
+      b.addEventListener('pointerdown',()=>{clearTimeout(t);v.querySelectorAll('.czk.pr').forEach(x=>x!==b&&x.classList.remove('pr'));b.classList.add('pr')});
+      ['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,up))});
     $('qskip').onclick=()=>{if(answered)return;fin(false)};
     $('czx').onclick=()=>{startQuiz();scrollTo(0,0);renderQuiz()};
     czKey=e=>{if(tab!=='quiz'||!v.querySelector('.czq')||e.metaKey||e.ctrlKey||e.altKey)return;if(/^[a-z]$/i.test(e.key)){press(e.key.toLowerCase());e.preventDefault()}else if(e.key==='Backspace'){del();e.preventDefault()}};
