@@ -1870,6 +1870,130 @@ header .kbar{display:none}
 .gs-btns .two button{height:52px;border-radius:16px;border:1px solid #2e2e33;border-bottom-width:4px;background:#18181b;color:#c9c9ce;font:inherit;font-size:.9rem;cursor:pointer}
 .gs-btns .two .send{color:#ffb950}
 @media (max-height:700px){.gp-opts button{height:60px}.gp-panel{height:128px}.gp-word{font-size:2rem}.gm-start{height:58px}.gm-lv .v{font-size:1.5rem}}
+/* ---- game: online (test build plays against a CPU) ---- */
+.gplay[data-s=wait] .g-on,.gplay[data-s=found] .g-on,.gplay[data-s=duel] .g-on,.gplay[data-s=dres] .g-on{display:flex}
+.g-on{overflow:hidden}
+.go-top{position:relative;display:flex;align-items:center;height:44px;flex:none}
+.go-top span{font-size:.75rem;color:#8f8670}
+.go-x{margin-left:auto;height:36px;padding:0 14px;border-radius:12px;border:1px solid #2e2e33;background:#18181b;color:#c9c9ce;font:inherit;font-size:.82rem;cursor:pointer}
+.go-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(245,197,24,.06) 1.2px,transparent 1.6px);background-size:14px 14px;pointer-events:none}
+.go-search{position:absolute;left:30%;top:-60px;width:110px;height:420px;background:rgba(245,197,24,.09);transform-origin:top center;clip-path:polygon(35% 0,65% 0,100% 100%,0 100%);animation:gosweep 2.6s ease-in-out infinite alternate;pointer-events:none}
+@keyframes gosweep{from{transform:rotate(-30deg)}to{transform:rotate(18deg)}}
+.go-wh{position:relative;display:flex;gap:10px;height:210px;flex:none}
+.go-wh .f{width:140px;flex:none;position:relative}
+.go-wh .f .fig{position:absolute;left:10px;top:18px;width:120px;aspect-ratio:221/320;animation:golook 1.6s ease-in-out infinite alternate}
+@keyframes golook{from{transform:rotate(-6deg)}to{transform:rotate(5deg)}}
+.go-wh .f .ring{position:absolute;left:0;top:178px;width:140px;height:24px;border-radius:50%;background:#16140c;border:2px solid #d9b01a;box-shadow:0 0 6px rgba(245,197,24,.5)}
+.go-wh .t{padding-top:40px}
+.go-wh .t div{font-size:1.05rem;line-height:1.4}
+.go-wh .t b{display:block;margin-top:8px;font-family:'Orbitron',var(--f-en),sans-serif;font-size:1.9rem;font-weight:900;color:#fff0a8;text-shadow:0 0 4px rgba(245,197,24,.8),0 0 14px rgba(245,197,24,.3)}
+.go-wh .t small{font-size:.7rem;color:#8f8670}
+.go-ld{display:flex;gap:6px;margin-top:8px}.go-ld i{width:8px;height:8px;border-radius:50%;background:#f5c518;animation:gold 1s infinite}
+.go-ld i:nth-child(2){animation-delay:.2s}.go-ld i:nth-child(3){animation-delay:.4s}
+@keyframes gold{0%,100%{opacity:.25}50%{opacity:1;box-shadow:0 0 8px rgba(245,197,24,.7)}}
+.go-h{position:relative;margin-top:8px;display:flex;align-items:baseline;flex:none}
+.go-h b{font-size:1rem}.go-h span{margin-left:auto;font-size:.7rem;color:#8f8670}
+.go-h span em{font-style:normal;font-family:'Orbitron',var(--f-en),sans-serif;color:#ffe680}
+.go-card{position:relative;margin-top:10px;flex:1;min-height:160px;max-height:260px;border-radius:22px;background:#17171a;border:1.5px solid #34342f;border-bottom-width:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#f2f2f3;font:inherit;cursor:pointer}
+.go-card .tag{height:24px;padding:0 10px;border-radius:999px;background:#33191b;color:#ff9b9b;font-size:.7rem;display:flex;align-items:center}
+.go-card .w{font-family:var(--f-en);font-size:2.3rem;font-weight:900;text-align:center;padding:0 10px}
+.go-card .m{font-size:1.05rem;color:#ffe680;min-height:1.4em}
+.go-card .hint{font-size:.8rem;color:#55555b}
+.go-yn{position:relative;margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:none}
+.go-yn button{height:56px;border-radius:16px;font:inherit;font-size:.95rem;cursor:pointer}
+.go-yn .no{border:1px solid #4a1c28;border-bottom-width:4px;background:#160b10;color:#ff9b9b}
+.go-yn .yes{border:1.5px solid #d9b01a;border-bottom-width:4px;background:#16140c;color:#ffe680}
+.go-foot{position:relative;margin-top:12px;text-align:center;font-size:.72rem;color:#8f8670;flex:none}
+/* found (A2) */
+.gf-l,.gf-r{position:absolute;top:-40px;width:170px;height:560px;clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);pointer-events:none}
+.gf-l{left:10px;background:rgba(255,159,10,.10)}.gf-r{right:10px;background:rgba(245,197,24,.12)}
+.gf-title{position:relative;margin-top:50px;text-align:center}
+.gf-title span{display:inline-flex;height:32px;padding:0 16px;border-radius:10px;background:#121108;border:1.5px solid #d9b01a;color:#fff0a8;font-size:.9rem;letter-spacing:3px;align-items:center;box-shadow:0 0 4px rgba(245,197,24,.5),0 0 14px rgba(245,197,24,.2)}
+.gf-st{position:relative;flex:1;min-height:220px}
+.gf-st .a,.gf-st .b{position:absolute;bottom:20px;width:42%;max-width:150px;aspect-ratio:221/320}
+.gf-st .a{left:4%}.gf-st .b{right:4%}
+.gf-st .a .mfig{transform:scaleX(-1)}
+.gf-st .vs{position:absolute;left:0;right:0;top:40%;text-align:center;font-family:'Orbitron',var(--f-en),sans-serif;font-size:2.7rem;font-weight:900;color:#fff0a8;text-shadow:0 0 6px rgba(245,197,24,.9),0 0 22px rgba(245,197,24,.4);animation:gpop .5s cubic-bezier(.3,1.6,.5,1)}
+.gf-pl{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:none}
+.gf-pl div{border-radius:14px;background:#111113;border:1.5px solid #8a5a10;padding:10px 12px;text-align:center}
+.gf-pl div.me{background:#141310;border-color:#d9b01a;box-shadow:0 0 4px rgba(245,197,24,.45),0 0 14px rgba(245,197,24,.15)}
+.gf-pl small{display:block;font-size:.65rem;color:#ffb950;letter-spacing:2px}.gf-pl .me small{color:#d9b01a}
+.gf-pl b{display:block;margin-top:2px;font-size:1rem}
+.gf-pl span{display:block;margin-top:4px;font-size:.7rem;color:#8f8670}
+.gf-cd{position:relative;margin-top:18px;text-align:center;flex:none}
+.gf-cd small{font-size:.75rem;color:#8f8670}
+.gf-cd b{display:block;font-family:'Orbitron',var(--f-en),sans-serif;font-size:3.6rem;font-weight:900;line-height:1.1;color:#fff0a8;text-shadow:0 0 6px rgba(245,197,24,.85),0 0 20px rgba(245,197,24,.35)}
+.gf-cd p{margin:4px 0 0;font-size:.72rem;color:#8f8670}
+/* duel (5a / 5b / R1-R4) */
+.gd-head{position:relative;height:46px;display:flex;align-items:center;gap:10px;flex:none}
+.gd-head .tag{font-size:.72rem;color:#8f8670}
+.gd-head .sc{margin-left:auto;font-size:.75rem;color:#8f8670;white-space:nowrap}
+.gd-head .sc b{font-family:'Orbitron',var(--f-en),sans-serif;color:#fff;font-size:.95rem}
+.gd-clocks{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:none}
+.gd-c{position:relative;border-radius:14px;background:#111113;border:1px solid #26262a;padding:6px 12px 8px}
+.gd-c small{display:block;font-size:.62rem;letter-spacing:1px;color:#55555b}
+.gd-c b{font-family:'Orbitron',var(--f-en),sans-serif;font-size:1.85rem;font-weight:900;line-height:1.1;color:#55555b}
+.gd-c.on{background:#121108;border:1.5px solid #d9b01a;box-shadow:0 0 4px rgba(245,197,24,.55),0 0 16px rgba(245,197,24,.2)}
+.gd-c.on b{color:#fff0a8;text-shadow:0 0 4px rgba(245,197,24,.85),0 0 14px rgba(245,197,24,.35)}
+.gd-c.me.on small{color:#d9b01a}.gd-c.op.on small{color:#ffb950}
+.gd-c.hit{background:#1a070c;border:1.5px solid #ff4f6d;box-shadow:0 0 6px rgba(255,79,109,.6),0 0 18px rgba(255,79,109,.25)}
+.gd-c.hit b{color:#ffd6d6;text-shadow:0 0 6px rgba(255,79,109,.8)}
+.gd-c .minus{position:absolute;right:8px;top:-10px;height:24px;padding:0 9px;border-radius:999px;background:#ff4f6d;color:#1a070c;font-family:'Orbitron',var(--f-en),sans-serif;font-size:.85rem;font-weight:900;display:none;align-items:center;box-shadow:0 0 14px rgba(255,79,109,.6)}
+.gd-c .minus.show{display:flex;animation:gpop2 .8s}
+.gd-area{position:relative;flex:1;min-height:250px;margin-top:4px}
+.gd-bub{position:absolute;left:50%;transform:translateX(-50%);bottom:206px;max-width:46%;width:max-content;text-align:center;padding:9px 14px;border-radius:16px;font-size:.8rem;line-height:1.5;z-index:4;background:#1c1c1f;border:1px solid #2e2e33;color:#c9c9ce}
+.gd-bub.me{background:#f5c518;border-color:#f5c518;color:#18181a;box-shadow:0 0 14px rgba(245,197,24,.35)}
+.gd-bub.ng{background:#1d0c12;border-color:#ff4f6d;color:#ffb3bf}
+.gd-ms{position:absolute;left:0;right:0;bottom:120px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 6px;z-index:3;pointer-events:none}
+.gd-m{position:relative;display:flex;flex-direction:column;align-items:center;width:30%;max-width:116px}
+.gd-m .fig{position:relative;width:100%;aspect-ratio:221/320;transition:filter .3s,transform .3s}
+.gd-m.op .fig .mfig{transform:scaleX(-1)}
+.gd-m .tagn{position:relative;margin-top:-8px;height:20px;padding:0 8px;border-radius:999px;font-size:.62rem;display:flex;align-items:center;background:#222225;color:#8a8a90}
+.gd-m.on.me .tagn{background:#f5c518;color:#18181a}.gd-m.on.op .tagn{background:#ff9f0a;color:#18181a}
+.gd-m:not(.on) .fig{filter:brightness(.35) grayscale(.7)}
+.gd-m .beam{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:170px;height:280px;background:rgba(245,197,24,.18);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);opacity:0;transition:opacity .35s}
+.gd-m .glow{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:130px;height:22px;border-radius:50%;background:rgba(245,197,24,.45);filter:blur(5px);opacity:0;transition:opacity .35s}
+.gd-m.on .beam,.gd-m.on .glow{opacity:1}
+.gd-m.happy .fig{animation:ghop .5s cubic-bezier(.3,1.6,.5,1)}
+.gd-m.sad .fig{transform:rotate(-10deg)}.gd-m.op.sad .fig{transform:rotate(10deg)}
+.gd-panel{position:absolute;left:0;right:0;bottom:0;height:136px;border-radius:18px;background-color:#0f0f11;background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px);background-size:6px 6px;border:1px solid #2e2e33;box-shadow:inset 0 0 30px rgba(0,0,0,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding-top:14px;box-sizing:border-box;overflow:hidden}
+.gd-panel small{font-size:.7rem;color:#8f8670;letter-spacing:3px}
+.gd-panel.ok{border:1.5px solid #d9b01a;box-shadow:inset 0 0 30px rgba(0,0,0,.8),0 0 4px rgba(245,197,24,.55),0 0 18px rgba(245,197,24,.25)}
+.gd-panel.ng{border-color:#4a1c28;background-color:#160b10;background-image:none}
+.gd-panel .gp-word{font-size:2.2rem}.gd-panel .gp-word.sm{font-size:1.6rem}
+.gd-optw{position:relative;margin-top:10px;flex:none}
+.g-on .gp-opts{margin-top:0}
+.g-on.turn-op .gp-opts.idle{opacity:.3}
+.gd-lock{position:absolute;inset:0;display:none;align-items:center;justify-content:center;pointer-events:none}
+.gd-lock span{height:36px;padding:0 16px;border-radius:999px;background:rgba(24,24,27,.95);border:1px solid #2e2e33;font-size:.82rem;color:#c9c9ce;display:flex;align-items:center;gap:8px}
+.g-on.turn-op .gd-lock{display:flex}
+.g-on.turn-op .gp-pass{opacity:.3;pointer-events:none}
+.g-on .gp-opts button .who{position:absolute;top:-9px;right:8px;height:18px;padding:0 7px;border-radius:999px;font-size:.6rem;display:flex;align-items:center;background:#ff9f0a;color:#18181a}
+.g-on .gp-opts button{position:relative}
+.g-on .gp-opts button .who.me{background:#f5c518}
+.gplay.dng{background:#0b0609;box-shadow:inset 0 0 70px rgba(255,40,70,.45)}
+.gplay.dng-op{background:#0b0609;box-shadow:inset 0 0 50px rgba(255,40,70,.28)}
+.gplay.dng .gp-opts button.fade,.gplay.dng-op .gp-opts button.fade{color:#6e5a60;border-color:#4a1c28;background:#160b10}
+.gd-panel .gp-stamp{position:absolute;inset:0}
+/* duel result */
+.gw-top{position:relative;margin-top:24px;text-align:center}
+.gw-top b{font-size:2.2rem;font-weight:900;color:#fff3b8;text-shadow:0 0 6px rgba(245,197,24,.8),0 0 20px rgba(245,197,24,.35)}
+.gw-top b.lose{color:#c9c9ce;text-shadow:none}
+.gw-top small{display:block;margin-top:4px;font-size:.78rem;color:#8f8670}
+.gw-st{position:relative;flex:none;height:min(180px,22vh);margin-top:16px}
+.gw-st .a,.gw-st .b{position:absolute;bottom:0;height:92%;aspect-ratio:221/320}
+.gw-top{z-index:2}
+.gw-st .a{left:6%}.gw-st .b{right:6%}
+.gw-st .a .mfig{transform:scaleX(-1)}
+.gw-st .lost .fig{filter:brightness(.35) grayscale(.7);transform:rotate(-8deg)}
+.gw-st .won .fig{animation:ghop .6s cubic-bezier(.3,1.6,.5,1) 2}
+.gw-st .fig{width:100%;height:100%}
+
+.gplay[data-s=dres] .g-on{overflow-y:auto}
+.gm-who button[data-w=online].test:not([aria-checked=true]){border-style:solid;background:#18181b;color:#c9c9ce}
+.g-on .fig .mfig{width:100%;height:100%}
+.g-on .fig .mfig>img{width:100%;height:100%;object-fit:contain}
+.g-on .gp-opts button:disabled{pointer-events:none}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -2147,6 +2271,7 @@ header .kbar{display:none}
     <button class="gp-pass" id="gpPass">パス <small>−3秒</small></button>
   </div>
   <div class="gscr g-res" id="gsBody"></div>
+  <div class="gscr g-on" id="gOn"></div>
 </div>
 
 <section class="bv navv setv" id="setv" role="dialog" aria-labelledby="setTitle" aria-hidden="true">
@@ -4505,14 +4630,15 @@ header(); setTab(tab); initSync(); initAcct();
     if(GC)$('gmChalX').onclick=()=>{GC=null;renderTop()};
     document.querySelectorAll('#gamev .gm-who button').forEach(b=>b.setAttribute('aria-checked',b.dataset.w===(GC?'friend':G.who)));
     $('gmFig').innerHTML=figHTML();
+    $('gmStart').textContent=(!GC&&G.who==='online'&&GAME_ONLINE_TEST)?'対戦をさがす':'スタート';
   }
   window.renderGameTop=renderTop;
   document.querySelectorAll('#gamev .gm-seg button').forEach(b=>b.onclick=()=>{if(GC)return;G.mode=b.dataset.m;gSave();renderTop()});
   $('gmPrev').onclick=()=>{if(G.lv>0){G.lv--;gSave();renderTop()}};
   $('gmNext').onclick=()=>{if(G.lv<2){G.lv++;gSave();renderTop()}};
   document.querySelectorAll('#gamev .gm-who button').forEach(b=>b.onclick=()=>{
-    if(b.dataset.w==='online'){toast('<div><strong>オンライン対戦は準備中です</strong><span>使う人が増えたら、ほかの人とすぐ対戦できるようになります</span></div>');return}
-    if(GC&&b.dataset.w==='solo')GC=null; G.who=b.dataset.w; gSave(); renderTop()});
+    if(b.dataset.w==='online'&&!GAME_ONLINE_TEST){toast('<div><strong>オンライン対戦は準備中です</strong><span>使う人が増えたら、ほかの人とすぐ対戦できるようになります</span></div>');return}
+    if(GC&&b.dataset.w!=='friend')GC=null; G.who=b.dataset.w; gSave(); renderTop()});
   $('gmRank').onclick=()=>{const rk=rankNow(setKey(curMode(),curLv()));
     toast(rk?`<div><strong>今週 ${rk.n}人中 ${rk.r}位</strong><span>${LV[curLv()]}・${curMode()==='listen'?'聞いて':'読んで'}4択の記録です</span></div>`:'<div><strong>今週の順位はまだありません</strong><span>1回遊ぶと、同じ問題を遊んだ人の中での順位が出ます</span></div>')};
 
@@ -4520,7 +4646,7 @@ header(); setTab(tab); initSync(); initAcct();
   const gp=$('gplay'); let R=null, timers=[];
   const later=(f,ms)=>timers.push(setTimeout(f,ms));
   function stopAll(){timers.forEach(clearTimeout);timers=[];if(R&&R.raf)cancelAnimationFrame(R.raf);try{speechSynthesis.cancel()}catch(e){}}
-  function closePlay(){stopAll();R=null;gp.classList.remove('open','last','lock');document.body.classList.remove('sv-lock');renderTop();if($('gamev').classList.contains('open'))document.body.classList.add('sv-lock')}
+  function closePlay(){stopAll();R=null;onStop();gp.classList.remove('open','last','lock');document.body.classList.remove('sv-lock');renderTop();if($('gamev').classList.contains('open'))document.body.classList.add('sv-lock')}
   function start(){
     const m=curMode(),lv=curLv(),seed=GC?GC.seed:weekSeed(m,lv);
     R={m,lv,seed,key:setKey(m,lv),qs:makeQs(lv,seed),i:0,score:0,wrong:0,pass:0,miss:[],streak:0,left:TOTAL,lastSec:61,lastHalf:0,lock:false,t:0,times:[]};
@@ -4604,13 +4730,151 @@ header(); setTab(tab); initSync(); initAcct();
     try{await navigator.clipboard.writeText(text+' '+url);toast('<div><strong>挑戦状のリンクをコピーしました</strong><span>友達に送ると、同じ問題で勝負できます</span></div>')}
     catch(e){toast('<div><strong>リンクをコピーできませんでした</strong><span>'+esc(url)+'</span></div>')}
   }
-  $('gmStart').onclick=()=>{uiClick();start()};
+  $('gmStart').onclick=()=>{uiClick();if(!GC&&G.who==='online'&&GAME_ONLINE_TEST)startOnline();else start()};
   $('gpQuit').onclick=closePlay;
   $('gpPass').onclick=pass;
   document.addEventListener('keydown',e=>{if(!gp.classList.contains('open'))return;
     if(e.key==='Escape'){closePlay();return}
     if(gp.dataset.s==='play'&&/^[1-4]$/.test(e.key))answer(+e.key-1)});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&R&&gp.dataset.s==='play'){R.left=0}});
+
+  // ---- online (test build: the opponent is a CPU) ----
+  // At release set GAME_ONLINE_TEST=false: the online button goes back to 「準備中」.
+  const GAME_ONLINE_TEST=true;
+  const gOn=$('gOn'); let O=null;
+  const cpuFig=()=>`<span class="mfig">${fig('','','','')}</span>`;
+  const xSvg='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  function onStop(){if(O){O.dead=true;if(O.raf)cancelAnimationFrame(O.raf)}O=null;gp.classList.remove('dng','dng-op');gOn.classList.remove('turn-op')}
+  function oOpen(){stopAll();R=null;onStop();gp.classList.remove('last','lock','hit');gp.classList.add('open');document.body.classList.add('sv-lock')}
+  function startOnline(){
+    oOpen(); const m=G.mode,lv=G.lv;
+    O={m,lv,p:pool(lv),seen:0,card:null,t0:performance.now()};
+    gp.dataset.s='wait';
+    gOn.innerHTML=`<div class="go-dots" aria-hidden="true"></div><div class="go-search" aria-hidden="true"></div>
+      <div class="go-top"><span>${LV[lv]} ・ オンライン対戦（テスト）</span><button class="go-x" id="goX">やめる</button></div>
+      <div class="go-wh"><div class="f"><div class="ring"></div><div class="fig">${figHTML()}</div></div><div class="t"><div>対戦相手を<br>さがしています</div><b id="goT" aria-live="off">0:00</b><small>めやす 約10秒</small><div class="go-ld" aria-hidden="true"><i></i><i></i><i></i></div></div></div>
+      <div class="go-h"><b>待っている間に復習</b><span>チェック <em id="goN">0</em>語</span></div>
+      <button class="go-card" id="goCard"></button>
+      <div class="go-yn"><button class="no" id="goNo">まだ</button><button class="yes" id="goYes">覚えた</button></div>
+      <div class="go-foot">相手が見つかると自動で始まります</div>`;
+    $('goX').onclick=closePlay;
+    const nextCard=()=>{const p=O.p;O.card=p[Math.floor(Math.random()*p.length)];O.show=false;drawCard()};
+    const drawCard=()=>{const c=O.card;$('goCard').innerHTML=`<span class="tag">${LV[O.lv]}の単語</span><span class="w">${esc(c.en)}</span><span class="m">${O.show?esc(c.ja):''}</span><span class="hint">${O.show?'':'タップで意味を見る'}</span>`};
+    $('goCard').onclick=()=>{if(!O)return;O.show=true;drawCard();speak(O.card.en)};
+    const done=()=>{if(!O)return;O.seen++;$('goN').textContent=O.seen;nextCard()};
+    $('goNo').onclick=done;$('goYes').onclick=done;
+    nextCard();
+    const tick=()=>{if(!O||gp.dataset.s!=='wait')return;$('goT').textContent=mmss(performance.now()-O.t0+999);later(tick,500)};tick();
+    later(found,5000+Math.random()*4000);
+  }
+  function found(){if(!O)return; const lv=O.lv, best=G.best[setKey(O.m,lv)]||0;
+    gp.dataset.s='found'; gS('up');
+    gOn.innerHTML=`<div class="gf-l" aria-hidden="true"></div><div class="gf-r" aria-hidden="true"></div>
+      <div class="gf-title"><span>対戦相手が決まりました</span></div>
+      <div class="gf-st"><div class="a"><div class="fig">${cpuFig()}</div></div><div class="vs">VS</div><div class="b"><div class="fig">${figHTML()}</div></div></div>
+      <div class="gf-pl"><div><small>相手</small><b>CPU（テスト）</b><span>${LV[lv]}</span></div><div class="me"><small>あなた</small><b>あなた</b><span>ベスト ${best?best+'問':'--'}</span></div></div>
+      <div class="gf-cd"><small>まもなく開始</small><b id="gfN" aria-live="assertive">3</b><p>先攻：あなた ・ 持ち時間 各1:00</p></div>`;
+    let k=3; const step=()=>{if(!O)return;const n=$('gfN');
+      if(k>0){n.textContent=k;n.style.animation='none';void n.offsetWidth;n.style.animation='gpop .5s cubic-bezier(.3,1.6,.5,1)';gS('beep');k--;later(step,800)}
+      else{gS('go');duel()}};
+    later(step,900);
+  }
+  function duel(){
+    const m=O.m,lv=O.lv,seed=Math.floor(Math.random()*1e9);
+    Object.assign(O,{qs:makeQs(lv,seed),seed,i:0,turn:'me',paused:true,lock:true,me:{s:0,left:TOTAL,ng:0,ps:0},op:{s:0,left:TOTAL,ng:0},miss:[],lastSec:0,lastHalf:0});
+    gp.dataset.s='duel';
+    gOn.innerHTML=`<div class="gd-head"><button class="gp-x" id="gdX" aria-label="やめる">${xSvg}</button><span class="tag">${LV[lv]} ・ オンライン対戦（テスト）</span><span class="sc">あなた <b id="gdMe">0</b> − <b id="gdOp">0</b> 相手</span></div>
+      <div class="gd-clocks"><div class="gd-c op" id="gdCo"><small>相手（CPU）</small><b>1:00</b><span class="minus">−2</span></div><div class="gd-c me" id="gdCm"><small>あなた</small><b>1:00</b><span class="minus">−2</span></div></div>
+      <div class="gd-area"><div class="gd-bub" id="gdBub"></div>
+        <div class="gd-ms"><div class="gd-m op" id="gdMo"><div class="beam"></div><div class="glow"></div><div class="fig">${cpuFig()}</div><span class="tagn">相手</span></div><div class="gd-m me" id="gdMm"><div class="beam"></div><div class="glow"></div><div class="fig">${figHTML()}</div><span class="tagn">あなた</span></div></div>
+        <div class="gd-panel" id="gdPanel"><small id="gdAsk">意味は？</small><div id="gdQ"></div><div class="gp-stamp" id="gdStamp"><span>パス −3</span></div></div></div>
+      <div class="gd-optw"><div class="gp-opts" id="gdOpts"></div><div class="gd-lock"><span id="gdLock">相手が答えています</span></div></div>
+      <button class="gp-pass" id="gdPass">パス <small>−3秒</small></button>`;
+    $('gdX').onclick=closePlay; $('gdPass').onclick=dPass;
+    dTurn('me'); O.t=performance.now(); dLoop();
+  }
+  const dq=()=>{if(O.i>=O.qs.length)O.qs=O.qs.concat(makeQs(O.lv,O.seed+O.i));return O.qs[O.i]};
+  function dLoop(){if(!O||O.dead)return; const now=performance.now(),dt=now-O.t; O.t=now;
+    if(!O.paused){const s=O[O.turn]; s.left-=dt;
+      if(s.left>10000){const sec=Math.ceil(s.left/1000);if(sec!==O.lastSec){O.lastSec=sec;gS(sec%2?'tick':'tock')}}
+      else{const h=Math.ceil(s.left/500);if(h!==O.lastHalf){O.lastHalf=h;gS('fast')}}}
+    dClock(); if(O.me.left<=0||O.op.left<=0){dEnd();return}
+    O.raf=requestAnimationFrame(dLoop)}
+  function dClock(){for(const [w,id] of [['me','gdCm'],['op','gdCo']]){const c=$(id);if(!c)continue;
+      c.querySelector('b').textContent=mmss(O[w].left); c.classList.toggle('on',O.turn===w)}
+    gp.classList.toggle('last',O[O.turn].left<=10000)}
+  function dFx(){gp.classList.remove('dng','dng-op');$('gdPanel').classList.remove('ok','ng');
+    for(const id of ['gdCm','gdCo'])$(id).classList.remove('hit');
+    for(const id of ['gdMm','gdMo'])$(id).classList.remove('happy','sad');
+    $('gdStamp').classList.remove('show'); gOn.querySelectorAll('.gd-c .minus').forEach(m=>m.classList.remove('show'))}
+  function dTurn(w){if(!O||O.ended)return; O.turn=w; const me=w==='me';
+    $('gdMm').classList.toggle('on',me); $('gdMo').classList.toggle('on',!me);
+    gOn.classList.toggle('turn-op',!me); $('gdLock').textContent='相手が答えています';
+    const b=$('gdBub'); b.className='gd-bub'+(me?' me':''); b.textContent=me?'あなたの番！':'相手の番…';
+    O.lastSec=0;O.lastHalf=0; dShow()}
+  function dShow(){if(!O||O.ended)return; const x=dq(),me=O.turn==='me'; dFx();
+    $('gdLock').textContent='相手が答えています'; {const b=$('gdBub'); b.className='gd-bub'+(me?' me':''); b.textContent=me?'あなたの番！':'相手の番…'} O.lock=!me; gp.classList.toggle('lock',!me);
+    if(O.m==='listen'&&me){$('gdAsk').textContent='聞こえた単語の意味は？';
+      $('gdQ').innerHTML=`<button class="gp-say" id="gdSay" aria-label="もう一度聞く"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>`;
+      $('gdSay').onclick=()=>speak(x.en); speak(x.en)}
+    else{$('gdAsk').textContent='意味は？';dWord(x)}
+    const o=$('gdOpts'); o.className='gp-opts'+(me?'':' idle');
+    o.innerHTML=x.opts.map((t,k)=>`<button data-k="${k}"${me?'':' disabled'}>${esc(t)}</button>`).join('');
+    o.querySelectorAll('button').forEach(b=>b.onclick=()=>dAnswer(+b.dataset.k));
+    O.paused=false;
+    if(!me){const acc=[.62,.7,.78][O.lv],wait=1500+Math.random()*3000;
+      later(()=>{if(!O||O.turn!=='op'||O.dead)return;
+        const ok=Math.random()<acc,xi=x.opts.indexOf(x.ja),wrong=[0,1,2,3].filter(i=>i!==xi);
+        cpuAnswer(ok?xi:wrong[Math.floor(Math.random()*3)])},wait)}}
+  function dWord(x){$('gdQ').innerHTML=`<div class="gp-word${x.en.length>12?' sm':''}">${esc(x.en)}</div>`}
+  function dMark(k,who){const x=dq(); $('gdOpts').querySelectorAll('button').forEach((b,i)=>{
+      b.classList.add(x.opts[i]===x.ja?'ok':(i===k?'ng':'fade'));
+      if(i===k)b.insertAdjacentHTML('beforeend',`<span class="who${who==='me'?' me':''}">${who==='me'?'あなた':'相手'}</span>`)});
+    dWord(x)}
+  const hop=id=>{const e=$(id);e.classList.remove('happy','sad');void e.offsetWidth;e.classList.add('happy')};
+  const minus=(id,t)=>{const c=$(id),mm=c.querySelector('.minus');mm.textContent=t;mm.classList.remove('show');void mm.offsetWidth;mm.classList.add('show');c.classList.add('hit')};
+  function dAnswer(k){if(!O||O.lock||O.turn!=='me')return; O.lock=true; O.paused=true; gp.classList.add('lock');
+    const x=dq(),ok=x.opts[k]===x.ja; dMark(k,'me'); const b=$('gdBub');
+    if(ok){O.me.s++;$('gdMe').textContent=O.me.s;gS('ok');$('gdPanel').classList.add('ok');hop('gdMm');
+      b.className='gd-bub me';b.textContent='正解！ 次は相手の番';
+      later(()=>{if(!O)return;O.i++;dTurn('op');O.t=performance.now()},900)}
+    else{O.me.left-=2000;O.me.ng++;O.miss.push(x);gS('ng');buzz(false);
+      gp.classList.add('dng');$('gdPanel').classList.add('ng');minus('gdCm','−2');$('gdMm').classList.add('sad');
+      b.className='gd-bub ng';b.textContent='おしい！ −2秒 つぎの問題へ';
+      later(()=>{if(!O||O.me.left<=0)return;O.i++;dShow();O.t=performance.now()},950)}}
+  function dPass(){if(!O||O.lock||O.turn!=='me')return; O.lock=true; O.paused=true; gp.classList.add('lock');
+    const x=dq(); O.me.left-=3000;O.me.ps++;O.miss.push(x);gS('pass');dWord(x);
+    $('gdOpts').querySelectorAll('button').forEach(b=>b.classList.add('fade'));
+    const st=$('gdStamp');st.classList.remove('show');void st.offsetWidth;st.classList.add('show');minus('gdCm','−3');
+    const b=$('gdBub');b.className='gd-bub ng';b.textContent='パス −3秒';
+    later(()=>{if(!O||O.me.left<=0)return;O.i++;dShow();O.t=performance.now()},700)}
+  function cpuAnswer(k){if(!O||O.ended)return; O.paused=true; const x=dq(),ok=x.opts[k]===x.ja; dMark(k,'op'); const b=$('gdBub');
+    if(ok){O.op.s++;$('gdOp').textContent=O.op.s;gS('ok');$('gdPanel').classList.add('ok');hop('gdMo');
+      $('gdLock').textContent='相手が正解しました';b.className='gd-bub';b.textContent='相手が正解… 次はあなたの番！';
+      later(()=>{if(!O)return;O.i++;dTurn('me');O.t=performance.now()},1000)}
+    else{O.op.left-=2000;O.op.ng++;gS('ng');
+      gp.classList.add('dng-op');$('gdPanel').classList.add('ng');minus('gdCo','−2');$('gdMo').classList.add('sad');
+      $('gdLock').textContent='相手がまちがえました';b.className='gd-bub ng';b.textContent='相手がミス！ −2秒';
+      later(()=>{if(!O||O.op.left<=0)return;O.i++;dShow();O.t=performance.now()},1000)}}
+  function dEnd(){const o=O; o.ended=true; o.paused=true; o.lock=true; gp.classList.add('lock'); o.me.left=Math.max(0,o.me.left); o.op.left=Math.max(0,o.op.left); dClock();
+    try{speechSynthesis.cancel()}catch(e){}
+    const win=o.op.left<=0; gS('up');
+    later(()=>{if(O!==o)return; gp.classList.remove('last','dng','dng-op','lock'); gOn.classList.remove('turn-op'); gp.dataset.s='dres';
+      if(win)gS('best');
+      const miss=o.miss.slice(0,4);
+      gOn.innerHTML=`<div class="gf-l" aria-hidden="true"></div><div class="gf-r" aria-hidden="true"></div>
+        <div class="gw-top"><b class="${win?'':'lose'}">${win?'勝ち！':'負け…'}</b><small>${win?'相手の持ち時間がなくなりました':'あなたの持ち時間がなくなりました'}</small></div>
+        <div class="gw-st"><div class="a ${win?'lost':'won'}"><div class="fig">${cpuFig()}</div></div><div class="b ${win?'won':'lost'}"><div class="fig">${figHTML()}</div></div></div>
+        <div class="gf-pl"><div><small>相手（CPU）</small><b>${o.op.s}問 正解</b><span>まちがい ${o.op.ng}</span></div><div class="me"><small>あなた</small><b>${o.me.s}問 正解</b><span>まちがい ${o.me.ng} ・ パス ${o.me.ps}</span></div></div>
+        ${miss.length?`<div class="gs-miss" style="position:relative;margin-top:12px"><h4>まちがえた・パスした単語</h4>${miss.map(x=>`<div><b>${esc(x.en)}</b><span>${esc(x.ja)}</span></div>`).join('')}</div>`:''}
+        <div class="gs-btns" style="position:relative;bottom:auto;margin-top:auto"><button class="again" id="gwAgain">もう一度対戦</button><div class="two"><button id="gwTop">設定にもどる</button><button id="gwEnd">おわる</button></div></div>`;
+      $('gwAgain').onclick=()=>{uiClick();startOnline()};
+      $('gwTop').onclick=closePlay; $('gwEnd').onclick=()=>{closePlay();try{closeNavViews()}catch(e){}};
+    },1100)}
+  if(GAME_ONLINE_TEST){const ob=document.querySelector('#gamev .gm-who button[data-w=online]');if(ob){ob.innerHTML='オンライン<small>テスト・CPU</small>';ob.classList.add('test')}}
+  document.addEventListener('keydown',e=>{if(!gp.classList.contains('open')||gp.dataset.s!=='duel')return;
+    if(/^[1-4]$/.test(e.key))dAnswer(+e.key-1)});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&O&&gp.dataset.s==='duel'&&O.turn==='me'){O.me.left=0}});
 
   // ---- a friend's challenge link: ?gc=mode.level.seed.score ----
   try{const p=new URLSearchParams(location.search),gc=p.get('gc');
