@@ -198,6 +198,13 @@ input[type=search],select{font:inherit;font-weight:700;font-size:.92rem;color:va
 /* settings */
 .controls{margin-top:6px;padding-top:18px;border-top:2px solid var(--line);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 @media (max-width:560px){.controls{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.controls.ctl2{grid-template-columns:1.3fr 1fr 1fr 1fr;gap:6px;padding-top:14px}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ctl2 .crange{position:relative;display:block}
+.ctl2 .crange select{appearance:none;-webkit-appearance:none;height:44px;border-radius:999px;border:1px solid var(--line);background:var(--bg2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239a9aa1' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/12px;padding:0 24px 0 10px;text-align:center;text-align-last:center;font-family:var(--f);font-weight:900;font-size:.85rem;color:var(--fg);text-overflow:ellipsis}
+.cpill{height:44px;min-width:0;border-radius:999px;border:1px solid var(--line);background:var(--bg2);color:var(--fg);font:inherit;font-family:var(--f-jp);font-weight:800;font-size:.82rem;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 6px;white-space:nowrap;cursor:pointer}
+.cpill.on{border-color:transparent;background:#2b2a20;color:#f5c518}
+@media (max-width:560px){.controls.ctl2{grid-template-columns:1.3fr 1fr 1fr 1fr}}
 label.ctl{display:flex;flex-direction:column;gap:4px;font-size:.72rem;color:var(--muted);font-weight:800}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 .splash{position:fixed;inset:0;z-index:100;background:var(--splash);display:flex;align-items:center;justify-content:center;transition:opacity .45s ease;padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -1777,11 +1784,14 @@ header .kbar{display:none}
     </div>
   </section>
 
-  <div class="controls">
-    <label class="ctl">範囲<select id="range"></select></label>
-    <label class="ctl">出題<select id="filter"><option value="all">すべて</option><option value="todo">未習得のみ</option><option value="weak">苦手のみ</option></select></label>
-    <label class="ctl">表面<select id="dir"><option value="je">日本語</option><option value="ej">英語</option></select></label>
-    <label class="ctl">順番<select id="order"><option value="seq">番号順</option><option value="shuf">シャッフル</option></select></label>
+  <div class="controls ctl2">
+    <label class="ctl crange"><span class="vh">範囲</span><select id="range"></select></label>
+    <button class="cpill" id="cFilter" aria-label="出題"></button>
+    <button class="cpill" id="cDir" aria-label="表面"></button>
+    <button class="cpill" id="cOrder" aria-label="順番"></button>
+    <label class="ctl vh">出題<select id="filter"><option value="all">すべて</option><option value="todo">未習得のみ</option><option value="weak">苦手のみ</option></select></label>
+    <label class="ctl vh">表面<select id="dir"><option value="je">日本語</option><option value="ej">英語</option></select></label>
+    <label class="ctl vh">順番<select id="order"><option value="seq">番号順</option><option value="shuf">シャッフル</option></select></label>
   </div>
 
   <label id="hapt" aria-hidden="true" style="position:fixed;top:0;left:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none"><input type="checkbox" switch tabindex="-1"></label>
@@ -2229,7 +2239,7 @@ function buildRange(){
   const N=DATA.length,sets=[],gold=S.deck==='gold';
   for(let a=0;a<N;a+=100){const b=Math.min(N,a+100);sets.push(`<option value="${a}-${b}">${a+1}–${b}</option>`)}
   const keep=rangeVal(); RBASE=null;
-  rs.innerHTML=`<option value="0-${Math.max(N,1)}">全部 1–${N}</option>`+(N>100?sets.join(''):'');
+  rs.innerHTML=`<option value="0-${Math.max(N,1)}">全部</option>`+(N>100?sets.join(''):'');
   if([...rs.options].some(o=>o.value===keep))rs.value=keep;
   if($('filter').selectedIndex<0)$('filter').value='all';
 }
@@ -3130,7 +3140,7 @@ function fillCard(){
   setPos();
   $('prev').disabled=ci===0; $('next').disabled=!P.length;
 }
-function reshuffle(){$('order').value='shuf'; savePrefs(); P=pool(); ci=0; fillCard()}
+function reshuffle(){$('order').value='shuf'; savePrefs(); ctlSync(); P=pool(); ci=0; fillCard()}
 function flip(){
   const f=$('flip'); pageFlip();
   // finish any spin in progress so state stays consistent on fast taps
@@ -3943,6 +3953,7 @@ function setTab(t){
 }
 function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({lsort:typeof lsort==='string'?lsort:'no',range:rangeVal(),filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab,testN:testN||10,testLast:typeof testLast!=='undefined'?testLast:null,testKinds:typeof testKinds!=='undefined'?testKinds:undefined}))}catch(e){}}
 function refresh(reset=true){
+  ctlSync();
   if(reset||!P.length){P=pool();ci=0}
   if(tab==='card')buildCard();
   if(tab==='quiz'){if(reset||!QP.length)startQuiz();renderQuiz()}
@@ -3958,7 +3969,19 @@ $('cedit').onclick=e=>{if(e.target.id==='cedit')closeCardEdit()};
 ['ceEn','ceJp','ceMemo'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();saveCardEdit()}}));
 $('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
 $('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
-for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];refresh(true)};
+for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];ctlSync();refresh(true)};
+// 案2: one compact row — the range is a list, the other three switch each time they are pressed
+const SHUF_SVG='<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>';
+function ctlSync(){const f=$('filter').value,d=$('dir').value,o=$('order').value,F={all:'すべて',todo:'まだ',weak:'苦手'};
+  const cf=$('cFilter'),cd=$('cDir'),co=$('cOrder');if(!cf)return;
+  cf.textContent=F[f]||'すべて';cf.classList.toggle('on',f!=='all');cf.setAttribute('aria-label','出題 '+cf.textContent+'（押すと切りかえ）');
+  cd.textContent=d==='je'?'日→英':'英→日';cd.setAttribute('aria-label','表面 '+(d==='je'?'日本語':'英語')+'（押すと切りかえ）');
+  co.innerHTML=o==='shuf'?SHUF_SVG+'ランダム':'番号順';co.classList.toggle('on',o==='shuf');co.setAttribute('aria-label','順番 '+(o==='shuf'?'ランダム':'番号順')+'（押すと切りかえ）')}
+const ctlFlip=(id,vals)=>{const el=$(id),i=vals.indexOf(el.value);el.value=vals[(i+1)%vals.length];el.onchange()};
+$('cFilter').onclick=()=>ctlFlip('filter',['all','todo','weak']);
+$('cDir').onclick=()=>ctlFlip('dir',['ej','je']);
+$('cOrder').onclick=()=>ctlFlip('order',['seq','shuf']);
+ctlSync();
 for(const x of ['card','quiz','mc','test','list']) $('t-'+x).onclick=()=>setTab(x);
 $('askClose').onclick=closeAsk;
 $('navHome').onclick=goHome;
