@@ -2029,10 +2029,17 @@ function mascotSay(kind){
 }
 
 const rs=$('range');
+// while a picked set (まだ / 苦手) is being played, the range menu shows it as an extra choice,
+// so picking any real range (even the same one) switches back to that range
+let RBASE=null;
+const rangeOpt=()=>rs.value==='custom'&&RBASE?RBASE:rs.selectedOptions[0];
+const rangeVal=()=>{const o=rangeOpt();return o&&o.value!=='custom'?o.value:'0-0'};
+function clearCustomRange(){const o=rs.querySelector('option[data-custom]');if(o){if(rs.value==='custom'&&RBASE&&RBASE.parentNode)rs.value=RBASE.value;o.remove()}RBASE=null}
+function setCustomRange(label,n){clearCustomRange();RBASE=rs.selectedOptions[0]||null;const o=new Option(`${label}（${n}枚）`,'custom');o.dataset.custom='1';rs.add(o);rs.value='custom'}
 function buildRange(){
   const N=DATA.length,sets=[],gold=S.deck==='gold';
   for(let a=0;a<N;a+=100){const b=Math.min(N,a+100);sets.push(`<option value="${a}-${b}">${a+1}–${b}</option>`)}
-  const keep=rs.value;
+  const keep=rangeVal(); RBASE=null;
   rs.innerHTML=`<option value="0-${Math.max(N,1)}">全部 1–${N}</option>`+(N>100?sets.join(''):'');
   if([...rs.options].some(o=>o.value===keep))rs.value=keep;
   if($('filter').selectedIndex<0)$('filter').value='all';
@@ -2621,8 +2628,8 @@ function renderBadges(){
 function status(d){return S.known[d.id]?'ok':(S.miss[d.id]?'bad':'new')}
 function chip(d){const s=status(d);return `<span class="chip ${s}">${s==='ok'?'覚えた':s==='bad'?'苦手 ×'+S.miss[d.id]:'未習得'}</span>`}
 function pool(){
-  PLABEL=null;
-  const [a,b]=$('range').value.split('-').map(Number); const f=$('filter').value;
+  PLABEL=null; clearCustomRange();
+  const [a,b]=rangeVal().split('-').map(Number); const f=$('filter').value;
   let p=DATA.slice(a,b).filter(d=>f==='all'||(f==='todo'&&!S.known[d.id])||(f==='weak'&&S.miss[d.id]&&!S.known[d.id])||(f==='fix'&&d.fix)||(f==='add'&&d.add));
   if($('order').value==='shuf'){p=p.slice();for(let i=p.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[p[i],p[j]]=[p[j],p[i]]}}
   return p;
@@ -2956,7 +2963,7 @@ function flip(){
 // where you are in the chosen range: the range on the left, a thin progress bar, and "12 / 100" on the right
 function setPos(){
   const el=$('pos'); if(!el.querySelector('.cp-bar'))el.innerHTML='<span class="cp-r"></span><span class="cp-bar" aria-hidden="true"><i></i></span><span class="cp-n"></span>';
-  const o=$('range').selectedOptions[0], n=P.length, k=Math.min(ci+1,n);
+  const o=rangeOpt(), n=P.length, k=Math.min(ci+1,n);
   el.querySelector('.cp-r').textContent=PLABEL||(!o?'':o.index===0?'全部':o.text);
   el.querySelector('.cp-bar i').style.width=(n?k/n*100:0)+'%';
   el.querySelector('.cp-n').innerHTML=`<b>${k}</b> / ${n}`;
@@ -2968,11 +2975,11 @@ const rdOf=()=>{if(RD.p!==P)RD={p:P,ok:new Set,ng:new Set};return RD};
 function hideEnd(){const v=$('rend');if(!v||v.hidden)return;v.hidden=true;['scene','pos'].forEach(id=>$(id).hidden=false);document.querySelector('#v-card .row').hidden=false;typeof fitCard==='function'&&requestAnimationFrame(fitCard)}
 function showEnd(){
   const v=$('rend'); if(!v||!P.length)return; const r=rdOf(), rs=$('range');
-  const [a,b]=rs.value.split('-').map(Number), inRange=DATA.slice(a,b);
+  const [a,b]=rangeVal().split('-').map(Number), inRange=DATA.slice(a,b), bo=rangeOpt(), bi=[...rs.options].indexOf(bo);
   const ng=P.filter(d=>r.ng.has(d.id)), weak=inRange.filter(d=>S.miss[d.id]&&!S.known[d.id]);
   const same=weak.length===ng.length&&ng.every(d=>weak.includes(d));
-  const nx=rs.selectedIndex>0&&rs.selectedIndex<rs.options.length-1?rs.options[rs.selectedIndex+1]:null;
-  const lab=PLABEL||(rs.selectedIndex===0?'全部':rs.selectedOptions[0].text), allOk=!ng.length&&r.ok.size===P.length;
+  const nxo=rs.options[bi+1], nx=bi>0&&nxo&&!nxo.dataset.custom?nxo:null;
+  const lab=PLABEL||(bi===0?'全部':bo?bo.text:''), allOk=!ng.length&&r.ok.size===P.length;
   const opts=[];
   if(ng.length)opts.push(['ng',`「まだ」の${ng.length}枚だけもう一度`]);
   if(weak.length&&!same)opts.push(['weak',`苦手な${weak.length}枚だけやる`]);
@@ -2996,13 +3003,14 @@ function showEnd(){
   ['scene','pos'].forEach(id=>$(id).hidden=true); document.querySelector('#v-card .row').hidden=true; v.hidden=false;
   v.onclick=e=>{const sb=e.target.closest('[data-say-id]');if(sb){const d=ng.find(x=>String(x.id)===sb.dataset.sayId);d&&speak(d.en);return}
     const k=e.target.closest('[data-end]')?.dataset.end; if(!k)return;
-    const play=(list,label)=>{P=list;PLABEL=label;ci=0;fillCard();window.scrollTo&&scrollTo({top:0,behavior:'smooth'})};
+    const play=(list,label)=>{P=list;PLABEL=label;if(label)setCustomRange(label,list.length);ci=0;fillCard();window.scrollTo&&scrollTo({top:0,behavior:'smooth'})};
     if(k==='back'){hideEnd();return}
     if(k==='ng')play(ng,'まだの分');
     else if(k==='weak')play(weak,'苦手');
-    else if(k==='next'){rs.selectedIndex++;rs.onchange()}
-    else if(k==='again')PLABEL?play(P.slice(),PLABEL):play(pool(),null);
-    else if(k==='shuf'){const s=P.slice();for(let i=s.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[s[i],s[j]]=[s[j],s[i]]}play(s,PLABEL)}
+    else if(k==='next'){clearCustomRange();rs.value=nx.value;rs.onchange()}
+    // 最初から / シャッフル always go back to the whole chosen range, known cards included
+    else if(k==='again')play(pool(),null);
+    else if(k==='shuf'){const s=pool();for(let i=s.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[s[i],s[j]]=[s[j],s[i]]}play(s,null)}
   };
   if(allOk&&typeof fanfare==='function')fanfare();
 }
@@ -3387,7 +3395,7 @@ function toggleLsMenu(open){const m=$('lsMenu');open=open??m.hidden;m.hidden=!op
 var lfilt='all';
 function renderList(){
   const q=$('q').value.trim().toLowerCase();
-  const [a,b]=$('range').value.split('-').map(Number);
+  const [a,b]=rangeVal().split('-').map(Number);
   const base=(q||lsort==='fav'?DATA:DATA.slice(a,b)).filter(d=>(!q||d.en.toLowerCase().includes(q)||d.jp.includes(q))&&(lsort!=='fav'||(S.fav||{})[d.id]));
   const isWeak=d=>S.miss[d.id]&&!S.known[d.id], cnt={all:base.length,weak:base.filter(isWeak).length,ok:base.filter(d=>S.known[d.id]).length};
   $('lchips').innerHTML=[['all','すべて'],['weak','苦手'],['ok','覚えた']].map(([k,l])=>`<button data-lf="${k}" aria-pressed="${lfilt===k}">${l} ${cnt[k]}</button>`).join('');
@@ -3510,7 +3518,7 @@ function setTab(t){
   for(const x of ['card','quiz','mc','test','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
   savePrefs(); refresh(false); qmodeSync(); requestAnimationFrame(fitCard);
 }
-function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({lsort:typeof lsort==='string'?lsort:'no',range:$('range').value,filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab,testN:testN||10,testKinds:typeof testKinds!=='undefined'?testKinds:undefined}))}catch(e){}}
+function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({lsort:typeof lsort==='string'?lsort:'no',range:rangeVal(),filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab,testN:testN||10,testKinds:typeof testKinds!=='undefined'?testKinds:undefined}))}catch(e){}}
 function refresh(reset=true){
   if(reset||!P.length){P=pool();ci=0}
   if(tab==='card')buildCard();
