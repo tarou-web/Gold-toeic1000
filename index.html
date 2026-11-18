@@ -1159,27 +1159,29 @@ body.navopen .wrap{visibility:hidden}
 body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .bv{overscroll-behavior:contain}
 /* 復習: graph card (記憶 / 予定 / 覚え具合) under the start box */
-.lstart2{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:22px;padding:12px 12px 12px 16px}
+.lstart2{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:20px;padding:8px 8px 8px 16px}
 .lstart2>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .lstart2 b{font-family:var(--f-jp);font-weight:900;font-size:1.05rem}
 .lstart2 small{font-size:.75rem;color:var(--muted);font-weight:800}
-.lstart2 #lsGo{flex:none;width:auto;min-height:48px;padding:0 22px;font-size:1rem}
+.lstart2 #lsGo{flex:none;width:auto;min-height:44px;padding:0 22px;font-size:1rem}
 /* list: two short rows per card — text + chip, then remembered % + small buttons */
-#listbox .item{grid-template-columns:2.4em minmax(0,1fr) auto;padding:10px 12px;gap:4px 8px;align-items:center}
-#listbox .item .n{grid-row:1/3;align-self:start;padding-top:2px}
-#listbox .item .t{grid-column:2;grid-row:1}
-#listbox .item .e{font-size:.95rem;line-height:1.3}
-#listbox .item .j{font-size:.8rem;line-height:1.35}
+#listbox .item{grid-template-columns:2.1em minmax(0,1fr) auto;grid-template-rows:auto auto;padding:8px 10px;gap:2px 8px;align-items:center}
+#listbox .item .n{grid-row:1/3;align-self:start;padding-top:2px;font-size:.7rem}
+#listbox .item .t{grid-column:2;grid-row:1/3;gap:0}
+#listbox .item .e{font-size:.92rem;line-height:1.3}
+#listbox .item .jl{display:flex;align-items:center;gap:4px 8px;flex-wrap:wrap}
+#listbox .item .j{font-size:.78rem;line-height:1.35}
 #listbox .item .acts{display:contents}
-#listbox .item .acts>button{grid-column:3;grid-row:1;justify-self:end;align-self:start}
-#listbox .item .lbtns{grid-column:3;grid-row:2;justify-self:end;gap:4px}
-#listbox .item .led{width:32px;height:28px}
-#listbox .item .lmem{grid-column:2;grid-row:2;margin:0}
-.rvg{margin-top:12px;background:var(--surface);border-radius:24px;padding:12px 16px 14px}
+#listbox .item .acts>button{grid-column:3;grid-row:1;justify-self:end;align-self:start;font-size:.7rem}
+#listbox .item .lbtns{grid-column:3;grid-row:2;justify-self:end;align-self:end;gap:2px}
+#listbox .item .led{width:28px;height:26px;border:0!important}
+#listbox .item .led svg{width:16px;height:16px}
+#listbox .lmem{margin:0;gap:4px}#listbox .lmem .mt{width:34px;height:5px}#listbox .lmem .pc{font-size:.7rem}
+.rvg{margin-top:10px;background:var(--surface);border-radius:22px;padding:10px 14px 12px}
 .rvg-seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:3px;border-radius:12px;background:var(--bg)}
-.rvg-seg button{min-height:38px;border:0;border-radius:9px;background:none;color:var(--muted);font:inherit;font-weight:800;font-size:.85rem;cursor:pointer}
+.rvg-seg button{min-height:34px;border:0;border-radius:9px;background:none;color:var(--muted);font:inherit;font-weight:800;font-size:.85rem;cursor:pointer}
 .rvg-seg button[aria-selected=true]{background:#46464c;color:var(--fg)}
-.rvg-body{margin-top:12px}
+.rvg-body{margin-top:8px}
 .rvg-top{display:flex;justify-content:space-between;align-items:baseline;font-size:.78rem;font-weight:800;color:var(--muted)}
 .rvg-top b{font-size:1.4rem;font-weight:900;color:var(--fg)}
 .rvg svg.chart{display:block;width:100%;height:auto;margin-top:4px}
@@ -1191,8 +1193,9 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .rvg .lb{fill:var(--muted);font-size:10px;font-weight:800}.rvg .lb.now{fill:var(--fg)}
 .rvg-note{margin:6px 0 0;font-size:.72rem;color:var(--muted);font-weight:800}
 .rvg-empty{margin:8px 0;font-size:.85rem;color:var(--muted);font-weight:800;line-height:1.6}
-.rvg-fh{margin-top:10px;display:flex;justify-content:space-between;align-items:center;font-size:.76rem;font-weight:800;color:var(--muted)}
+.rvg-fh{margin-top:6px;display:flex;justify-content:space-between;align-items:center;font-size:.76rem;font-weight:800;color:var(--muted)}
 .rvg-eye{min-height:34px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--green);font:inherit;font-size:.76rem;font-weight:800;display:flex;align-items:center;gap:4px;cursor:pointer}
+.rvg-list{max-height:150px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;margin-top:4px;border-top:1px solid var(--line)}
 .rvg-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);min-height:40px}
 .rvg-row:last-of-type{border-bottom:0}
 .rvg-row .w{flex:1;min-width:0;display:flex;flex-direction:column}
@@ -3182,22 +3185,22 @@ function rvgMem(){
   const fut=[[0,now.sum]];for(let k=1;k<=7;k++)fut.push([k,memNow(t+k).sum]);
   const all=[...pts,...fut].map(p=>p[1]);let lo=Math.min(...all),hi=Math.max(...all);
   const pad=Math.max(2,Math.round((hi-lo)*.15));lo=Math.max(0,lo-pad);hi=hi+pad;if(hi-lo<4)hi=lo+4;
-  const X=k=>((k+14)/21*300).toFixed(1),Y=v=>(96-(v-lo)/(hi-lo)*88).toFixed(1);
+  const X=k=>((k+14)/21*300).toFixed(1),Y=v=>(70-(v-lo)/(hi-lo)*64).toFixed(1);
   const line=a=>a.map(([k,v])=>`${X(k)},${Y(v)}`).join(' ');
-  const svg=`<svg class="chart" viewBox="0 0 330 116" role="img" aria-label="いま覚えているのは約${now.sum}枚。復習しないと1週間後は約${fut[7][1]}枚">
-    <line x1="0" y1="96" x2="300" y2="96" class="ax"/><line x1="${X(0)}" y1="4" x2="${X(0)}" y2="96" class="today"/>
-    <text x="304" y="${+Y(hi)+4}" class="lb">${hi}</text><text x="304" y="100" class="lb">${lo}</text>
+  const svg=`<svg class="chart" viewBox="0 0 330 88" role="img" aria-label="いま覚えているのは約${now.sum}枚。復習しないと1週間後は約${fut[7][1]}枚">
+    <line x1="0" y1="70" x2="300" y2="70" class="ax"/><line x1="${X(0)}" y1="2" x2="${X(0)}" y2="70" class="today"/>
+    <text x="304" y="${+Y(hi)+4}" class="lb">${hi}</text><text x="304" y="74" class="lb">${lo}</text>
+    ${pts.length<2?`<text x="4" y="40" class="lb">これまでの線は今日から記録</text>`:''}
     ${pts.length>1?`<polyline points="${line(pts)}" class="past"/>`:''}
     <polyline points="${line(fut)}" class="fut"/>
     <circle cx="${X(0)}" cy="${Y(now.sum)}" r="5" class="dot"/>
-    <text x="0" y="112" class="lb">2週間前</text><text x="${+X(0)-11}" y="112" class="lb now">今日</text><text x="250" y="112" class="lb">やらないと</text></svg>`;
+    <text x="0" y="86" class="lb">2週間前</text><text x="${+X(0)-11}" y="86" class="lb now">今日</text><text x="250" y="86" class="lb">やらないと</text></svg>`;
   const fg=DATA.map(d=>[d,recallOf(d.id,t)]).filter(x=>x[1]!=null&&x[1]<.7).sort((a,b)=>a[1]-b[1]);
-  const rows=fg.slice(0,3).map(([d,r])=>{const p=Math.round(r*100),c=pctCls(r);
+  const rows=fg.map(([d,r])=>{const p=Math.round(r*100),c=pctCls(r);
     return `<div class="rvg-row">${RVSHOW?`<div class="w"><b>${esc(d.en)}</b><small>${esc(d.jp)}</small></div>`:`<div class="w hid" aria-label="かくれています"><i></i><i></i></div>`}<span class="pc ${c}">${p}%</span><span class="mt"><i class="${c}" style="width:${p}%"></i></span></div>`}).join('');
   return `<div class="rvg-top"><span>いま覚えている（推定）</span><span><b>${now.sum}</b> 枚</span></div>${svg}
-    ${pts.length<2?`<p class="rvg-note">これまでの線は、今日から毎日記録していきます</p>`:''}
     <div class="rvg-fh"><span>忘れかけているカード ${fg.length}枚</span>${fg.length?`<button class="rvg-eye" data-rvshow aria-pressed="${RVSHOW}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>${RVSHOW?'かくす':'単語を見る'}</button>`:''}</div>
-    ${fg.length?rows+(fg.length>3?`<button class="rvg-all" data-rvall>すべて見る（一覧の忘れかけ順）</button>`:''):`<p class="rvg-note">いまは、忘れかけているカードはありません</p>`}`;
+    ${fg.length?`<div class="rvg-list">${rows}</div>`:`<p class="rvg-note">いまは、忘れかけているカードはありません</p>`}`;
 }
 function rvgPlan(){
   const t=dayNo(),n=[0,0,0,0,0,0,0];
@@ -3534,7 +3537,7 @@ function renderList(){
   $('lchips').innerHTML=[['all','すべて'],['weak','苦手'],['ok','覚えた']].map(([k,l])=>`<button data-lf="${k}" aria-pressed="${lfilt===k}">${l} ${cnt[k]}</button>`).join('');
   $('lchips').querySelectorAll('[data-lf]').forEach(b=>b.onclick=()=>{lfilt=b.dataset.lf;LIM=150;renderList()});
   const rows=sortRows(base.filter(d=>lfilt==='all'||(lfilt==='weak'?isWeak(d):S.known[d.id])));
-  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t" data-ed="${d.id}"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.memo?`<span class="j">📝 ${esc(d.memo)}</span>`:''}${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div>${memTag(d)}<div class="acts"><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button><span class="lbtns"><button class="led lfav" data-fav="${d.id}" aria-label="お気に入り" aria-pressed="${!!(S.fav||{})[d.id]}"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button><button class="led" data-ed="${d.id}" aria-label="直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="led ldel" data-del="${d.id}" aria-label="消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></span></div></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):(lsort==='fav'?'<div class="empty" style="border:0">お気に入りはまだありません。<br>カードの右上のハートを押すと、ここに集まります。</div>':'<div class="empty" style="border:0">見つかりませんでした。</div>');
+  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t" data-ed="${d.id}"><span class="e">${esc(d.en)}</span><span class="jl"><span class="j">${esc(d.jp)}</span>${memTag(d)}</span>${d.memo?`<span class="j">📝 ${esc(d.memo)}</span>`:''}${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><div class="acts"><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button><span class="lbtns"><button class="led lfav" data-fav="${d.id}" aria-label="お気に入り" aria-pressed="${!!(S.fav||{})[d.id]}"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button><button class="led" data-ed="${d.id}" aria-label="直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="led ldel" data-del="${d.id}" aria-label="消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></span></div></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):(lsort==='fav'?'<div class="empty" style="border:0">お気に入りはまだありません。<br>カードの右上のハートを押すと、ここに集まります。</div>':'<div class="empty" style="border:0">見つかりませんでした。</div>');
   $('listbox').querySelectorAll('button[data-id]').forEach(b=>b.onclick=()=>{const id=+b.dataset.id;if(S.known[id])delete S.known[id];else S.known[id]=1;save();header();b.innerHTML=chip(DATA.find(x=>x.id===id))});
   $('listbox').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
     if(!b.classList.contains('arm')){$('listbox').querySelectorAll('.ldel.arm').forEach(x=>{x.classList.remove('arm');x.innerHTML=x._svg});b._svg=b.innerHTML;b.classList.add('arm');b.textContent='消す？';clearTimeout(b._t);b._t=setTimeout(()=>{if(b.isConnected&&b.classList.contains('arm')){b.classList.remove('arm');b.innerHTML=b._svg}},3000);return}
