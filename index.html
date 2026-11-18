@@ -1261,14 +1261,32 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .mc-r .w2{flex:1;min-width:0}
 .mc-r .mine{margin-top:2px;font-size:.75rem;font-weight:800;color:var(--red-ink)}
 .rd-btns .btn{min-height:52px;width:100%}
-.rvg{margin-top:10px;background:var(--surface);border-radius:22px;padding:10px 14px 12px}
+.rvg{margin-top:10px}
+.rvg-card{background:var(--surface);border-radius:20px;padding:10px 12px}
+.rvg-pills{display:flex;gap:6px}
+.rvg-pills button{min-height:30px;padding:0 12px;border-radius:999px;border:0;background:#323236;color:#c9c9ce;font:inherit;font-size:.78rem;font-weight:900;cursor:pointer}
+.rvg-pills button[aria-selected=true]{background:var(--fg);color:var(--bg)}
+.rvg-fx{margin-top:8px}
 .rvg-seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:3px;border-radius:12px;background:var(--bg)}
 .rvg-seg button{min-height:34px;border:0;border-radius:9px;background:none;color:var(--muted);font:inherit;font-weight:800;font-size:.85rem;cursor:pointer}
 .rvg-seg button[aria-selected=true]{background:#46464c;color:var(--fg)}
-.rvg-body{margin-top:8px}
+.rvg-body{margin-top:8px;height:76px;display:flex;gap:12px}
+.rvg-num{width:104px;flex:none;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.rvg-num span{font-size:.66rem;font-weight:800;color:var(--muted);white-space:nowrap}
+.rvg-num b{font-size:1.9rem;font-weight:900;line-height:1.1}.rvg-num b small{font-size:.75rem;color:var(--muted);margin-left:2px}.rvg-num b.y{color:#f5c518}
+.rvg-g{flex:1;min-width:0;display:flex;align-items:center}
+.rvg-g .rvg-empty{margin:0;font-size:.75rem}
+.rvg-mb{width:100%;height:76px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;align-items:end}
+.rvg-mb div{display:flex;flex-direction:column;align-items:center;gap:2px}
+.rvg-mb i{display:block;width:100%;border-radius:4px;background:#4a4a50}.rvg-mb i.on{background:#f5c518}
+.rvg-mb .v{font-size:.62rem;font-weight:800;color:var(--muted)}.rvg-mb .d{font-size:.58rem;font-weight:800;color:var(--muted);white-space:nowrap}
+.rvg-mb div:first-child .v{color:#f5c518;font-weight:900}.rvg-mb div:first-child .d{color:var(--fg)}
+.rvg-md{display:flex;align-items:center;gap:10px;width:100%}.rvg-md svg{flex:none}
+.rvg-ml{flex:1;min-width:0;display:grid;gap:2px}
+.rvg-ml div{display:flex;align-items:center;gap:5px;font-size:.66rem;font-weight:800;color:#c9c9ce}.rvg-ml i{width:7px;height:7px;border-radius:2px;flex:none}.rvg-ml b{margin-left:auto;color:var(--fg)}
 .rvg-top{display:flex;justify-content:space-between;align-items:baseline;font-size:.78rem;font-weight:800;color:var(--muted)}
 .rvg-top b{font-size:1.4rem;font-weight:900;color:var(--fg)}
-.rvg svg.chart{display:block;width:100%;height:auto;margin-top:4px}
+.rvg svg.chart{display:block;width:100%;height:76px;margin:0}
 .rvg-eye svg{flex:none}
 .rvg .ax{stroke:var(--line)}.rvg .today{stroke:#5a5a60}
 .rvg .past{fill:none;stroke:#f5c518;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
@@ -3262,60 +3280,66 @@ const pctCls=r=>r<.5?'risk':r<.7?'soon':'ok';
 let RVT='mem', RVSHOW=false;
 function rvgHTML(){
   const seg=[['mem','記憶'],['plan','予定'],['lvl','覚え具合']].map(([k,l])=>`<button role="tab" data-rvt="${k}" aria-selected="${RVT===k}">${l}</button>`).join('');
-  return `<div class="rvg" id="rvg"><div class="rvg-seg" role="tablist" aria-label="復習のグラフ">${seg}</div><div class="rvg-body">${RVT==='plan'?rvgPlan():RVT==='lvl'?rvgLvl():rvgMem()}</div></div>`;
+  return `<div class="rvg" id="rvg"><div class="rvg-card"><div class="rvg-pills" role="tablist" aria-label="復習のグラフ">${seg}</div><div class="rvg-body">${rvgGraph()}</div></div><div class="rvg-fx">${rvgForget()}</div></div>`;
 }
+const rvgGraph=()=>RVT==='plan'?rvgPlan():RVT==='lvl'?rvgLvl():rvgMem();
+const rvgNum=(cap,num,unit,sub,y)=>`<div class="rvg-num"><span>${cap}</span><b class="${y?'y':''}">${num}<small>${unit}</small></b><span>${sub}</span></div>`;
+// 記憶: number on the left, a small line on the right (past 2 weeks + what happens without review)
 function rvgMem(){
   const t=dayNo(),now=memNow();
-  if(!now.n)return `<p class="rvg-empty">まだ記録がありません。復習を始めると、ここに「いま覚えている数」が出ます。</p>`;
+  if(!now.n)return rvgNum('いま覚えている',0,'枚','')+`<div class="rvg-g"><p class="rvg-empty">復習を始めると、ここに記録が出ます</p></div>`;
   const h=memHist(),pts=[];
   for(let k=-14;k<=0;k++)if(h[t+k]!=null)pts.push([k,h[t+k]]);
   const fut=[[0,now.sum]];for(let k=1;k<=7;k++)fut.push([k,memNow(t+k).sum]);
   const all=[...pts,...fut].map(p=>p[1]);let lo=Math.min(...all),hi=Math.max(...all);
   const pad=Math.max(2,Math.round((hi-lo)*.15));lo=Math.max(0,lo-pad);hi=hi+pad;if(hi-lo<4)hi=lo+4;
-  const X=k=>((k+14)/21*300).toFixed(1),Y=v=>(70-(v-lo)/(hi-lo)*64).toFixed(1);
+  const X=k=>(k<=0?(k+14)/14*140:140+k/7*76).toFixed(1),Y=v=>(60-(v-lo)/(hi-lo)*54).toFixed(1);
   const line=a=>a.map(([k,v])=>`${X(k)},${Y(v)}`).join(' ');
-  const svg=`<svg class="chart" viewBox="0 0 330 88" role="img" aria-label="いま覚えているのは約${now.sum}枚。復習しないと1週間後は約${fut[7][1]}枚">
-    <line x1="0" y1="70" x2="300" y2="70" class="ax"/><line x1="${X(0)}" y1="2" x2="${X(0)}" y2="70" class="today"/>
-    <text x="304" y="${+Y(hi)+4}" class="lb">${hi}</text><text x="304" y="74" class="lb">${lo}</text>
-    ${pts.length<2?`<text x="4" y="40" class="lb">これまでの線は今日から記録</text>`:''}
-    ${pts.length>1?`<polyline points="${line(pts)}" class="past"/>`:''}
-    <polyline points="${line(fut)}" class="fut"/>
-    <circle cx="${X(0)}" cy="${Y(now.sum)}" r="5" class="dot"/>
-    <text x="0" y="86" class="lb">2週間前</text><text x="${+X(0)-11}" y="86" class="lb now">今日</text><text x="250" y="86" class="lb">やらないと</text></svg>`;
+  const svg=`<svg class="chart" viewBox="0 0 220 76" role="img" aria-label="いま覚えているのは約${now.sum}枚。復習しないと1週間後は約${fut[7][1]}枚">
+    <line x1="0" y1="60" x2="218" y2="60" class="ax"/><line x1="140" y1="2" x2="140" y2="60" class="today"/>
+    ${pts.length>1?`<polyline points="${line(pts)}" class="past"/>`:`<text x="2" y="34" class="lb">今日から記録</text>`}
+    <polyline points="${line(fut)}" class="fut"/><circle cx="140" cy="${Y(now.sum)}" r="4.5" class="dot"/>
+    <text x="0" y="74" class="lb">2週間前</text><text x="130" y="74" class="lb now">今日</text><text x="176" y="74" class="lb">1週間後</text></svg>`;
+  return rvgNum('いま覚えている',now.sum,'枚',`1週間後は${fut[7][1]}枚に`)+`<div class="rvg-g">${svg}</div>`;
+}
+// the forgetting list stays under the graph whichever tab is open
+function rvgForget(){
+  const t=dayNo();
   const fg=DATA.map(d=>[d,recallOf(d.id,t)]).filter(x=>x[1]!=null&&x[1]<.7).sort((a,b)=>a[1]-b[1]);
   const rows=fg.map(([d,r])=>{const p=Math.round(r*100),c=pctCls(r);
     return `<div class="rvg-row">${RVSHOW?`<div class="w"><b>${esc(d.en)}</b><small>${esc(d.jp)}</small></div>`:`<div class="w hid" aria-label="かくれています"><i></i><i></i></div>`}<span class="pc ${c}">${p}%</span><span class="mt"><i class="${c}" style="width:${p}%"></i></span></div>`}).join('');
-  return `<div class="rvg-top"><span>いま覚えている（推定）</span><span><b>${now.sum}</b> 枚</span></div>${svg}
-    <div class="rvg-fh"><span>忘れかけ ${fg.length}枚<small>（70%より下）</small></span>${fg.length?`<button class="rvg-eye" data-rvshow aria-pressed="${RVSHOW}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>${RVSHOW?'かくす':'単語を見る'}</button>`:''}</div>
+  return `<div class="rvg-fh"><span>忘れかけ ${fg.length}枚<small>（70%より下）</small></span>${fg.length?`<button class="rvg-eye" data-rvshow aria-pressed="${RVSHOW}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>${RVSHOW?'かくす':'単語を見る'}</button>`:''}</div>
     ${fg.length?`<div class="rvg-list">${rows}</div>`:`<p class="rvg-note">いまは、忘れかけているカードはありません</p>`}`;
 }
 function rvgPlan(){
   const t=dayNo(),n=[0,0,0,0,0,0,0];
   for(const d of DATA){const rv=(S.rv||{})[d.id];if(!rv)continue;const k=rv[0]+rv[1]-t;if(k<=0)n[0]++;else if(k<7)n[k]++}
   const mx=Math.max(1,...n),wd='日月火水木金土',tw=new Date().getDay();
-  const bars=n.map((v,k)=>`<div><span class="v">${v}</span><i style="height:${Math.max(3,Math.round(v/mx*150))}px" class="${k?'':'on'}"></i><span class="d">${k?wd[(tw+k)%7]:'今日'}</span></div>`).join('');
-  return `<p class="rvg-cap">復習する日が来るカードの枚数</p>
-    <div class="rvg-stats"><div><span>今日やる</span><b class="y">${n[0]}<small>枚</small></b></div><div><span>明日</span><b>${n[1]}<small>枚</small></b></div><div><span>7日間の合計</span><b>${n.reduce((a,b)=>a+b,0)}<small>枚</small></b></div></div>
-    <div class="rvg-bars" role="img" aria-label="これからの復習 ${n.map((v,k)=>(k?wd[(tw+k)%7]:'今日')+v+'枚').join(' ')}">${bars}</div>
-    <p class="rvg-note">今日の分には、まちがえたカードと、予定の日を過ぎたカードも入っています</p>`;
+  const bars=n.map((v,k)=>`<div><span class="v">${v}</span><i style="height:${Math.max(3,Math.round(v/mx*40))}px" class="${k?'':'on'}"></i><span class="d">${k?wd[(tw+k)%7]:'今日'}</span></div>`).join('');
+  return rvgNum('今日やる復習',n[0],'枚',`7日で${n.reduce((a,b)=>a+b,0)}枚`,true)+`<div class="rvg-g"><div class="rvg-mb" role="img" aria-label="これからの復習 ${n.map((v,k)=>(k?wd[(tw+k)%7]:'今日')+v+'枚').join(' ')}">${bars}</div></div>`;
 }
 function rvgLvl(){
   const c={s:0,f:0,l:0,n:0};
   for(const d of DATA){const rv=(S.rv||{})[d.id];if(!rv){c.n++;continue}rv[1]>=30?c.s++:rv[1]>=7?c.f++:c.l++}
-  const tot=Math.max(1,DATA.length),C=2*Math.PI*48,parts=[['s','#f5c518'],['f','#b8931a'],['l','#6b5a24'],['n','#3a3a3f']];
-  let off=0;const arcs=parts.map(([k,col])=>{const len=c[k]/tot*C,gap=c[k]&&c[k]<tot?2:0,a=`<circle cx="60" cy="60" r="48" stroke="${col}" stroke-dasharray="${Math.max(0,len-gap).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}"/>`;off+=len;return a}).join('');
-  const pct=Math.round((tot-c.n)/tot*100);
-  const lg=[['しっかり覚えた','s','#f5c518'],['定着してきた','f','#b8931a'],['覚えかけ','l','#6b5a24'],['新しい','n','#3a3a3f']].map(([l,k,col])=>`<div><i style="background:${col}"></i>${l}<b>${c[k]}</b></div>`).join('');
-  return `<div class="rvg-donut"><svg viewBox="0 0 120 120" role="img" aria-label="覚え具合 しっかり${c.s}枚 定着${c.f}枚 覚えかけ${c.l}枚 新しい${c.n}枚"><g transform="rotate(-90 60 60)" fill="none" stroke-width="15">${arcs}</g></svg><div><b>${pct}<small>%</small></b><span>学習ずみ</span></div></div>
-    <div class="rvg-lg">${lg}</div><p class="rvg-note">次に出るまでの日数で分けています（〜6日：覚えかけ、7〜29日：定着、30日〜：しっかり）</p>`;
+  const tot=Math.max(1,DATA.length),C=2*Math.PI*25,parts=[['s','#f5c518'],['f','#b8931a'],['l','#6b5a24'],['n','#4a4a50']];
+  let off=0;const arcs=parts.map(([k,col])=>{const len=c[k]/tot*C,gap=c[k]&&c[k]<tot?1.5:0,a=`<circle cx="32" cy="32" r="25" stroke="${col}" stroke-dasharray="${Math.max(0,len-gap).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}"/>`;off+=len;return a}).join('');
+  const done=tot-c.n,pct=Math.round(done/tot*100);
+  const lg=[['しっかり','s','#f5c518'],['定着','f','#b8931a'],['覚えかけ','l','#6b5a24'],['新しい','n','#4a4a50']].map(([l,k,col])=>`<div><i style="background:${col}"></i>${l}<b>${c[k]}</b></div>`).join('');
+  return rvgNum('学習ずみ',pct,'%',`${DATA.length}枚のうち${done}枚`)+`<div class="rvg-g"><div class="rvg-md"><svg viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="覚え具合 しっかり${c.s}枚 定着${c.f}枚 覚えかけ${c.l}枚 新しい${c.n}枚"><g transform="rotate(-90 32 32)" fill="none" stroke-width="10">${arcs}</g></svg><div class="rvg-ml">${lg}</div></div></div>`;
 }
+// the word box takes the room left above the menu bar
+function rvgFit(){const L=document.querySelector('#rvg .rvg-list'),nav=document.querySelector('.bnav');if(!L||!L.offsetParent)return;L.style.maxHeight='';
+  const navTop=nav&&getComputedStyle(nav).display!=='none'?nav.getBoundingClientRect().top:innerHeight;
+  const avail=Math.floor(navTop-12-(L.getBoundingClientRect().top+scrollY));L.style.maxHeight=Math.max(150,avail)+'px'}
+addEventListener('resize',()=>{if(tab==='quiz')rvgFit()});
 function bindRvg(root){
   const g=root.querySelector('#rvg');if(!g)return;
   g.onclick=e=>{
-    const tb=e.target.closest('[data-rvt]');if(tb){RVT=tb.dataset.rvt;g.outerHTML=rvgHTML();bindRvg(root);return}
-    if(e.target.closest('[data-rvshow]')){RVSHOW=!RVSHOW;g.querySelector('.rvg-body').innerHTML=rvgMem();return}
+    const tb=e.target.closest('[data-rvt]');if(tb){RVT=tb.dataset.rvt;g.querySelectorAll('[data-rvt]').forEach(b=>b.setAttribute('aria-selected',b===tb));g.querySelector('.rvg-body').innerHTML=rvgGraph();return}
+    if(e.target.closest('[data-rvshow]')){RVSHOW=!RVSHOW;const L=g.querySelector('.rvg-list'),st=L?L.scrollTop:0;g.querySelector('.rvg-fx').innerHTML=rvgForget();rvgFit();const L2=g.querySelector('.rvg-list');if(L2)L2.scrollTop=st;return}
     if(e.target.closest('[data-rvall]')){lsort='forget';savePrefs();lfilt='all';setTab('list');$('lsortBtn')&&$('lsortBtn').classList.add('on');scrollTo(0,0)}
   };
+  rvgFit();requestAnimationFrame(rvgFit);setTimeout(rvgFit,400);
 }
 // ---- 学習: each card goes 4択 → 並べ替え (phrases) or 書く (words); both right = 覚えた
 const ROUND=7, MASTER=2;
