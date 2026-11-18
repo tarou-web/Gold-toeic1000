@@ -1159,11 +1159,33 @@ body.navopen .wrap{visibility:hidden}
 body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .bv{overscroll-behavior:contain}
 /* end of the range */
-.rend .done{padding:8px 4px 6px;gap:12px}
-.rend .done .dmas{width:92px;height:112px}
-.rend-opts{display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px}
-.rend-opts .btn{width:100%;min-height:50px;font-size:1rem}
-.rend-back{background:none;border:0;color:var(--muted);font:inherit;font-weight:800;min-height:44px;padding:0 12px;cursor:pointer}
+.rend{display:flex;flex-direction:column;gap:12px;padding-top:2px}
+.re-sum{display:flex;align-items:center;gap:16px;background:var(--surface);border-radius:22px;padding:14px 16px}
+.re-ring{position:relative;width:96px;height:96px;flex:none}
+.re-ring svg{display:block}
+.re-ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.5rem;font-variant-numeric:tabular-nums}
+.re-ring b small{font-size:.8rem;margin-top:5px}
+.re-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+.re-txt h2{margin:0;font-family:var(--f-jp);font-weight:900;font-size:1.3rem;line-height:1.2}
+.re-lg{display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:800}
+.re-lg i{width:10px;height:10px;border-radius:3px;background:#6a6a72}.re-lg i.y{background:#f5c518}
+.re-lg span{margin-left:auto;font-variant-numeric:tabular-nums}
+.re-miss{background:var(--surface);border-radius:20px;padding:4px 0;overflow:hidden}
+.re-mh{display:flex;justify-content:space-between;padding:8px 16px 6px;font-size:.8rem;font-weight:800;color:var(--muted)}
+/* fixed-height box: the list scrolls inside it */
+.re-list{list-style:none;margin:0;padding:0;max-height:186px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-top:1px solid var(--line)}
+.re-list li{display:flex;align-items:center;gap:8px;padding:5px 6px 5px 16px;border-bottom:1px solid var(--line)}
+.re-list li:last-child{border-bottom:0}
+.re-list li div{flex:1;min-width:0;display:flex;flex-direction:column}
+.re-list b{font-size:1rem;font-weight:800;overflow-wrap:anywhere}
+.re-list small{font-size:.8rem;color:var(--muted)}
+.re-say{width:44px;height:44px;flex:none;border:0;background:none;color:var(--muted);display:flex;align-items:center;justify-content:center;border-radius:12px;cursor:pointer}
+.re-acts{display:flex;flex-direction:column;gap:10px}
+.re-acts>.btn{width:100%;min-height:54px;font-size:1.05rem}
+.re-sub{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:10px}
+.re-sub .btn{min-height:46px;font-size:.95rem}
+.re-links{display:flex;justify-content:center;flex-wrap:wrap;gap:2px}
+.re-links button{background:none;border:0;color:var(--muted);font:inherit;font-weight:800;font-size:.85rem;min-height:44px;padding:0 10px;cursor:pointer}
 /* card position: range · progress bar · 12 / 100 */
 .cpos{display:flex;align-items:center;gap:10px;padding-inline:6px;text-align:left}
 .cpos .cp-r,.cpos .cp-n{flex:none;color:var(--muted)}
@@ -2956,13 +2978,24 @@ function showEnd(){
   if(weak.length&&!same)opts.push(['weak',`苦手な${weak.length}枚だけやる`]);
   if(nx)opts.push(['next',`次の範囲へ（${nx.text}）`]);
   opts.push(['again','最初からもう一度'],['shuf','シャッフルして最初から']);
-  v.innerHTML=`<div class="done"><h2>${allOk?'ぜんぶ覚えた！':`${lab} おわり！`}</h2>
-    <p style="margin:0;color:var(--muted)">${lab==='全部'?'':lab+' の'}${P.length}枚をひととおり見ました</p>
-    <div class="boxes"><div class="box g"><b>覚えた</b><span>${r.ok.size}枚</span></div><div class="box"><b>まだ</b><span>${r.ng.size}枚</span></div></div>
-    <div class="rend-opts">${opts.map(([k,s],i)=>`<button class="btn${i===0?' ok':''}" data-end="${k}">${s}</button>`).join('')}</div>
-    <button class="rend-back" data-end="back">最後のカードに戻る</button></div>`;
+  const pct=Math.round(r.ok.size/P.length*100), C=2*Math.PI*40, spk='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h3l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>';
+  const main=ng.length?['ng',`この${ng.length}枚を練習する`]:nx?['next',`次の範囲へ（${nx.text}）`]:['again','最初からもう一度'];
+  const sub=[nx&&main[0]!=='next'?['next','次の範囲へ']:null,main[0]!=='again'?['again','最初から']:null].filter(Boolean);
+  const links=[weak.length&&!same?['weak',`苦手だけ（${weak.length}）`]:null,['shuf','シャッフル'],['back','最後のカードに戻る']].filter(Boolean);
+  v.innerHTML=`<div class="re-sum">
+      <div class="re-ring"><svg viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="${P.length}枚中${r.ok.size}枚 覚えた"><circle cx="48" cy="48" r="40" fill="none" stroke="var(--line)" stroke-width="11"/><circle cx="48" cy="48" r="40" fill="none" stroke="#f5c518" stroke-width="11" stroke-linecap="round" stroke-dasharray="${(C*pct/100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 48 48)" style="${pct?'':'display:none'}"/></svg><b>${pct}<small>%</small></b></div>
+      <div class="re-txt"><h2>${allOk?'ぜんぶ覚えた！':`${esc(lab)} おわり！`}</h2>
+        <div class="re-lg"><i class="y"></i>覚えた<span>${r.ok.size}枚</span></div>
+        <div class="re-lg"><i></i>まだ<span>${r.ng.size}枚</span></div></div>
+    </div>
+    ${ng.length?`<div class="re-miss"><div class="re-mh"><span>わからなかったカード</span><span>${ng.length}枚</span></div>
+      <ul class="re-list">${ng.map(d=>`<li><div><b>${esc(d.en||'')}</b><small>${esc(d.jp||'')}</small></div><button class="re-say" data-say-id="${esc(String(d.id))}" aria-label="${esc(d.en||'')} の発音を聞く">${spk}</button></li>`).join('')}</ul></div>`:''}
+    <div class="re-acts"><button class="btn ok" data-end="${main[0]}">${main[1]}</button>
+      ${sub.length?`<div class="re-sub">${sub.map(([k,s])=>`<button class="btn" data-end="${k}">${s}</button>`).join('')}</div>`:''}
+      <div class="re-links">${links.map(([k,s])=>`<button data-end="${k}">${s}</button>`).join('')}</div></div>`;
   ['scene','pos'].forEach(id=>$(id).hidden=true); document.querySelector('#v-card .row').hidden=true; v.hidden=false;
-  v.onclick=e=>{const k=e.target.closest('[data-end]')?.dataset.end; if(!k)return;
+  v.onclick=e=>{const sb=e.target.closest('[data-say-id]');if(sb){const d=ng.find(x=>String(x.id)===sb.dataset.sayId);d&&speak(d.en);return}
+    const k=e.target.closest('[data-end]')?.dataset.end; if(!k)return;
     const play=(list,label)=>{P=list;PLABEL=label;ci=0;fillCard();window.scrollTo&&scrollTo({top:0,behavior:'smooth'})};
     if(k==='back'){hideEnd();return}
     if(k==='ng')play(ng,'まだの分');
@@ -2972,7 +3005,6 @@ function showEnd(){
     else if(k==='shuf'){const s=P.slice();for(let i=s.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[s[i],s[j]]=[s[j],s[i]]}play(s,PLABEL)}
   };
   if(allOk&&typeof fanfare==='function')fanfare();
-  requestAnimationFrame(()=>v.querySelector('.btn')?.focus({preventScroll:true}));
 }
 function go(n){if(n>0&&P.length&&ci>=P.length-1){showEnd();return}const c=Math.max(0,Math.min(P.length-1,ci+n));if(c!==ci){ci=c;fillCard()}}
 let judging=false;
