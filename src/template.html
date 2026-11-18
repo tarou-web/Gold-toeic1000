@@ -3753,13 +3753,13 @@ function renderTest(){
   $('tQuit').onclick=()=>{TT=null;renderTest();scrollTo(0,0)};
   $('tGrade').onclick=grade;
   // swipe sideways: the question follows the finger and the next / previous one slides in beside it (like the home screens)
-  (()=>{const box=v.querySelector('.tqs');if(!box)return;let st=null,busy=false;
+  (()=>{const box=v.querySelector('.tqs'),area=v.querySelector('.ttest');if(!box||!area)return;let st=null,busy=false;
     const setX=(el,x,tr)=>{if(el){el.style.transition=tr||'none';el.style.transform=`translateX(${x}px)`}};
     const clean=el=>{if(el){el.style.transition='';el.style.transform='';el.style.position='';el.style.top='';el.style.left='';el.style.right=''}};
     const reduce=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
-    box.addEventListener('touchstart',e=>{st=null;if(busy||e.touches.length!==1||e.target.closest('.tkb,input,textarea'))return;
+    area.addEventListener('touchstart',e=>{st=null;if(busy||e.touches.length!==1||e.target.closest('.tkb,.tbar2,input,textarea'))return;
       const p=e.touches[0];st={x0:p.clientX,y0:p.clientY,lock:null,dx:0,hist:[[p.clientX,performance.now()]]}},{passive:true});
-    box.addEventListener('touchmove',e=>{if(!st)return;const p=e.touches[0],dx=p.clientX-st.x0,dy=p.clientY-st.y0;
+    area.addEventListener('touchmove',e=>{if(!st)return;const p=e.touches[0],dx=p.clientX-st.x0,dy=p.clientY-st.y0;
       if(!st.lock){if(Math.hypot(dx,dy)<10)return;if(Math.abs(dx)<Math.abs(dy)*1.2){st=null;return}
         st.lock=1;st.side=dx<0?-1:1;st.from=TT.cur;st.to=TT.cur-st.side;if(st.to<0||st.to>=n)st.to=null;
         st.W=box.clientWidth+24;st.fv=$('tq'+st.from);
@@ -3779,7 +3779,7 @@ function renderTest(){
         setTimeout(()=>{clean(s.fv);clean(s.tv);go(s.to);busy=false},d)}
       else{setX(s.fv,0,'transform .45s var(--spring)');if(s.tv)setX(s.tv,-s.side*s.W,'transform .3s var(--ease-ios)');
         setTimeout(()=>{clean(s.fv);if(s.tv){clean(s.tv);s.tv.hidden=true}busy=false},450)}};
-    box.addEventListener('touchend',end,{passive:true});box.addEventListener('touchcancel',end,{passive:true})})();
+    area.addEventListener('touchend',end,{passive:true});area.addEventListener('touchcancel',end,{passive:true})})();
 }
 var testKey=null;
 document.addEventListener('keydown',e=>{if(testKey&&!e.target.closest('input,textarea,select'))testKey(e)});
