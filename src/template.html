@@ -1160,6 +1160,28 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 #listbox .item .lmem{grid-column:2;grid-row:2;justify-self:end;align-self:end;margin:0 0 6px;gap:4px}
 #listbox .item:has(.lmem) .jl{padding-right:76px}
 #listbox .lmem .pc{min-width:2.6em;text-align:right}#listbox .lmem .mt{width:34px;height:5px}#listbox .lmem .pc{font-size:.7rem}
+.rdone{display:flex;flex-direction:column;gap:12px}
+.rd-h{display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.rd-h h2{margin:0;font-family:var(--f-jp);font-weight:900;font-size:1.5rem;color:#f5c518}
+.rd-h small{font-size:.8rem;color:var(--muted);font-weight:700}
+.rd-c{display:flex;gap:6px;flex:none}
+.rd-c span{height:26px;padding:0 9px;border-radius:999px;display:flex;align-items:center;font-size:.75rem;font-weight:800}
+.rd-c .y{background:#2b2a20;color:#f5c518}.rd-c .o{background:#3a2a14;color:#ff9f0a}
+.rd-box{background:var(--surface);border-radius:20px;overflow:hidden}
+.rd-bh{display:flex;justify-content:space-between;padding:9px 14px 7px;font-size:.75rem;font-weight:800;color:var(--muted);border-bottom:1px solid var(--line)}
+/* fixed-height box: the cards scroll inside it */
+.rd-list{max-height:236px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.rd-row{display:flex;align-items:center;gap:8px;min-height:46px;padding:0 4px 0 12px;border-bottom:1px solid var(--line)}
+.rd-row:last-child{border-bottom:0}
+.rd-row .mk{width:18px;height:18px;border-radius:999px;display:flex;align-items:center;justify-content:center;flex:none}
+.rd-row .mk.y{background:#f5c518;color:#18181a}.rd-row .mk.o{background:#3a2a14;color:#ff9f0a}
+.rd-row .w{flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;overflow:hidden;white-space:nowrap}
+.rd-row .w b{font-weight:800;font-size:.88rem;flex:none;max-width:88%;overflow:hidden;text-overflow:ellipsis}
+.rd-row .w span{font-size:.75rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.rd-row .nx{font-size:.7rem;font-weight:800;color:var(--muted);flex:none}.rd-row .nx.o{color:#ff9f0a;font-weight:900}
+.rd-say{width:40px;height:40px;border:0;background:none;color:var(--muted);display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer;border-radius:10px}
+.rd-btns{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+.rd-btns .btn{min-height:52px;width:100%}
 .rvg{margin-top:10px;background:var(--surface);border-radius:22px;padding:10px 14px 12px}
 .rvg-seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:3px;border-radius:12px;background:var(--bg)}
 .rvg-seg button{min-height:34px;border:0;border-radius:9px;background:none;color:var(--muted);font:inherit;font-weight:800;font-size:.85rem;cursor:pointer}
@@ -3265,10 +3287,23 @@ function renderQuiz0(){
   }
   if(!d){
     const miss=Object.keys(LR.miss).length;
-    v.innerHTML=`<div class="done"><img class="dmas" src="mascot.png" alt=""><h2>ラウンド完了！</h2><p style="margin:0;color:var(--muted)">${QP.length}枚 ぜんぶ覚えました</p>
-      <div class="boxes"><div class="box g"><b>一発でクリア</b><span>${QP.length-miss}枚</span></div><div class="box"><b>間違えて復習</b><span>${miss}枚</span></div></div>
-      <button class="btn ok" id="again" style="width:100%;max-width:320px">次のラウンドへ</button></div>`;
-    fanfare(); mascotSay&&mascotSay('ok'); $('again').onclick=()=>{startQuiz();LR.started=true;scrollTo(0,0);renderQuiz()};return}
+    // the cards of this round, missed ones first, each with when it comes back
+    const today=dayNo(), when=n=>n<=0?'今日':n===1?'明日':n===2?'あさって':n<7?`${n}日後`:n<28&&n%7===0?`${n/7}週間後`:n>=28?`約${Math.round(n/30)}か月後`:`${n}日後`;
+    const spk='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h3l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>';
+    const mkO='<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.5-5.8"/><path d="M4 4v4h4"/></svg>', mkY='<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+    const cards=QP.slice().sort((a,b)=>(LR.miss[b.id]?1:0)-(LR.miss[a.id]?1:0));
+    const rows=cards.map(c=>{const m=!!LR.miss[c.id],rv=(S.rv||{})[c.id],n=rv?rv[0]+rv[1]-today:null;
+      return `<div class="rd-row"><i class="mk ${m?'o':'y'}" aria-label="${m?'まちがえた':'一発でクリア'}">${m?mkO:mkY}</i><div class="w"><b>${esc(c.en)}</b><span>${esc(c.jp)}</span></div><span class="nx${m?' o':''}">${n==null?'':when(n)}</span><button class="rd-say" data-say-id="${esc(String(c.id))}" aria-label="${esc(c.en)} の発音を聞く">${spk}</button></div>`}).join('');
+    v.innerHTML=`<div class="rdone">
+      <div class="rd-h"><div><h2>ラウンド完了！</h2><small>${QP.length}枚 ぜんぶ覚えました</small></div><div class="rd-c"><span class="y">一発 ${QP.length-miss}</span>${miss?`<span class="o">まちがえ ${miss}</span>`:''}</div></div>
+      <div class="rd-box"><div class="rd-bh"><span>このラウンドのカード ${QP.length}枚</span><span>次に出る日</span></div><div class="rd-list">${rows}</div></div>
+      <div class="rd-btns"><button class="btn" id="rdQuit">おわる</button><button class="btn ok" id="again">次のラウンドへ</button></div></div>`;
+    v.querySelector('.rd-list').onclick=e=>{const b=e.target.closest('[data-say-id]');if(!b)return;const c=QP.find(x=>String(x.id)===b.dataset.sayId);c&&speak(c.en)};
+    fanfare(); mascotSay&&mascotSay('ok');
+    $('again').onclick=()=>{startQuiz();LR.started=true;scrollTo(0,0);renderQuiz()};
+    // おわる: back to the first screen (today's round and the graphs)
+    $('rdQuit').onclick=()=>{startQuiz();scrollTo(0,0);renderQuiz()};
+    return}
   const kind=qKind(d), je=$('dir').value==='je';
   const segs=QP.map(x=>{const st=LR.st[x.id]||0;return `<i class="${st>=MASTER?'d':st>0?'h':''}"></i>`}).join('');
   const head=`<div class="qhead"><div class="lsegs" style="grid-template-columns:repeat(${QP.length},minmax(0,1fr))">${segs}</div><span class="score">${done} / ${QP.length}</span></div>
