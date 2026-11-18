@@ -632,7 +632,7 @@ body.sheet-open .wrap{padding-bottom:calc(var(--bnavh,0px) + 180px)!important}
 .face .cimg{position:relative;z-index:1;max-width:86%;max-height:42%;object-fit:contain;border-radius:12px;display:block}
 body.cardbig .face .cimg{max-height:50%}
 body.cardbig header,body.cardbig .tabs,body.cardbig .controls{display:none!important}
-body.testing header,body.testing .gzone>:not(.tabs),body.testing .bnav,body.testing .controls{display:none!important}
+body.testing header,body.testing .gzone,body.testing .bnav,body.testing .controls{display:none!important}
 /* during a test the page is exactly one screen tall: the question scrolls inside, the arrows + 採点する stay at the bottom */
 body.testing .wrap{height:calc(100dvh - env(safe-area-inset-top,0px));min-height:0;padding-bottom:0!important;box-sizing:border-box;display:flex;flex-direction:column;gap:12px}
 body.testing #v-test{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
@@ -1216,6 +1216,48 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .rd-row .nx{font-size:.7rem;font-weight:800;color:var(--muted);flex:none}.rd-row .nx.o{color:#ff9f0a;font-weight:900}
 .rd-say{width:40px;height:40px;border:0;background:none;color:var(--muted);display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer;border-radius:10px}
 .rd-btns{display:grid;grid-template-columns:1fr 2fr;gap:10px}
+/* テスト (案A) */
+.tset{background:var(--surface);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.tset-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.tset-h h2{margin:0;font-size:1.25rem;font-weight:900}
+.tset-h span{font-size:.75rem;font-weight:800;color:var(--muted)}
+.tlab2{margin-top:10px;font-size:.75rem;font-weight:800;color:var(--muted)}.tlab2 small{font-weight:700}
+.tseg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:3px;border-radius:12px;background:var(--bg)}
+.tseg button{min-height:36px;border:0;border-radius:9px;background:none;color:var(--muted);font:inherit;font-weight:900;font-size:.9rem;cursor:pointer}
+.tseg button[aria-checked=true]{background:#46464c;color:var(--fg)}
+.tkind{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tkind button{min-height:46px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--muted);font:inherit;font-weight:900;font-size:.9rem;display:flex;align-items:center;gap:8px;padding:0 12px;cursor:pointer}
+.tkind button i{width:20px;height:20px;border-radius:999px;background:var(--line);color:transparent;display:grid;place-items:center;flex:none}
+.tkind button[aria-pressed=true]{border-color:#f5c518;background:#2b2a20;color:var(--fg)}.tkind button[aria-pressed=true] i{background:#f5c518;color:#18181a}
+.tnote2{margin:4px 0 0;font-size:.72rem;color:var(--muted)}
+.tmeta{margin-top:10px;display:flex;justify-content:space-between;font-size:.75rem;font-weight:800;color:var(--muted)}.tmeta b{color:#f5c518}
+.tset #tStart{margin-top:6px;min-height:54px;font-size:1.05rem}
+.tbar2{display:flex;align-items:center;gap:10px;min-height:44px}
+.tbar2 .tx{border-radius:999px;border:0;background:var(--surface)}
+.tbt{flex:1;display:flex;flex-direction:column}.tbt b{font-size:.95rem;font-weight:900}.tbt small{font-size:.7rem;font-weight:800;color:var(--muted)}
+.tgr{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:none;color:#f5c518;font:inherit;font-weight:900;font-size:.82rem;cursor:pointer}
+.tdots i.a{background:#7a6a2a}
+.tq2{display:flex;flex-direction:column;gap:12px}
+.tcard{background:var(--surface);border-radius:22px;padding:14px 16px 16px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.tqh{align-self:stretch;display:flex;justify-content:space-between;align-items:center;font-size:.75rem;font-weight:900;color:var(--muted)}
+.tqh b{color:var(--fg);font-size:.9rem;margin-right:8px}
+.tbig{margin:4px 0;font-size:1.8rem;font-weight:900;line-height:1.25;overflow-wrap:anywhere}.tbig.jp{font-family:var(--f-jp);font-size:1.4rem}
+.tjp{margin:0;font-family:var(--f-jp);font-size:1.05rem;font-weight:800}
+.tpair{display:flex;flex-direction:column;align-items:center;gap:6px}.tpair b{font-size:1.6rem;font-weight:900}.tpair i{width:40px;height:2px;background:var(--line)}.tpair span{font-family:var(--f-jp);font-size:1.15rem;font-weight:800;color:#c9c9ce}
+.tq2 .ordans{align-self:stretch;min-height:52px}
+.tf2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tf2 button{height:96px;border-radius:18px;border:2px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-weight:800;font-size:.82rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer}
+.tf2 button b{font-size:2.1rem;line-height:1;font-weight:900}
+.tf2 button.sel{border-color:#f5c518;background:#2b2a20}
+.tq2 .opt.sel{border-color:#f5c518;background:#2b2a20}.tq2 .opt.sel .k{background:#f5c518;color:#18181a}
+.tfoot2{position:sticky;bottom:0;margin-top:auto;flex:0 0 auto;z-index:5;background:var(--bg);padding:10px 0 max(14px,env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+.tfoot2.kbon{padding-bottom:0}
+.tnav2{display:grid;grid-template-columns:52px 1fr;gap:10px}
+.tnav2 .btn{min-height:52px;padding:0;display:grid;place-items:center}.tnav2 .btn[disabled]{opacity:.35}
+.tfoot2 .tkb{position:static;margin:0;max-width:none;width:auto;left:auto;right:auto;border-radius:20px 20px 0 0;padding-left:4px;padding-right:4px}
+.tfoot2 .tkb[hidden]{display:none}
+.tres .w em{font-style:normal;font-size:.68rem;font-weight:800;color:var(--muted);flex:none}
+.tres .tlearn{width:100%;min-height:52px}
+.rd-btns.two{grid-template-columns:1fr 1fr}
 /* 4択: auto-advance feedback */
 .opt.dim{opacity:.45}
 .mc-tm{height:4px;border-radius:999px;background:var(--line);overflow:hidden;opacity:0;transition:opacity .15s}
@@ -3596,68 +3638,116 @@ function testOk(q){
   if(q.k==='write')return clozeOk(a,q.cl)>0;
   return normAns(a.map(t=>q.tiles[t]).join(' '))===normAns(d.en);
 }
+var testLast=prefs.testLast||null;
+const TASK={mc:'正しい意味は？',tf:'この意味は合ってる？',order:'英語の順に並べよう',write:'空いているところを英語で'};
+const CHK='<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+// the answer the learner gave, as text for the result list
+function testMine(q,i){const a=TT.ans[i];if(a==null||a===''||(Array.isArray(a)&&!a.length))return '（答えなし）';
+  if(q.k==='mc'){const o=q.opts.find(o=>o.id===a);return o?(q.je?o.en:o.jp):''}
+  if(q.k==='tf')return a?'○ 合っている':'× ちがう';
+  if(q.k==='write')return a;
+  return a.map(t=>q.tiles[t]).join(' ')}
+// keep the result list inside the screen, above the menu bar
+function testFit(){const v=$('v-test'),L=v&&v.querySelector('.tres .rd-list'),B=v&&v.querySelector('.tres .rd-btns'),nav=document.querySelector('.bnav');if(!L||!B||!L.offsetParent)return;
+  L.style.maxHeight='';const navTop=nav&&getComputedStyle(nav).display!=='none'?nav.getBoundingClientRect().top:innerHeight;
+  const over=B.getBoundingClientRect().bottom-(navTop-12);if(over>0)L.style.maxHeight=Math.max(132,L.getBoundingClientRect().height-over)+'px'}
+addEventListener('resize',()=>{if(tab==='test')testFit()});
 function renderTest(){
   const v=$('v-test'); {const on=!!(TT&&!TT.graded&&TT.qs.length);document.body.classList.toggle('testing',on);document.documentElement.classList.toggle('noscroll',on||bigCard);if(on)scrollTo(0,0)}
   if(!pool().length){v.innerHTML='<div class="empty">この条件に当てはまるフレーズはありません。</div>';return}
   if(!TT){
-    v.innerHTML=`<div class="tsetup">
-      <div class="tlab">問題数</div>
-      <div class="tnum">${[10,20,30].map(n=>`<button data-n="${n}" aria-pressed="${n===testN}">${n}問</button>`).join('')}</div>
-      <div class="tlab">問題の形（タップで入れる・外す）</div>
-      <div class="tnum tkinds">${['mc','tf','order','write'].map(k=>`<button data-k="${k}" aria-pressed="${testKinds.includes(k)}">${TKIND[k]}</button>`).join('')}</div>
-      ${testKinds.length===1&&testKinds[0]==='order'?'<p class="tnote">並べ替えは3語以上のフレーズだけで出ます</p>':''}
-      <button class="btn ok" id="tStart" style="width:100%">テストを始める</button></div>`;
+    const n=pool().length,[a0]=rangeVal().split('-').map(Number);
+    v.innerHTML=`<div class="tset">
+      <div class="tset-h"><h2>テスト</h2><span>範囲 ${a0+1}〜${a0+n}（${n}枚）</span></div>
+      <div class="tlab2">問題数</div>
+      <div class="tseg" role="radiogroup" aria-label="問題数">${[10,20,30].map(k=>`<button role="radio" data-n="${k}" aria-checked="${k===testN}">${k}問</button>`).join('')}</div>
+      <div class="tlab2">問題の形<small>（押して入れる・外す）</small></div>
+      <div class="tkind">${['mc','tf','order','write'].map(k=>`<button data-k="${k}" aria-pressed="${testKinds.includes(k)}"><i>${CHK}</i>${TKIND[k]}</button>`).join('')}</div>
+      ${testKinds.length===1&&testKinds[0]==='order'?'<p class="tnote2">並べ替えは3語以上のフレーズだけで出ます</p>':''}
+      <div class="tmeta"><span>めやす 約${Math.max(1,Math.round(testN/4))}分</span>${testLast?`<span>前回 <b>${testLast.p}点</b>（${esc(testLast.d)}）</span>`:''}</div>
+      <button class="btn ok" id="tStart">${testN}問のテストを始める</button></div>`;
     v.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{testN=+b.dataset.n;savePrefs();renderTest()});
     v.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
       if(testKinds.includes(k)){if(testKinds.length===1){toast('<div><strong>1つは選んでください</strong></div>');return}testKinds=testKinds.filter(x=>x!==k)}
       else testKinds=['mc','tf','order','write'].filter(x=>x===k||testKinds.includes(x));
       savePrefs();renderTest()});
     $('tStart').onclick=()=>{startTest();if(!TT.qs.length){TT=null;toast('<div><strong>この形で出せる問題がありません</strong><span>ほかの形も入れてください</span></div>');return}renderTest();scrollTo(0,0)};return}
-  const g=TT.graded, okN=g?TT.qs.filter(testOk).length:0, n=TT.qs.length, pct=Math.round(okN/n*100);
-  const head=g?`<div class="tscore ${pct>=80?'good':''}"><b>${pct}<small>点</small></b><span>${n}問中 ${okN}問 正解</span>
-      <div class="tbtns">${okN<n?`<button class="btn ok" id="tLearn">間違えた${n-okN}枚を復習する</button>`:''}<button class="btn" id="tNew">もう一度テスト</button></div></div>`
-    :`<div class="tbar"><button class="tx" id="tQuit" aria-label="テストをやめる"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><span class="tt">テスト</span><span id="tCount"></span></div><div class="tdots" id="tDots" style="grid-template-columns:repeat(${n},minmax(0,1fr))">${TT.qs.map(()=>'<i></i>').join('')}</div>`;
-  v.innerHTML=`<div class="quiz ttest">${head}${TT.qs.map((q,i)=>{const d=q.d,a=TT.ans[i],ok=g&&testOk(q);
-    let body='';
-    if(q.k==='mc')body=`<div class="tprompt"><p class="tp ${q.je?'jp':''}">${esc(q.je?d.jp:d.en)}</p></div><div class="opts">${q.opts.map((o,k)=>`<button class="opt ${q.je?'':'jp'} ${a===o.id?'sel':''} ${g&&o.id===d.id?'right':''} ${g&&a===o.id&&o.id!==d.id?'wrong':''}" data-q="${i}" data-o="${o.id}" ${g?'disabled':''}><span class="k">${k+1}</span><span>${esc(q.je?o.en:o.jp)}</span></button>`).join('')}</div>`;
-    if(q.k==='tf')body=`<div class="tprompt"><p class="tp">${esc(d.en)}</p><i class="tdiv"></i><p class="tp jp">${esc(q.shown)}</p></div><p class="tqhint">この組み合わせは合っていますか？</p><div class="tf"><button class="opt ${a===true?'sel':''}" data-q="${i}" data-tf="1" ${g?'disabled':''}><span class="tfm">○</span>合っている</button><button class="opt ${a===false?'sel':''}" data-q="${i}" data-tf="0" ${g?'disabled':''}><span class="tfm">×</span>違う</button></div>`;
-    if(q.k==='write')body=`<div class="tprompt"><p class="tp jp">${esc(d.jp)}</p><p class="cloze">${g?clozeAns(q.cl):clozeHTML(q.cl)}</p></div><input class="qin" data-q="${i}" value="${esc(a||'')}" ${g?'disabled':''} autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next" placeholder="ヒント：${esc(q.cl.word[0])} で始まる${q.cl.word.length}文字">`;
-    if(q.k==='order')body=`<div class="tprompt"><p class="tp jp">${esc(d.jp)}</p></div><div class="ordans" data-ans="${i}"></div><div class="ordpool" data-pool="${i}">${q.tiles.map((w,t)=>`<button class="tile" data-q="${i}" data-t="${t}" ${g?'disabled':''}>${esc(w)}</button>`).join('')}</div>`;
-    return `<div class="tq ${g?(ok?'ok':'ng'):''}" id="tq${i}" ${!g&&i!==TT.cur?'hidden':''}><div class="qn"><span><b class="qno">問${i+1}</b>${TKIND[q.k]}</span>${g?`<b>${ok?'○ 正解':'× 不正解'}</b>`:''}</div>${body}${g&&!ok?`<p class="corr">正解：${q.k==='write'?esc(q.cl.word):esc(q.k==='mc'&&!q.je?d.jp:q.k==='tf'?(q.truth?'○ 合っている':'× 違う（'+d.jp+'）'):d.en)}</p>`:''}</div>`}).join('')}
-    ${g?'':`<div class="tfoot"><div class="tnav"><button class="btn" id="tPrev" aria-label="前の問題"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><span id="tPos"></span><button class="btn" id="tNext" aria-label="次の問題"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div><button class="btn ok" id="tGrade" style="width:100%">採点する</button></div>`}</div>`;
+  const g=TT.graded, n=TT.qs.length;
+  if(g){
+    const okN=TT.qs.filter(testOk).length, ng=n-okN, pct=Math.round(okN/n*100), prev=TT.prev;
+    const mkY='<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>', mkX='<svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="3.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    const order=TT.qs.map((q,i)=>i).sort((x,y)=>(testOk(TT.qs[x])?1:0)-(testOk(TT.qs[y])?1:0)||x-y);
+    const rows=order.map(i=>{const q=TT.qs[i],d=q.d,ok=testOk(q);
+      return `<div class="rd-row mc-r${ok?'':' ng'}"><i class="mk ${ok?'y':'r'}" aria-label="${ok?'正解':'まちがえ'}">${ok?mkY:mkX}</i><div class="w2"><div class="w"><em>問${i+1} ${TKIND[q.k]}</em><b>${esc(d.en)}</b><span>${esc(d.jp)}</span></div>${ok?'':`<div class="mine">あなたの答え：${testMine(q,i)==='（答えなし）'?'答えなし':`<s>${esc(testMine(q,i))}</s>`}</div>`}</div></div>`}).join('');
+    const msg=pct===100?'満点！':pct>=80?'よくできました':pct>=50?'もう少し！':'復習しよう';
+    v.innerHTML=`<div class="rdone mcdone tres">
+      <div class="mcd-h"><div class="qd-ring sm" style="--p:${pct}"><span>${pct}<small>点</small></span></div><div class="mcd-t"><h2>${pct}点 ${msg}</h2><small>${n}問中 <b>${okN}問</b> 正解${prev!=null?` ・ 前回 ${prev}点`:''}</small><div class="rd-c"><span class="y">正解 ${okN}</span>${ng?`<span class="r">まちがえ ${ng}</span>`:''}</div></div></div>
+      <div class="rd-box"><div class="rd-bh"><span>問題ごとの結果</span><span>${n>5?'枠の中をスクロール':''}</span></div><div class="rd-list">${rows}</div></div>
+      ${ng?`<button class="btn ok tlearn" id="tLearn">まちがえた${ng}問を復習する</button>`:''}
+      <div class="rd-btns two"><button class="btn" id="tEnd">おわる</button><button class="btn${ng?'':' ok'}" id="tNew">もう一度テスト</button></div></div>`;
+    $('tNew').onclick=()=>{startTest();renderTest();scrollTo(0,0)};
+    $('tEnd').onclick=()=>{TT=null;renderTest();scrollTo(0,0)};
+    const l=$('tLearn'); if(l)l.onclick=()=>{const w=TT.qs.filter(q=>!testOk(q)).map(q=>q.d);QP=w.slice(0,ROUND*3);qi=0;qOpts=null;LR={st:{},q:QP.map(d=>d.id),miss:{},step:0,started:true};if(DATA.length<4)for(const d of QP)LR.st[d.id]=1;setTab('quiz');scrollTo(0,0)};
+    testFit();requestAnimationFrame(testFit);setTimeout(testFit,400);
+    return}
+  // ---- answering: one question at a time; 穴埋め uses the in-app keyboard so nothing jumps
+  TT.wr=TT.wr||{};
+  const fx=(w,j)=>j===0||!/[a-z]/i.test(w[j]);
+  const wrOf=i=>{const w=TT.qs[i].cl.word;return TT.wr[i]=TT.wr[i]||w.split('').map((c,j)=>fx(w,j)?c:'')};
+  const boxes=i=>{const w=TT.qs[i].cl.word,t=wrOf(i),bw=Math.max(18,Math.min(30,Math.floor(300/w.length)-3));
+    return `<span class="czbx" style="--bw:${bw}px" data-bx="${i}" aria-label="答えのマス ${w.length}文字">${w.split('').map((c,j)=>`<i class="${fx(w,j)?'fx':''}">${esc(t[j]||'')}</i>`).join('')}</span>`};
+  const keys=r=>r.split('').map(c=>`<button class="czk no-press" data-key="${c}" aria-label="${c}">${c}</button>`).join('');
+  v.innerHTML=`<div class="quiz ttest">
+    <div class="tbar2"><button class="tx" id="tQuit" aria-label="テストをやめる"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="tbt"><b>テスト</b><small id="tCount"></small></div><button class="tgr" id="tGrade">採点する</button></div>
+    <div class="tdots" id="tDots" style="grid-template-columns:repeat(${n},minmax(0,1fr))">${TT.qs.map(()=>'<i></i>').join('')}</div>
+    ${TT.qs.map((q,i)=>{const d=q.d,a=TT.ans[i];let body='',ans='';
+      if(q.k==='mc'){body=`<p class="tbig ${q.je?'jp':''}">${esc(q.je?d.jp:d.en)}</p>`;ans=`<div class="opts">${q.opts.map((o,k)=>`<button class="opt ${q.je?'':'jp'} ${a===o.id?'sel':''}" data-q="${i}" data-o="${o.id}"><span class="k">${k+1}</span><span>${esc(q.je?o.en:o.jp)}</span></button>`).join('')}</div>`}
+      if(q.k==='tf'){body=`<div class="tpair"><b>${esc(d.en)}</b><i></i><span>${esc(q.shown)}</span></div>`;ans=`<div class="tf2"><button class="${a===true?'sel':''}" data-q="${i}" data-tf="1"><b>○</b>合っている</button><button class="${a===false?'sel':''}" data-q="${i}" data-tf="0"><b>×</b>ちがう</button></div>`}
+      if(q.k==='order'){body=`<p class="tjp">${esc(d.jp)}</p><div class="ordans" data-ans="${i}"></div>`;ans=`<div class="ordpool" data-pool="${i}">${q.tiles.map((w,t)=>`<button class="tile" data-q="${i}" data-t="${t}">${esc(w)}</button>`).join('')}</div>`}
+      if(q.k==='write'){const cl=q.cl;body=`<p class="tjp">${esc(d.jp)}</p><p class="cloze czs">${esc(cl.pre)}${cl.pre?' ':''}${esc(cl.lead)}${boxes(i)}${esc(cl.trail)}${cl.post?' ':''}${esc(cl.post)}</p>`}
+      return `<div class="tq2" id="tq${i}" ${i!==TT.cur?'hidden':''}><div class="tcard"><div class="tqh"><span><b>問${i+1}</b>${TKIND[q.k]}</span><span>${TASK[q.k]}</span></div>${body}</div>${ans}</div>`}).join('')}
+    <div class="tfoot2"><div class="tnav2"><button class="btn" id="tPrev" aria-label="前の問題"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="btn ok" id="tNext">次の問題へ</button></div>
+      <div class="czkb tkb" role="group" aria-label="キーボード" hidden><div class="czr">${keys('qwertyuiop')}</div><div class="czr r2">${keys('asdfghjkl')}</div><div class="czr r3">${keys('zxcvbnm')}<button class="czk del no-press" id="tDel" aria-label="1文字消す"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M17 9l-6 6M11 9l6 6"/></svg></button></div></div></div></div>`;
   const has=i=>{const a=TT.ans[i];return a!=null&&a!==''&&!(Array.isArray(a)&&!a.length)};
-  const count=()=>{const c=$('tCount');if(c)c.textContent=`${TT.qs.filter((q,i)=>has(i)).length} / ${n}`;
+  const count=()=>{const c=$('tCount');if(c)c.textContent=`答えた数 ${TT.qs.filter((q,i)=>has(i)).length} / ${n}`;
     const dots=$('tDots');if(dots)[...dots.children].forEach((x,i)=>x.className=i===TT.cur?'c':has(i)?'a':'')};
   const drawOrd=i=>{const q=TT.qs[i],a=TT.ans[i]||[],box=v.querySelector(`[data-ans="${i}"]`);
-    box.innerHTML=a.map((t,k)=>`<button class="tile" data-k="${k}" ${g?'disabled':''}>${esc(q.tiles[t])}</button>`).join('');
+    box.innerHTML=a.map((t,k)=>`<button class="tile" data-k="${k}">${esc(q.tiles[t])}</button>`).join('');
     v.querySelectorAll(`[data-pool="${i}"] .tile`).forEach(b=>b.classList.toggle('used',a.includes(+b.dataset.t)));
-    if(g){box.classList.add(testOk(q)?'ok':'ng');return}
     box.querySelectorAll('.tile').forEach(b=>b.onclick=()=>{a.splice(+b.dataset.k,1);TT.ans[i]=a;drawOrd(i);count()})};
   TT.qs.forEach((q,i)=>{if(q.k==='order')drawOrd(i)});
-  if(g){
-    $('tNew').onclick=()=>{startTest();renderTest();scrollTo(0,0)};
-    const l=$('tLearn'); if(l)l.onclick=()=>{const w=TT.qs.filter(q=>!testOk(q)).map(q=>q.d);QP=w.slice(0,ROUND*3);qi=0;qOpts=null;LR={st:{},q:QP.map(d=>d.id),miss:{},step:0,started:true};if(DATA.length<4)for(const d of QP)LR.st[d.id]=1;setTab('quiz');scrollTo(0,0)};
-    return}
-  count();
-  const go=k=>{TT.cur=Math.max(0,Math.min(n-1,k));v.querySelectorAll('.tq').forEach((x,i)=>x.hidden=i!==TT.cur);
-    $('tPos').textContent=`${TT.cur+1} / ${n}`;$('tPrev').disabled=TT.cur===0;$('tNext').disabled=TT.cur===n-1;
-    const a=document.activeElement;if(a&&a.classList&&a.classList.contains('qin'))a.blur();count()};
-  go(TT.cur); $('tPrev').onclick=()=>go(TT.cur-1); $('tNext').onclick=()=>go(TT.cur+1);
-  v.querySelectorAll('.opt[data-o]').forEach(b=>b.onclick=()=>{const i=+b.dataset.q;TT.ans[i]=+b.dataset.o;v.querySelectorAll(`.opt[data-q="${i}"]`).forEach(x=>x.classList.toggle('sel',x===b));count()});
-  v.querySelectorAll('.opt[data-tf]').forEach(b=>b.onclick=()=>{const i=+b.dataset.q;TT.ans[i]=b.dataset.tf==='1';v.querySelectorAll(`.opt[data-q="${i}"]`).forEach(x=>x.classList.toggle('sel',x===b));count()});
-  v.querySelectorAll('.qin').forEach(inp=>{inp.oninput=()=>{TT.ans[+inp.dataset.q]=inp.value;count()};
-    inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();inp.blur();if(TT.cur<n-1)go(TT.cur+1)}})});
-  v.querySelectorAll('.ordpool .tile').forEach(b=>b.onclick=()=>{const i=+b.dataset.q,t=+b.dataset.t,a=TT.ans[i]||[];if(a.includes(t))return;a.push(t);TT.ans[i]=a;drawOrd(i);count()});
-  $('tQuit').onclick=()=>{TT=null;renderTest();scrollTo(0,0)};
-  $('tGrade').onclick=()=>{
-    const left=TT.qs.filter((q,i)=>{const a=TT.ans[i];return a==null||a===''||(Array.isArray(a)&&!a.length)}).length;
-    const b=$('tGrade'); if(left&&!b.dataset.arm){b.dataset.arm=1;b.textContent=`まだ${left}問 答えていません。このまま採点する`;return}
-    TT.graded=true; let okN=0;
+  const drawWr=i=>{const w=TT.qs[i].cl.word,t=wrOf(i),bx=[...v.querySelectorAll(`[data-bx="${i}"] i`)],nx=t.findIndex(x=>!x);
+    bx.forEach((b,j)=>{if(!fx(w,j))b.textContent=t[j];b.classList.toggle('cur',j===nx)});
+    TT.ans[i]=t.some((x,j)=>!fx(w,j)&&x)?t.map(x=>x||'').join(''):''};
+  const go=k=>{TT.cur=Math.max(0,Math.min(n-1,k));v.querySelectorAll('.tq2').forEach((x,i)=>x.hidden=i!==TT.cur);
+    $('tPrev').disabled=TT.cur===0;$('tNext').textContent=TT.cur===n-1?'採点する':'次の問題へ';
+    const w=TT.qs[TT.cur].k==='write';v.querySelector('.tkb').hidden=!w;v.querySelector('.tfoot2').classList.toggle('kbon',w);if(w)drawWr(TT.cur);
+    const sc=v.querySelector('.ttest');if(sc)sc.scrollTop=0;count()};
+  const grade=()=>{
+    const left=TT.qs.filter((q,i)=>!has(i)).length;
+    if(left&&!TT.arm){TT.arm=1;toast(`<div><strong>まだ${left}問 答えていません</strong><span>もう一度押すと、このまま採点します</span></div>`);setTimeout(()=>{if(TT)TT.arm=0},4000);return}
+    TT.graded=true; TT.prev=testLast?testLast.p:null; let okN=0;
     for(const q of TT.qs){const d=q.d;review(d.id,testOk(q));if(testOk(q)){okN++;studied(3)}else{S.miss[d.id]=(S.miss[d.id]||0)+1;delete S.known[d.id]}}
-    save(); header(); const ok=okN/TT.qs.length>=.8; sfx(ok); mascotSay(ok?'ok':'ng'); if(ok)fanfare();
-    renderTest(); scrollTo({top:0,behavior:'smooth'});
-  };
+    const pct=Math.round(okN/n*100),dt=new Date();testLast={p:pct,d:`${dt.getMonth()+1}/${dt.getDate()}`};savePrefs();
+    save(); header(); const ok=okN/n>=.8; sfx(ok); mascotSay(ok?'ok':'ng'); if(ok)fanfare();
+    renderTest(); scrollTo({top:0,behavior:'smooth'})};
+  go(TT.cur); $('tPrev').onclick=()=>go(TT.cur-1); $('tNext').onclick=()=>{if(TT.cur===n-1)grade();else go(TT.cur+1)};
+  v.querySelectorAll('.opt[data-o]').forEach(b=>b.onclick=()=>{const i=+b.dataset.q;TT.ans[i]=+b.dataset.o;v.querySelectorAll(`.opt[data-q="${i}"]`).forEach(x=>x.classList.toggle('sel',x===b));count()});
+  v.querySelectorAll('[data-tf]').forEach(b=>b.onclick=()=>{const i=+b.dataset.q;TT.ans[i]=b.dataset.tf==='1';v.querySelectorAll(`[data-tf][data-q="${i}"]`).forEach(x=>x.classList.toggle('sel',x===b));count()});
+  v.querySelectorAll('.ordpool .tile').forEach(b=>b.onclick=()=>{const i=+b.dataset.q,t=+b.dataset.t,a=TT.ans[i]||[];if(a.includes(t))return;a.push(t);TT.ans[i]=a;drawOrd(i);count()});
+  const press=c=>{const i=TT.cur,q=TT.qs[i];if(q.k!=='write')return;const t=wrOf(i),j=t.findIndex(x=>!x);if(j<0)return;t[j]=c;drawWr(i);count();
+    const b=v.querySelectorAll(`[data-bx="${i}"] i`)[j];if(b){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')}};
+  const del=()=>{const i=TT.cur,q=TT.qs[i];if(q.k!=='write')return;const w=q.cl.word,t=wrOf(i);for(let j=w.length-1;j>=0;j--)if(!fx(w,j)&&t[j]){t[j]='';break}drawWr(i);count()};
+  v.querySelectorAll('.tkb [data-key]').forEach(b=>b.onclick=()=>press(b.dataset.key)); $('tDel').onclick=del;
+  v.querySelectorAll('.tkb .czk').forEach(b=>{let t=0;const up=()=>{clearTimeout(t);t=setTimeout(()=>b.classList.remove('pr'),90)};
+    b.addEventListener('pointerdown',()=>{clearTimeout(t);v.querySelectorAll('.czk.pr').forEach(x=>x!==b&&x.classList.remove('pr'));b.classList.add('pr')});
+    ['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,up))});
+  testKey=e=>{if(tab!=='test'||!TT||TT.graded||TT.qs[TT.cur].k!=='write'||e.metaKey||e.ctrlKey||e.altKey)return;if(/^[a-z]$/i.test(e.key)){press(e.key.toLowerCase());e.preventDefault()}else if(e.key==='Backspace'){del();e.preventDefault()}};
+  $('tQuit').onclick=()=>{TT=null;renderTest();scrollTo(0,0)};
+  $('tGrade').onclick=grade;
 }
+var testKey=null;
+document.addEventListener('keydown',e=>{if(testKey&&!e.target.closest('input,textarea,select'))testKey(e)});
 function hideSheet(){const sh=$('sheet');sh.classList.remove('show');document.body.classList.remove('sheet-open')}
 
 // ---- list
@@ -3816,7 +3906,7 @@ function setTab(t){
   for(const x of ['card','quiz','mc','test','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
   savePrefs(); refresh(false); qmodeSync(); requestAnimationFrame(fitCard);
 }
-function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({lsort:typeof lsort==='string'?lsort:'no',range:rangeVal(),filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab,testN:testN||10,testKinds:typeof testKinds!=='undefined'?testKinds:undefined}))}catch(e){}}
+function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({lsort:typeof lsort==='string'?lsort:'no',range:rangeVal(),filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab,testN:testN||10,testLast:typeof testLast!=='undefined'?testLast:null,testKinds:typeof testKinds!=='undefined'?testKinds:undefined}))}catch(e){}}
 function refresh(reset=true){
   if(reset||!P.length){P=pool();ci=0}
   if(tab==='card')buildCard();
