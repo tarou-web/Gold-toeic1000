@@ -708,6 +708,7 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .qacts{display:grid;grid-template-columns:1fr 2fr;gap:8px}
 /* 穴埋め (案A): compact, fixed while typing */
 body.czmode .gzone .tabs,body.czmode .qkind{display:none!important}
+body.czmode .wrap{padding-bottom:300px!important}
 .czq{display:flex;flex-direction:column;gap:10px}
 .czx{width:40px;height:40px;flex:none;border:0;border-radius:999px;background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer}
 .czlab{margin:4px 0 0;font-size:.75rem;font-weight:800;color:var(--muted)}
@@ -715,10 +716,25 @@ body.czmode .gzone .tabs,body.czmode .qkind{display:none!important}
 .czjp{font-family:var(--f-jp);font-weight:800;font-size:.95rem;color:var(--muted)}
 .czcard .cloze{margin:6px 0 0;font-size:1.35rem;line-height:1.5}
 .czcard .cloze .blank{min-width:4.5em}
-.czhint{display:flex;justify-content:space-between;font-size:.72rem;font-weight:800;color:var(--muted);margin-top:2px}
-.czq .qin:focus{outline:none;border-color:var(--green)}
-.czacts{position:fixed;z-index:57;left:50%;transform:translateX(-50%);width:min(calc(100% - 32px),488px);bottom:max(calc(var(--kb,0px) + 10px),calc(12px + env(safe-area-inset-bottom,0px)))}
-.czq.czdone .czacts{display:none}
+.czs{line-height:2}
+.czbx{display:inline-flex;gap:3px;vertical-align:middle;margin:0 2px}
+.czbx i{font-style:normal;width:var(--bw,28px);height:calc(var(--bw,28px) * 1.35);box-sizing:border-box;border-radius:8px;border:2px solid var(--line);background:var(--bg);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:calc(var(--bw,28px) * .66);font-weight:900;line-height:1}
+.czbx i.fx{border-color:#5a5326;background:#2b2a20;color:#bfa53a}
+.czbx i.cur{border-color:var(--muted)}
+.czbx i:not(.fx):not(:empty){border-color:var(--green)}
+.czbx i.ok{border-color:var(--green);background:var(--green-s);color:var(--green-ink)}
+.czbx i.ng{border-color:var(--red);background:var(--red-s);color:var(--red-ink)}
+.czmsg{margin:0;min-height:0}
+.czkb{position:fixed;z-index:57;left:0;right:0;bottom:0;margin:0 auto;max-width:520px;box-sizing:border-box;background:var(--surface);border-top:1px solid var(--line);border-radius:24px 24px 0 0;padding:12px 6px calc(12px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:9px}
+.czr{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px}
+.czr.r2{grid-template-columns:repeat(9,minmax(0,1fr));padding:0 17px}
+.czr.r3{grid-template-columns:repeat(7,minmax(0,1fr)) 1.6fr;padding:0 17px}
+.czk{height:48px;border:0;border-radius:10px;background:#3d3d42;color:var(--fg);font:inherit;font-size:21px;font-weight:800;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.czk:active{background:#5a5a60}
+.czk.del{background:#2c2c30}
+.czskip{min-height:48px;margin:2px 4px 0}
+.czq.czdone .czkb{display:none}
+.qacts.one{grid-template-columns:1fr}
 .qin{font:inherit;font-size:18px;font-weight:700;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--fg);width:100%;box-sizing:border-box}
 .qin.ok{border-color:var(--green)}.qin.ng{border-color:var(--red-ink)}
 .cedit{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 40px) 16px 16px}
@@ -3371,36 +3387,49 @@ function renderQuiz0(){
      <h2 class="ask">英語に並べ替えてください</h2>${bubble(d.jp,'jp')}
      <div class="ordans" id="ordAns"></div>
      <div class="ordpool" id="ordPool">${tiles.map((w,i)=>`<button class="tile" data-t="${i}">${esc(w)}</button>`).join('')}</div>
-     <div class="qacts"><button class="btn" id="qskip">わからない</button><button class="btn ok" id="qcheck" disabled>答え合わせ</button></div></div>`;
+     <div class="qacts one"><button class="btn" id="qskip">わからない</button></div></div>`;
     const draw=()=>{
       $('ordAns').innerHTML=picked.map((t,k)=>`<button class="tile" data-k="${k}">${esc(tiles[t])}</button>`).join('');
       v.querySelectorAll('#ordPool .tile').forEach(b=>b.classList.toggle('used',picked.includes(+b.dataset.t)));
       $('ordAns').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{if(answered)return;picked.splice(+b.dataset.k,1);draw()});
-      $('qcheck').disabled=picked.length<words.length;
+      if(picked.length===words.length&&!answered)setTimeout(()=>{if(!answered&&picked.length===words.length)fin(normAns(picked.map(t=>tiles[t]).join(' '))===normAns(d.en))},250);
     };
     v.querySelectorAll('#ordPool .tile').forEach(b=>b.onclick=()=>{if(answered)return;const t=+b.dataset.t;if(picked.includes(t))return;picked.push(t);draw()});
     draw();
-    const fin=ok=>{v.querySelectorAll('.tile,#qcheck,#qskip').forEach(x=>x.disabled=true);$('ordAns').classList.add(ok?'ok':'ng');lrJudge(d,ok,ok?'':`正解：${esc(d.en)}`)};
-    $('qcheck').onclick=()=>{if(answered)return;fin(normAns(picked.map(t=>tiles[t]).join(' '))===normAns(d.en))};
+    const fin=ok=>{if(answered)return;v.querySelectorAll('.tile,#qskip').forEach(x=>x.disabled=true);$('ordAns').classList.add(ok?'ok':'ng');lrJudge(d,ok,ok?'':`正解：${esc(d.en)}`)};
     $('qskip').onclick=()=>{if(answered)return;fin(false)};
   }else{
     const cl=clozeOf(d);
-    // 案A: compact screen that stays put while the keyboard is up; buttons ride just above the keyboard
+    // 案D: in-app keyboard (no system keyboard, so nothing jumps); boxes fill one letter at a time,
+    // the first letter is the hint, and it is checked as soon as the last box is filled
+    const W=cl.word, fixed=i=>i===0||!/[a-z]/i.test(W[i]);
+    const typed=W.split('').map((c,i)=>fixed(i)?c:'');
+    const n=W.length, bw=Math.max(18,Math.min(30,Math.floor(300/n)-3));
     const czx='<button class="czx" id="czx" aria-label="復習をやめる"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
+    const keys=r=>r.split('').map(c=>`<button class="czk" data-k="${c}" aria-label="${c}">${c}</button>`).join('');
     v.innerHTML=`<div class="quiz czq">${head.replace('<div class="qhead">','<div class="qhead">'+czx)}
-     <p class="czlab">穴埋め ・ 空いているところの英語を書いてください</p>
-     <div class="czcard"><div class="czjp">${esc(d.jp)}</div><p class="cloze">${clozeHTML(cl,'')}</p></div>
-     <label class="czhint" for="qin"><span>ヒント：${esc(cl.word[0])} で始まる${cl.word.length}文字</span><span id="czn">0 / ${cl.word.length}</span></label>
-     <input class="qin" id="qin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done">
-     <div class="qacts czacts"><button class="btn" id="qskip">わからない</button><button class="btn ok" id="qcheck">答え合わせ</button></div></div>`;
-    const inp=$('qin'), blank=v.querySelector('.cloze .blank');
-    inp.addEventListener('input',()=>{if(blank)blank.textContent=inp.value;$('czn').textContent=`${inp.value.trim().length} / ${cl.word.length}`});
-    $('czx').onclick=()=>{inp.blur();startQuiz();scrollTo(0,0);renderQuiz()};
-    const fin=(ok,near)=>{v.querySelector('.czq').classList.add('czdone');inp.blur();inp.disabled=true;$('qcheck').disabled=$('qskip').disabled=true;inp.classList.add(ok?'ok':'ng');v.querySelector('.cloze').innerHTML=clozeAns(cl);lrJudge(d,ok,ok?(near?`つづりに注意：${esc(cl.word)}`:''):`正解：${clozeAns(cl)}`)};
-    const check=()=>{if(answered)return;if(!normAns(inp.value)){inp.focus();return}const k=clozeOk(inp.value,cl);fin(k>0,k===1)};
-    $('qcheck').onclick=check; inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();check()}});
+     <p class="czlab">穴埋め ・ 空いているところを英語で（最初の1文字はヒント）</p>
+     <div class="czcard"><div class="czjp">${esc(d.jp)}</div>
+       <p class="cloze czs">${esc(cl.pre)}${cl.pre?' ':''}${esc(cl.lead)}<span class="czbx" style="--bw:${bw}px" aria-label="答えのマス ${n}文字">${W.split('').map((c,i)=>`<i class="${fixed(i)?'fx':''}">${fixed(i)?esc(c):''}</i>`).join('')}</span>${esc(cl.trail)}${cl.post?' ':''}${esc(cl.post)}</p>
+       <p class="czmsg" aria-live="polite"></p></div>
+     <div class="czkb" role="group" aria-label="キーボード">
+       <div class="czr">${keys('qwertyuiop')}</div><div class="czr r2">${keys('asdfghjkl')}</div>
+       <div class="czr r3">${keys('zxcvbnm')}<button class="czk del" id="czdel" aria-label="1文字消す"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M17 9l-6 6M11 9l6 6"/></svg></button></div>
+       <button class="btn czskip" id="qskip">わからない</button></div></div>`;
+    const bx=[...v.querySelectorAll('.czbx i')];
+    const draw=()=>{const nx=typed.findIndex(t=>!t);bx.forEach((b,i)=>{if(!fixed(i))b.textContent=typed[i];b.classList.toggle('cur',i===nx)})};
+    const fin=(ok,near)=>{if(answered)return;v.querySelector('.czq').classList.add('czdone');
+      bx.forEach((b,i)=>{b.textContent=W[i];b.classList.add(ok?'ok':(normAns(typed[i]||'')===normAns(W[i])?'ok':'ng'))});
+      lrJudge(d,ok,ok?(near?`つづりに注意：${esc(cl.word)}`:''):`正解：${clozeAns(cl)}`)};
+    const press=c=>{if(answered)return;const i=typed.findIndex(t=>!t);if(i<0)return;typed[i]=c;draw();
+      if(typed.every(t=>t)){setTimeout(()=>{if(answered)return;const k=clozeOk(typed.join(''),cl);fin(k>0,k===1)},180)}};
+    const del=()=>{if(answered)return;for(let i=n-1;i>=0;i--)if(!fixed(i)&&typed[i]){typed[i]='';break}draw()};
+    v.querySelectorAll('.czk[data-k]').forEach(b=>b.onclick=()=>press(b.dataset.k));
+    $('czdel').onclick=del;
     $('qskip').onclick=()=>{if(answered)return;fin(false)};
-    setTimeout(()=>inp.focus({preventScroll:true}),60);
+    $('czx').onclick=()=>{startQuiz();scrollTo(0,0);renderQuiz()};
+    czKey=e=>{if(tab!=='quiz'||!v.querySelector('.czq')||e.metaKey||e.ctrlKey||e.altKey)return;if(/^[a-z]$/i.test(e.key)){press(e.key.toLowerCase());e.preventDefault()}else if(e.key==='Backspace'){del();e.preventDefault()}};
+    draw();
   }
 }
 function lrNext(){clearTimeout(mT);if(tab==='quiz')renderQuiz()}
@@ -3734,11 +3763,10 @@ slideBar(document.querySelector('.tabs'),b=>{const t=b.id.slice(2);if(t!==tab)se
 slideBar(document.querySelector('#deckv .dk-seg'),b=>setDm(b.dataset.dm),()=>setDm(dkMode));
 {const nb=document.querySelector('.bnav');let was=null;nb&&nb.addEventListener('pointerdown',()=>{was=nb.querySelector('button.on')},true);
  slideBar(nb,b=>{if(!b.classList.contains('on')||b!==was)b.onclick&&b.onclick();else b.classList.add('on')},()=>{nb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===was))},b=>nb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)))}
-var czOn=false;
-function czKb(){const vv=window.visualViewport;if(!vv)return;const kb=Math.max(0,innerHeight-vv.height-vv.offsetTop);document.documentElement.style.setProperty('--kb',kb+'px');if(czOn&&(scrollY||vv.offsetTop))scrollTo(0,0)}
-if(window.visualViewport){visualViewport.addEventListener('resize',czKb);visualViewport.addEventListener('scroll',czKb)}
+var czOn=false, czKey=null;
+document.addEventListener('keydown',e=>{if(czOn&&czKey&&!e.target.closest('input,textarea,select'))czKey(e)});
 function czSync(on){if(on===czOn)return;czOn=on;document.body.classList.toggle('czmode',on);
-  if(on){document.documentElement.classList.add('noscroll');scrollTo(0,0);czKb()}
+  if(on){document.documentElement.classList.add('noscroll');scrollTo(0,0)}
   else if(!document.body.classList.contains('testing')&&!bigCard)document.documentElement.classList.remove('noscroll')}
 function qmodeSync(){
   const on=tab==='quiz'&&!!(LR&&LR.started), v=$('v-quiz');
