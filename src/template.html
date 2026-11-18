@@ -706,6 +706,19 @@ body.cardbig .flip{flex:1 1 auto;height:auto!important;min-height:0!important}
 .tile:active{transform:translateY(2px);border-bottom-width:2px}
 .tile.used{visibility:hidden}
 .qacts{display:grid;grid-template-columns:1fr 2fr;gap:8px}
+/* 穴埋め (案A): compact, fixed while typing */
+body.czmode .gzone .tabs,body.czmode .qkind{display:none!important}
+.czq{display:flex;flex-direction:column;gap:10px}
+.czx{width:40px;height:40px;flex:none;border:0;border-radius:999px;background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.czlab{margin:4px 0 0;font-size:.75rem;font-weight:800;color:var(--muted)}
+.czcard{background:var(--surface);border-radius:22px;padding:14px 16px}
+.czjp{font-family:var(--f-jp);font-weight:800;font-size:.95rem;color:var(--muted)}
+.czcard .cloze{margin:6px 0 0;font-size:1.35rem;line-height:1.5}
+.czcard .cloze .blank{min-width:4.5em}
+.czhint{display:flex;justify-content:space-between;font-size:.72rem;font-weight:800;color:var(--muted);margin-top:2px}
+.czq .qin:focus{outline:none;border-color:var(--green)}
+.czacts{position:fixed;z-index:57;left:50%;transform:translateX(-50%);width:min(calc(100% - 32px),488px);bottom:max(calc(var(--kb,0px) + 10px),calc(12px + env(safe-area-inset-bottom,0px)))}
+.czq.czdone .czacts{display:none}
 .qin{font:inherit;font-size:18px;font-weight:700;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--fg);width:100%;box-sizing:border-box}
 .qin.ok{border-color:var(--green)}.qin.ng{border-color:var(--red-ink)}
 .cedit{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 40px) 16px 16px}
@@ -3372,13 +3385,18 @@ function renderQuiz0(){
     $('qskip').onclick=()=>{if(answered)return;fin(false)};
   }else{
     const cl=clozeOf(d);
-    v.innerHTML=`<div class="quiz" style="display:flex;flex-direction:column;gap:10px">${head}
-     <h2 class="ask">空いているところの英語を書いてください</h2>${bubble(d.jp,'jp')}
-     <p class="cloze">${clozeHTML(cl)}</p>
-     <input class="qin" id="qin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="ヒント：${esc(cl.word[0])} で始まる${cl.word.length}文字">
-     <div class="qacts"><button class="btn" id="qskip">わからない</button><button class="btn ok" id="qcheck">答え合わせ</button></div></div>`;
-    const inp=$('qin');
-    const fin=(ok,near)=>{inp.disabled=true;$('qcheck').disabled=$('qskip').disabled=true;inp.classList.add(ok?'ok':'ng');v.querySelector('.cloze').innerHTML=clozeAns(cl);lrJudge(d,ok,ok?(near?`つづりに注意：${esc(cl.word)}`:''):`正解：${clozeAns(cl)}`)};
+    // 案A: compact screen that stays put while the keyboard is up; buttons ride just above the keyboard
+    const czx='<button class="czx" id="czx" aria-label="復習をやめる"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
+    v.innerHTML=`<div class="quiz czq">${head.replace('<div class="qhead">','<div class="qhead">'+czx)}
+     <p class="czlab">穴埋め ・ 空いているところの英語を書いてください</p>
+     <div class="czcard"><div class="czjp">${esc(d.jp)}</div><p class="cloze">${clozeHTML(cl,'')}</p></div>
+     <label class="czhint" for="qin"><span>ヒント：${esc(cl.word[0])} で始まる${cl.word.length}文字</span><span id="czn">0 / ${cl.word.length}</span></label>
+     <input class="qin" id="qin" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done">
+     <div class="qacts czacts"><button class="btn" id="qskip">わからない</button><button class="btn ok" id="qcheck">答え合わせ</button></div></div>`;
+    const inp=$('qin'), blank=v.querySelector('.cloze .blank');
+    inp.addEventListener('input',()=>{if(blank)blank.textContent=inp.value;$('czn').textContent=`${inp.value.trim().length} / ${cl.word.length}`});
+    $('czx').onclick=()=>{inp.blur();startQuiz();scrollTo(0,0);renderQuiz()};
+    const fin=(ok,near)=>{v.querySelector('.czq').classList.add('czdone');inp.blur();inp.disabled=true;$('qcheck').disabled=$('qskip').disabled=true;inp.classList.add(ok?'ok':'ng');v.querySelector('.cloze').innerHTML=clozeAns(cl);lrJudge(d,ok,ok?(near?`つづりに注意：${esc(cl.word)}`:''):`正解：${clozeAns(cl)}`)};
     const check=()=>{if(answered)return;if(!normAns(inp.value)){inp.focus();return}const k=clozeOk(inp.value,cl);fin(k>0,k===1)};
     $('qcheck').onclick=check; inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();check()}});
     $('qskip').onclick=()=>{if(answered)return;fin(false)};
@@ -3716,10 +3734,17 @@ slideBar(document.querySelector('.tabs'),b=>{const t=b.id.slice(2);if(t!==tab)se
 slideBar(document.querySelector('#deckv .dk-seg'),b=>setDm(b.dataset.dm),()=>setDm(dkMode));
 {const nb=document.querySelector('.bnav');let was=null;nb&&nb.addEventListener('pointerdown',()=>{was=nb.querySelector('button.on')},true);
  slideBar(nb,b=>{if(!b.classList.contains('on')||b!==was)b.onclick&&b.onclick();else b.classList.add('on')},()=>{nb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===was))},b=>nb.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)))}
+var czOn=false;
+function czKb(){const vv=window.visualViewport;if(!vv)return;const kb=Math.max(0,innerHeight-vv.height-vv.offsetTop);document.documentElement.style.setProperty('--kb',kb+'px');if(czOn&&(scrollY||vv.offsetTop))scrollTo(0,0)}
+if(window.visualViewport){visualViewport.addEventListener('resize',czKb);visualViewport.addEventListener('scroll',czKb)}
+function czSync(on){if(on===czOn)return;czOn=on;document.body.classList.toggle('czmode',on);
+  if(on){document.documentElement.classList.add('noscroll');scrollTo(0,0);czKb()}
+  else if(!document.body.classList.contains('testing')&&!bigCard)document.documentElement.classList.remove('noscroll')}
 function qmodeSync(){
   const on=tab==='quiz'&&!!(LR&&LR.started), v=$('v-quiz');
   document.body.classList.toggle('qmode',on);
   document.body.classList.toggle('qactive',on&&!!v&&!v.querySelector('.done,.rdone,.empty'));
+  czSync(on&&!!v&&!!v.querySelector('.czq'));
   setBnavH&&setBnavH();
 }
 function setTab(t){
