@@ -1284,10 +1284,7 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .rvg-row:last-of-type{border-bottom:0}
 .rvg-row .w{flex:1;min-width:0;display:flex;flex-direction:column}
 .rvg-row .w b{font-weight:800;font-size:.95rem;overflow-wrap:anywhere}.rvg-row .w small{font-size:.75rem;color:var(--muted)}
-/* hidden words: frosted like an iOS spoiler; tap one to reveal just that word */
-.rvg-row .w.hid{border:0;background:none;padding:0;margin:0;font:inherit;color:inherit;text-align:left;cursor:pointer;align-items:flex-start;overflow:hidden}
-.rvg-row .w.hid b,.rvg-row .w.hid small{filter:blur(6px);opacity:.75;-webkit-user-select:none;user-select:none;transition:filter .35s ease,opacity .35s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.rvg-row .w.hid.open b,.rvg-row .w.hid.open small{filter:none;opacity:1}.rvg-row .w.hid small{opacity:.7}
+.rvg-row .w.hid{gap:6px}.rvg-row .w.hid i{display:block;height:11px;width:55%;border-radius:6px;background:var(--line)}.rvg-row .w.hid i+i{height:8px;width:35%;opacity:.7}.rvg-row .w.hid small{opacity:.7}
 .pc{font-size:.75rem;font-weight:900;min-width:2.6em;text-align:right}
 .pc.risk{color:#ff9f0a}.pc.soon{color:#f5c518}.pc.ok{color:var(--fg)}
 .mt{width:56px;height:6px;border-radius:3px;background:var(--line);overflow:hidden;display:flex;flex:none}
@@ -3286,8 +3283,8 @@ function rvgMem(){
     <circle cx="${X(0)}" cy="${Y(now.sum)}" r="5" class="dot"/>
     <text x="0" y="86" class="lb">2週間前</text><text x="${+X(0)-11}" y="86" class="lb now">今日</text><text x="250" y="86" class="lb">やらないと</text></svg>`;
   const fg=DATA.map(d=>[d,recallOf(d.id,t)]).filter(x=>x[1]!=null&&x[1]<.7).sort((a,b)=>a[1]-b[1]);
-  const rows=fg.map(([d,r],i)=>{const p=Math.round(r*100),c=pctCls(r);
-    return `<div class="rvg-row">${RVSHOW?`<div class="w"><b>${esc(d.en)}</b><small>${esc(d.jp)}</small></div>`:`<button class="w hid" data-peek aria-label="かくれています。押すと表示"><b>${esc(d.en)}</b><small>${esc(d.jp)}</small></button>`}<span class="pc ${c}">${p}%</span><span class="mt"><i class="${c}" style="width:${p}%"></i></span></div>`}).join('');
+  const rows=fg.map(([d,r])=>{const p=Math.round(r*100),c=pctCls(r);
+    return `<div class="rvg-row">${RVSHOW?`<div class="w"><b>${esc(d.en)}</b><small>${esc(d.jp)}</small></div>`:`<div class="w hid" aria-label="かくれています"><i></i><i></i></div>`}<span class="pc ${c}">${p}%</span><span class="mt"><i class="${c}" style="width:${p}%"></i></span></div>`}).join('');
   return `<div class="rvg-top"><span>いま覚えている（推定）</span><span><b>${now.sum}</b> 枚</span></div>${svg}
     <div class="rvg-fh"><span>忘れかけ ${fg.length}枚<small>（70%より下）</small></span>${fg.length?`<button class="rvg-eye" data-rvshow aria-pressed="${RVSHOW}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>${RVSHOW?'かくす':'単語を見る'}</button>`:''}</div>
     ${fg.length?`<div class="rvg-list">${rows}</div>`:`<p class="rvg-note">いまは、忘れかけているカードはありません</p>`}`;
@@ -3316,7 +3313,6 @@ function bindRvg(root){
   const g=root.querySelector('#rvg');if(!g)return;
   g.onclick=e=>{
     const tb=e.target.closest('[data-rvt]');if(tb){RVT=tb.dataset.rvt;g.outerHTML=rvgHTML();bindRvg(root);return}
-    const pk=e.target.closest('[data-peek]');if(pk){pk.classList.toggle('open');pk.setAttribute('aria-label',pk.classList.contains('open')?'押すとかくす':'かくれています。押すと表示');return}
     if(e.target.closest('[data-rvshow]')){RVSHOW=!RVSHOW;g.querySelector('.rvg-body').innerHTML=rvgMem();return}
     if(e.target.closest('[data-rvall]')){lsort='forget';savePrefs();lfilt='all';setTab('list');$('lsortBtn')&&$('lsortBtn').classList.add('on');scrollTo(0,0)}
   };
