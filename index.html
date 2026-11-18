@@ -1284,7 +1284,7 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .rvg-row:last-of-type{border-bottom:0}
 .rvg-row .w{flex:1;min-width:0;display:flex;flex-direction:column}
 .rvg-row .w b{font-weight:800;font-size:.95rem;overflow-wrap:anywhere}.rvg-row .w small{font-size:.75rem;color:var(--muted)}
-.rvg-row .w.hid{gap:6px}.rvg-row .w.hid i{display:block;height:11px;width:55%;border-radius:6px;background:var(--line)}.rvg-row .w.hid i+i{height:8px;width:35%;opacity:.7}
+.rvg-row .w.hid b,.rvg-row .w.hid small{color:var(--muted);letter-spacing:.14em;font-weight:900;line-height:1.1;font-size:1.15rem}.rvg-row .w.hid small{font-size:.95rem}.rvg-row .w.hid small{opacity:.7}
 .pc{font-size:.75rem;font-weight:900;min-width:2.6em;text-align:right}
 .pc.risk{color:#ff9f0a}.pc.soon{color:#f5c518}.pc.ok{color:var(--fg)}
 .mt{width:56px;height:6px;border-radius:3px;background:var(--line);overflow:hidden;display:flex;flex:none}
@@ -3283,8 +3283,8 @@ function rvgMem(){
     <circle cx="${X(0)}" cy="${Y(now.sum)}" r="5" class="dot"/>
     <text x="0" y="86" class="lb">2週間前</text><text x="${+X(0)-11}" y="86" class="lb now">今日</text><text x="250" y="86" class="lb">やらないと</text></svg>`;
   const fg=DATA.map(d=>[d,recallOf(d.id,t)]).filter(x=>x[1]!=null&&x[1]<.7).sort((a,b)=>a[1]-b[1]);
-  const rows=fg.map(([d,r])=>{const p=Math.round(r*100),c=pctCls(r);
-    return `<div class="rvg-row">${RVSHOW?`<div class="w"><b>${esc(d.en)}</b><small>${esc(d.jp)}</small></div>`:`<div class="w hid" aria-label="かくれています"><i></i><i></i></div>`}<span class="pc ${c}">${p}%</span><span class="mt"><i class="${c}" style="width:${p}%"></i></span></div>`}).join('');
+  const rows=fg.map(([d,r],i)=>{const p=Math.round(r*100),c=pctCls(r);
+    return `<div class="rvg-row">${RVSHOW?`<div class="w"><b>${esc(d.en)}</b><small>${esc(d.jp)}</small></div>`:`<div class="w hid" aria-label="かくれています"><b>${'•'.repeat(5+(i*3)%5)}</b><small>${'•'.repeat(3+(i*2)%3)}</small></div>`}<span class="pc ${c}">${p}%</span><span class="mt"><i class="${c}" style="width:${p}%"></i></span></div>`}).join('');
   return `<div class="rvg-top"><span>いま覚えている（推定）</span><span><b>${now.sum}</b> 枚</span></div>${svg}
     <div class="rvg-fh"><span>忘れかけ ${fg.length}枚<small>（70%より下）</small></span>${fg.length?`<button class="rvg-eye" data-rvshow aria-pressed="${RVSHOW}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>${RVSHOW?'かくす':'単語を見る'}</button>`:''}</div>
     ${fg.length?`<div class="rvg-list">${rows}</div>`:`<p class="rvg-note">いまは、忘れかけているカードはありません</p>`}`;
