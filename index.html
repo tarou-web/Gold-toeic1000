@@ -1159,6 +1159,22 @@ body.navopen .wrap{visibility:hidden}
 body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .bv{overscroll-behavior:contain}
 /* 復習: graph card (記憶 / 予定 / 覚え具合) under the start box */
+.lstart2{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:22px;padding:12px 12px 12px 16px}
+.lstart2>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lstart2 b{font-family:var(--f-jp);font-weight:900;font-size:1.05rem}
+.lstart2 small{font-size:.75rem;color:var(--muted);font-weight:800}
+.lstart2 #lsGo{flex:none;width:auto;min-height:48px;padding:0 22px;font-size:1rem}
+/* list: two short rows per card — text + chip, then remembered % + small buttons */
+#listbox .item{grid-template-columns:2.4em minmax(0,1fr) auto;padding:10px 12px;gap:4px 8px;align-items:center}
+#listbox .item .n{grid-row:1/3;align-self:start;padding-top:2px}
+#listbox .item .t{grid-column:2;grid-row:1}
+#listbox .item .e{font-size:.95rem;line-height:1.3}
+#listbox .item .j{font-size:.8rem;line-height:1.35}
+#listbox .item .acts{display:contents}
+#listbox .item .acts>button{grid-column:3;grid-row:1;justify-self:end;align-self:start}
+#listbox .item .lbtns{grid-column:3;grid-row:2;justify-self:end;gap:4px}
+#listbox .item .led{width:32px;height:28px}
+#listbox .item .lmem{grid-column:2;grid-row:2;margin:0}
 .rvg{margin-top:12px;background:var(--surface);border-radius:24px;padding:12px 16px 14px}
 .rvg-seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:3px;border-radius:12px;background:var(--bg)}
 .rvg-seg button{min-height:38px;border:0;border-radius:9px;background:none;color:var(--muted);font:inherit;font-weight:800;font-size:.85rem;cursor:pointer}
@@ -3144,8 +3160,9 @@ const isDue=d=>{const rv=(S.rv||{})[d.id];return !!rv&&dayNo()>=rv[0]+rv[1]};
 // A card answered on day rv[0] with a gap of rv[1] days is taken to be ~85% remembered on its due day,
 // and to fade the same way before and after it (longer gaps = slower fading).
 const RV_R=.85;
-function recallOf(id,day){const rv=(S.rv||{})[id];if(!rv)return null;const t=Math.max(0,(day??dayNo())-rv[0]);return Math.pow(RV_R,t/Math.max(.5,rv[1]))}
-function memNow(day){let sum=0,n=0;for(const d of DATA){const r=recallOf(d.id,day);if(r==null)continue;n++;sum+=r}return{sum:Math.round(sum),n}}
+function recallOf(id,day){const rv=(S.rv||{})[id];if(!rv)return null;const t=Math.max(0,(day??dayNo())-rv[0]);return Math.pow(RV_R,t/Math.max(1,rv[1]))}
+// cards marked 覚えた that have no review record yet count as mostly remembered (no date to fade from)
+function memNow(day){let sum=0,n=0;for(const d of DATA){const r=recallOf(d.id,day);if(r==null){if(S.known[d.id]){n++;sum+=.8}continue}n++;sum+=r}return{sum:Math.round(sum),n}}
 const mhKey=()=>KEY+'-mh-'+(S.deck||'gold');
 // one value per day, kept on this device for 30 days (the line grows from the day this started)
 function memHist(){let h={};try{h=JSON.parse(localStorage.getItem(mhKey())||'{}')||{}}catch(e){}
@@ -3249,10 +3266,9 @@ function renderQuiz0(){
   if(!LR.started&&d){
     const due=QP.filter(x=>LR.due&&LR.due[x.id]).length, weak=QP.filter(x=>!(LR.due&&LR.due[x.id])&&S.miss[x.id]&&!S.known[x.id]).length;
     const fresh=QP.filter(x=>!(LR.due&&LR.due[x.id])&&!S.known[x.id]&&!S.miss[x.id]).length, rest=QP.length-due-weak-fresh, cont=LR.step>0;
-    v.innerHTML=`<div class="lstart">
-      <div class="ls-h"><img src="mascot.png" alt=""><div><b>${cont?'続きから復習しよう':'今日のラウンド'}</b><small>${cont?`${QP.length}枚中 ${done}枚 覚えたところ`:`${QP.length}枚を覚えきるまで続けます`}</small></div></div>
-      <div class="ls-n">${[[due,'復習'],[weak,'苦手'],[fresh,'新しい'],[rest,'おさらい']].filter(x=>x[0]).map(([n,l])=>`<div><b>${n}</b><span>${l}</span></div>`).join('')}</div>
-      <button class="btn ok" id="lsGo">${cont?'続きから始める':'復習を始める'}</button>
+    v.innerHTML=`<div class="lstart2">
+      <div><b>${cont?'続きから':'今日のラウンド'} ${QP.length}枚</b><small>${cont?`${done}枚 覚えたところ`:[[due,'復習'],[weak,'苦手'],[fresh,'新しい'],[rest,'おさらい']].filter(x=>x[0]).map(([n,l])=>l+n).join('・')}</small></div>
+      <button class="btn ok" id="lsGo">${cont?'続ける':'始める'}</button>
     </div>${rvgHTML()}`;
     bindRvg(v);
     $('lsGo').onclick=()=>{LR.started=true;scrollTo(0,0);renderQuiz();const q=v.firstElementChild;if(q){q.classList.add('qfade')}};
@@ -3518,7 +3534,7 @@ function renderList(){
   $('lchips').innerHTML=[['all','すべて'],['weak','苦手'],['ok','覚えた']].map(([k,l])=>`<button data-lf="${k}" aria-pressed="${lfilt===k}">${l} ${cnt[k]}</button>`).join('');
   $('lchips').querySelectorAll('[data-lf]').forEach(b=>b.onclick=()=>{lfilt=b.dataset.lf;LIM=150;renderList()});
   const rows=sortRows(base.filter(d=>lfilt==='all'||(lfilt==='weak'?isWeak(d):S.known[d.id])));
-  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t" data-ed="${d.id}"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${memTag(d)}${d.memo?`<span class="j">📝 ${esc(d.memo)}</span>`:''}${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div><div class="acts"><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button><span class="lbtns"><button class="led lfav" data-fav="${d.id}" aria-label="お気に入り" aria-pressed="${!!(S.fav||{})[d.id]}"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button><button class="led" data-ed="${d.id}" aria-label="直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="led ldel" data-del="${d.id}" aria-label="消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></span></div></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):(lsort==='fav'?'<div class="empty" style="border:0">お気に入りはまだありません。<br>カードの右上のハートを押すと、ここに集まります。</div>':'<div class="empty" style="border:0">見つかりませんでした。</div>');
+  $('listbox').innerHTML=rows.length?rows.slice(0,LIM).map(d=>`<div class="item"><span class="n">${d.no||d.id}</span><div class="t" data-ed="${d.id}"><span class="e">${esc(d.en)}</span><span class="j">${esc(d.jp)}</span>${d.memo?`<span class="j">📝 ${esc(d.memo)}</span>`:''}${d.fix?`<span class="f">修正前 ${esc(d.fix)}</span>`:''}</div>${memTag(d)}<div class="acts"><button data-id="${d.id}" title="覚えた／未習得を切り替え">${chip(d)}</button><span class="lbtns"><button class="led lfav" data-fav="${d.id}" aria-label="お気に入り" aria-pressed="${!!(S.fav||{})[d.id]}"><svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button><button class="led" data-ed="${d.id}" aria-label="直す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button><button class="led ldel" data-del="${d.id}" aria-label="消す"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button></span></div></div>`).join('')+(rows.length>LIM?`<div class="more"><button class="btn blue" id="more">さらに表示（残り${rows.length-LIM}件）</button></div>`:''):(lsort==='fav'?'<div class="empty" style="border:0">お気に入りはまだありません。<br>カードの右上のハートを押すと、ここに集まります。</div>':'<div class="empty" style="border:0">見つかりませんでした。</div>');
   $('listbox').querySelectorAll('button[data-id]').forEach(b=>b.onclick=()=>{const id=+b.dataset.id;if(S.known[id])delete S.known[id];else S.known[id]=1;save();header();b.innerHTML=chip(DATA.find(x=>x.id===id))});
   $('listbox').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
     if(!b.classList.contains('arm')){$('listbox').querySelectorAll('.ldel.arm').forEach(x=>{x.classList.remove('arm');x.innerHTML=x._svg});b._svg=b.innerHTML;b.classList.add('arm');b.textContent='消す？';clearTimeout(b._t);b._t=setTimeout(()=>{if(b.isConnected&&b.classList.contains('arm')){b.classList.remove('arm');b.innerHTML=b._svg}},3000);return}
