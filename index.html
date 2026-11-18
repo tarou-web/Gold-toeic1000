@@ -1740,6 +1740,156 @@ header .kbar{display:none}
 .aitag{display:inline-block;padding:1px 6px;border-radius:6px;background:var(--green-s);color:var(--green);font-style:normal;font-size:10px;font-weight:800;font-family:var(--f-jp)}
 .ph-ainote{margin:6px 0 0;font-size:12px;color:var(--muted);line-height:1.6}
 @media (max-width:420px){.ph-row .jpw{grid-column:2}}
+/* ---- game: ミーモ・タイムアタック ---- */
+.bnav{grid-template-columns:repeat(6,1fr)!important}
+.gamev{background:#0a0a0c!important;color:#f2f2f3;font-family:var(--f-jp);font-weight:800;overflow:hidden!important;padding-bottom:0!important}
+.gm-top{position:relative;height:100%;min-height:560px;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 8px) 16px calc(78px + env(safe-area-inset-bottom,0px));box-sizing:border-box;overflow:hidden}
+.gm-deco{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.gm-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(245,197,24,.07) 1.2px,transparent 1.6px);background-size:14px 14px}
+.gm-beam{position:absolute;top:-40px;width:120px;height:640px;background:rgba(245,197,24,.05);transform-origin:top center;filter:blur(4px)}
+.gm-beam.l{left:-60px;transform:rotate(-22deg)}.gm-beam.r{right:-60px;transform:rotate(22deg)}
+.gm-cone{position:absolute;left:50%;top:32%;transform:translateX(-50%);width:280px;height:46%;background:rgba(245,197,24,.07);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%)}
+.gm-deco svg{position:absolute;left:50%;top:0;transform:translateX(-50%);width:390px;height:100%}
+.gm-bar{position:relative;display:flex;align-items:center;gap:8px;height:48px}
+.gm-bar b{font-size:1.15rem}
+.gm-pill{margin-left:auto;height:34px;padding:0 12px;border-radius:999px;background:#1c1c1f;border:1px solid #2e2e33;display:flex;align-items:center;gap:6px;font-size:.78rem;color:#c9c9ce;white-space:nowrap}
+.gm-pill b{font-family:'Orbitron',var(--f-en),sans-serif;color:#fff;font-size:.95rem}
+.gm-seg{position:relative;margin-top:6px;height:46px;padding:4px;box-sizing:border-box;border-radius:14px;background:#18181b;border:1px solid #2a2a2e;display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.gm-seg button{border:0;border-radius:10px;background:transparent;color:#9a9aa1;font:inherit;font-size:.9rem;cursor:pointer}
+.gm-seg button[aria-selected=true]{background:#f5c518;color:#18181a;box-shadow:0 0 10px rgba(245,197,24,.35)}
+.gm-lv{position:relative;margin:14px 14px 0;border-radius:16px;background:#141310;border:1.5px solid #d9b01a;box-shadow:0 0 4px rgba(245,197,24,.6),0 0 16px rgba(245,197,24,.22);padding:8px 6px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center}
+.gm-lv button{height:44px;border:0;background:none;color:#b8ad86;display:grid;place-items:center;cursor:pointer}
+.gm-lv button:disabled{opacity:.25}
+.gm-lv .k{font-size:.7rem;color:#d9b01a;letter-spacing:3px;text-align:center}
+.gm-lv .v{font-size:1.85rem;font-weight:900;color:#fff3b8;text-shadow:0 0 4px rgba(245,197,24,.8),0 0 12px rgba(245,197,24,.35);text-align:center;line-height:1.2}
+.gm-lv .s{font-size:.7rem;color:#8f8670;text-align:center}
+.gm-stage{position:relative;flex:1;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.gm-fig{position:relative;height:clamp(100px,calc(100% - 96px),240px);width:auto;aspect-ratio:221/320;z-index:2;margin-bottom:-14px}
+.gm-fig .mfig,.gp-fig .mfig{width:100%;height:100%}
+.gm-fig .mfig>img,.gp-fig .mfig>img{width:100%;height:100%;object-fit:contain}
+.gm-fig .m-acc,.gp-fig .m-acc{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.gm-ring{width:210px;height:34px;border-radius:50%;background:#16140c;border:2px solid #d9b01a;box-shadow:0 0 6px rgba(245,197,24,.5),0 0 22px rgba(245,197,24,.2)}
+.gm-plate{margin-top:10px;min-width:200px;height:44px;box-sizing:border-box;padding:0 16px;border-radius:10px;background:#111113;border:1px solid #2e2e33;display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:.82rem;color:#c9c9ce}
+.gm-plate span small{font-size:.65rem;color:#8f8670;margin-right:6px}
+.gm-plate b{font-family:'Orbitron',var(--f-en),sans-serif;font-size:1.35rem;font-weight:900;color:#ffe680;text-shadow:0 0 4px rgba(245,197,24,.8),0 0 12px rgba(245,197,24,.35)}
+.gm-bub{position:absolute;right:4px;top:12%;padding:8px 12px;border-radius:14px 14px 14px 4px;background:#1c1c1f;border:1px solid #2e2e33;font-size:.76rem;line-height:1.5;max-width:120px;z-index:3}
+.gm-chal{position:relative;margin:10px 0 0;padding:9px 12px;border-radius:12px;background:#1a1206;border:1.5px solid #ff9f0a;color:#ffd08a;font-size:.8rem;text-align:center}
+.gm-who{position:relative;margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.gm-who button{height:44px;border-radius:12px;border:1px solid #2e2e33;background:#18181b;color:#c9c9ce;font:inherit;font-size:.85rem;cursor:pointer}
+.gm-who button[data-w=friend]{color:#ffb950}
+.gm-who button[data-w=online]{border-style:dashed;background:#0e0e10;color:#6e6e75}
+.gm-who button[data-w=online] small{display:block;font-size:.58rem;line-height:1}
+.gm-who button[aria-checked=true]{border:1.5px solid #d9b01a;background:#16140c;color:#ffe680;box-shadow:0 0 8px rgba(245,197,24,.3)}
+.gm-who button[data-w=friend][aria-checked=true]{border-color:#ff9f0a;background:#1a1206;color:#ffb950;box-shadow:0 0 8px rgba(255,159,10,.3)}
+.gm-start{position:relative;margin-top:8px;height:66px;border-radius:18px;border:0;border-bottom:7px solid #b38f00;background:#f5c518;color:#18181a;font:inherit;font-size:1.55rem;font-weight:900;letter-spacing:6px;box-shadow:0 0 22px rgba(245,197,24,.35);cursor:pointer}
+
+/* play overlay */
+.gplay{position:fixed;inset:0;z-index:80;background:#0a0a0c;color:#f2f2f3;font-family:var(--f-jp);font-weight:800;display:none;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.gplay.open{display:block}
+.gplay .gscr{position:absolute;inset:0;display:none;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 6px) 16px calc(env(safe-area-inset-bottom,0px) + 18px);box-sizing:border-box}
+.gplay[data-s=ready] .g-ready,.gplay[data-s=play] .g-play,.gplay[data-s=res] .g-res{display:flex}
+.gp-beam{position:absolute;top:-40px;width:110px;height:600px;transform-origin:top center;background:rgba(245,197,24,.04);pointer-events:none}
+.gp-beam.l{left:-60px;transform:rotate(-24deg)}.gp-beam.r{right:-60px;transform:rotate(24deg)}
+.gplay.last{background:#0b0609;box-shadow:inset 0 0 60px rgba(255,40,70,.4)}
+.gplay.last .gp-beam{background:rgba(255,90,90,.05)}
+.gplay.hit{animation:ghit .5s}
+@keyframes ghit{0%,100%{box-shadow:inset 0 0 0 rgba(255,40,70,0)}30%{box-shadow:inset 0 0 80px rgba(255,40,70,.55)}}
+.gr-tag{display:inline-flex;height:30px;padding:0 14px;border-radius:999px;background:#18181b;border:1px solid #2e2e33;font-size:.82rem;color:#ffe680;align-items:center}
+.gr-circ{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:250px;height:250px;border-radius:50%;border:2px solid #d9b01a;box-shadow:0 0 6px rgba(245,197,24,.55),0 0 26px rgba(245,197,24,.2),inset 0 0 20px rgba(245,197,24,.12);background:#121108}
+.gr-num{position:absolute;left:0;right:0;top:44%;transform:translateY(-50%);text-align:center;font-family:'Orbitron',var(--f-en),sans-serif;font-size:8.5rem;font-weight:900;line-height:1;color:#fff0a8;text-shadow:0 0 6px rgba(245,197,24,.85),0 0 22px rgba(245,197,24,.4)}
+.gr-num.pop{animation:gpop .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes gpop{0%{transform:translateY(-50%) scale(1.5);opacity:0}100%{transform:translateY(-50%) scale(1);opacity:1}}
+.gr-rules{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 170px);display:flex;justify-content:center;gap:8px;font-size:.75rem}
+.gr-rules span{height:30px;padding:0 12px;border-radius:999px;background:#18181b;border:1px solid #2e2e33;color:#c9c9ce;display:flex;align-items:center}
+.gr-mas{position:absolute;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 30px);width:104px;aspect-ratio:221/320}
+.gr-bub{position:absolute;right:126px;bottom:calc(env(safe-area-inset-bottom,0px) + 108px);padding:9px 14px;border-radius:14px 14px 4px 14px;background:#f5c518;color:#18181a;font-size:.82rem;box-shadow:0 0 12px rgba(245,197,24,.35)}
+.gp-head{position:relative;height:48px;display:flex;align-items:center;gap:10px;flex:none}
+.gp-x{width:40px;height:40px;border-radius:50%;border:1px solid #2e2e33;background:#18181b;color:#c9c9ce;display:grid;place-items:center;cursor:pointer}
+.gp-head span{font-size:.75rem;color:#8f8670}
+.gp-row{position:relative;display:grid;grid-template-columns:1fr 92px;gap:8px;flex:none}
+.gp-clock{border-radius:14px;background:#121108;border:1.5px solid #d9b01a;box-shadow:0 0 4px rgba(245,197,24,.55),0 0 16px rgba(245,197,24,.2);padding:6px 14px 8px;display:flex;align-items:center;gap:12px;position:relative}
+.gp-clock b{font-family:'Orbitron',var(--f-en),sans-serif;font-size:2.4rem;font-weight:900;line-height:1.05;color:#fff0a8;letter-spacing:2px;text-shadow:0 0 4px rgba(245,197,24,.85),0 0 14px rgba(245,197,24,.35);min-width:4.2ch}
+.gp-meter{flex:1;display:grid;grid-template-columns:repeat(10,1fr);gap:2px}
+.gp-meter i{height:14px;border-radius:2px;background:#2c2a1c}
+.gp-meter i.on{background:#f5c518}
+.gplay.last .gp-clock{background:#1a070c;border-color:#ff3b5c;box-shadow:0 0 6px rgba(255,59,92,.6),0 0 22px rgba(255,59,92,.3)}
+.gplay.last .gp-clock b{color:#ffd6d6;text-shadow:0 0 6px rgba(255,59,92,.9),0 0 18px rgba(255,59,92,.4)}
+.gplay.last .gp-meter i.on{background:#ff3b5c}.gplay.last .gp-meter i{background:#2d0f16}
+.gp-minus{position:absolute;right:8px;top:-12px;height:26px;padding:0 10px;border-radius:999px;background:#ff4f6d;color:#1a070c;font-family:'Orbitron',var(--f-en),sans-serif;font-size:.9rem;font-weight:900;display:none;align-items:center;box-shadow:0 0 14px rgba(255,79,109,.6)}
+.gp-minus.show{display:flex;animation:gpop2 .7s}
+@keyframes gpop2{0%{opacity:0;transform:translateY(8px)}20%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+.gp-panel.passing .gp-word,.gp-panel.passing .gp-say{opacity:.2}
+.gp-score{border-radius:14px;background:#121113;border:1px solid #2e2e33;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 0}
+.gp-score small{font-size:.62rem;color:#8f8670;letter-spacing:2px}
+.gp-score b{font-family:'Orbitron',var(--f-en),sans-serif;font-size:1.9rem;font-weight:900;line-height:1.1;color:#fff}
+.gp-area{position:relative;flex:1;min-height:250px;margin-top:4px}
+.gp-fig{position:absolute;right:4px;bottom:120px;height:min(178px,calc(100% - 140px));min-height:100px;aspect-ratio:221/320;z-index:2;transition:transform .3s}
+.gp-fig.happy{animation:ghop .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes ghop{0%,100%{transform:none}40%{transform:translateY(-14px)}}
+.gplay.last .gp-fig{transform:rotate(10deg)}
+.gp-bub{position:absolute;left:4px;bottom:190px;padding:9px 13px;border-radius:16px 16px 4px 16px;background:#1c1c1f;border:1px solid #2e2e33;font-size:.8rem;line-height:1.5;z-index:3;max-width:58%}
+.gp-panel{position:absolute;left:0;right:0;bottom:0;height:150px;border-radius:18px;background-color:#0f0f11;background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px);background-size:6px 6px;border:1px solid #2e2e33;box-shadow:inset 0 0 30px rgba(0,0,0,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding-top:10px;box-sizing:border-box;overflow:hidden}
+.gplay.last .gp-panel{background-color:#160b10;border-color:#4a1c28;background-image:none}
+.gp-panel small{font-size:.72rem;color:#8f8670;letter-spacing:3px}
+.gp-word{font-family:var(--f-en);font-size:2.4rem;font-weight:900;color:#fff;text-align:center;padding:0 12px;line-height:1.15;word-break:break-word}
+.gp-word.sm{font-size:1.7rem}
+.gp-say{width:64px;height:64px;border-radius:50%;border:0;background:#f5c518;color:#18181a;display:grid;place-items:center;box-shadow:0 0 0 8px rgba(245,197,24,.12);cursor:pointer}
+.gp-stamp{position:absolute;inset:0;display:none;align-items:center;justify-content:center}
+.gp-stamp span{transform:rotate(-8deg);padding:6px 22px;border:4px solid #ff4f6d;border-radius:12px;color:#ff4f6d;font-size:2.2rem;font-weight:900;letter-spacing:8px;text-shadow:0 0 14px rgba(255,79,109,.7);background:rgba(10,10,12,.7)}
+.gp-stamp.show{display:flex;animation:gstamp .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes gstamp{0%{transform:scale(1.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.gp-opts{position:relative;margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;flex:none}
+.gp-opts button{height:70px;border-radius:16px;border:1.5px solid #34342f;border-bottom-width:5px;background:#17171a;color:#fff;font:inherit;font-size:1rem;padding:0 8px;line-height:1.25;cursor:pointer}
+.gp-opts button.ok{border:2px solid #f5c518;border-bottom-width:5px;background:#2a2614;color:#fff3b8;box-shadow:0 0 4px rgba(245,197,24,.6),0 0 16px rgba(245,197,24,.25)}
+.gp-opts button.ng{border:2px solid #ff4f6d;border-bottom-width:5px;background:#3a0f18;box-shadow:0 0 16px rgba(255,79,109,.45)}
+.gp-opts button.fade{color:#55555b;border-color:#26262a;background:#121214}
+.gplay.last .gp-opts button.fade{color:#6e5a60;border-color:#4a1c28;background:#160b10}
+.gp-pass{position:relative;margin-top:10px;flex:none;height:56px;border-radius:16px;border:1.5px solid #6b5a14;border-bottom-width:5px;background:#141310;color:#ffe680;font:inherit;font-size:1.1rem;font-weight:900;letter-spacing:6px;cursor:pointer}
+.gp-pass small{font-size:.75rem;letter-spacing:0;color:#ff9b9b}
+.gplay.last .gp-pass{border-color:#ff4f6d;background:#ff4f6d;color:#1a070c;box-shadow:0 0 22px rgba(255,79,109,.5)}
+.gplay.last .gp-pass small{color:#1a070c}
+.gplay.lock .gp-opts button,.gplay.lock .gp-pass{pointer-events:none}
+
+/* result */
+.g-res{overflow-y:auto}
+.gs-up{position:relative;margin-top:18px;text-align:center}
+.gs-up span{display:inline-flex;height:34px;padding:0 18px;border-radius:10px;background:#121108;border:1.5px solid #d9b01a;color:#fff0a8;font-size:.95rem;align-items:center;letter-spacing:4px;box-shadow:0 0 4px rgba(245,197,24,.5),0 0 14px rgba(245,197,24,.2)}
+.gs-main{position:relative;margin-top:12px;display:flex;align-items:center;justify-content:center;gap:14px}
+.gs-fig{width:100px;aspect-ratio:221/320;flex:none}
+.gs-main small{font-size:.75rem;color:#8f8670}
+.gs-main b{font-family:'Orbitron',var(--f-en),sans-serif;font-size:4.1rem;font-weight:900;line-height:1.05;color:#fff0a8;text-shadow:0 0 5px rgba(245,197,24,.85),0 0 18px rgba(245,197,24,.35)}
+.gs-best{display:inline-flex;margin-top:4px;height:26px;padding:0 12px;border-radius:999px;background:#f5c518;color:#18181a;font-size:.75rem;align-items:center}
+.gs-best.no{background:#1c1c1f;color:#c9c9ce;border:1px solid #2e2e33}
+.gs-box{position:relative;margin-top:14px;border-radius:18px;background:#121113;border:1px solid #2a2a2e;padding:12px 14px}
+.gs-box h3{margin:0;font-size:.85rem;display:flex;align-items:center}
+.gs-box h3 small{margin-left:auto;font-size:.7rem;color:#8f8670;font-weight:700}
+.gs-me{margin-top:10px;height:48px;border-radius:10px;background:#16140c;border:1.5px solid #d9b01a;box-shadow:0 0 4px rgba(245,197,24,.5),0 0 14px rgba(245,197,24,.18);display:flex;align-items:center;padding:0 12px;gap:10px;font-size:.85rem}
+.gs-me b{font-family:'Orbitron',var(--f-en),sans-serif;color:#fff0a8}
+.gs-me .r{margin-left:auto}
+.gs-note{margin-top:8px;font-size:.72rem;color:#8f8670;font-weight:700;line-height:1.6}
+.gs-vs{margin-top:10px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;text-align:center}
+.gs-vs div{border-radius:12px;padding:8px;background:#18181b;border:1px solid #2e2e33}
+.gs-vs div small{display:block;font-size:.65rem;color:#8f8670}
+.gs-vs div b{font-family:'Orbitron',var(--f-en),sans-serif;font-size:1.6rem}
+.gs-vs .me{border-color:#d9b01a;color:#fff0a8}
+.gs-vs .fr{border-color:#8a5a10;color:#ffd08a}
+.gs-vs em{font-style:normal;font-family:'Orbitron',var(--f-en),sans-serif;color:#8f8670}
+.gs-verdict{margin-top:8px;text-align:center;font-size:1rem;color:#ffe680}
+.gs-stats{position:relative;margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.gs-stats div{height:58px;border-radius:12px;background:#121113;border:1px solid #2a2a2e;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gs-stats small{font-size:.62rem;color:#8f8670}
+.gs-stats b{font-family:'Orbitron',var(--f-en),sans-serif;font-size:1.05rem}
+.gs-miss{position:relative;margin-top:10px;border-radius:14px;background:#121113;border:1px solid #2a2a2e;padding:10px 14px;font-size:.85rem}
+.gs-miss h4{margin:0 0 6px;font-size:.72rem;color:#8f8670}
+.gs-miss div{display:flex;gap:10px;padding:3px 0}
+.gs-miss div b{font-family:var(--f-en)}
+.gs-miss div span{margin-left:auto;color:#c9c9ce;font-weight:700;text-align:right}
+.gs-btns{position:sticky;bottom:calc(-18px - env(safe-area-inset-bottom,0px));margin:auto -16px 0;padding:14px 16px calc(18px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(10,10,12,0),#0a0a0c 22%);display:flex;flex-direction:column;gap:8px}
+.gs-btns .again{height:62px;border-radius:18px;border:0;border-bottom:7px solid #b38f00;background:#f5c518;color:#18181a;font:inherit;font-size:1.25rem;font-weight:900;letter-spacing:3px;box-shadow:0 0 20px rgba(245,197,24,.3);cursor:pointer}
+.gs-btns .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gs-btns .two button{height:52px;border-radius:16px;border:1px solid #2e2e33;border-bottom-width:4px;background:#18181b;color:#c9c9ce;font:inherit;font-size:.9rem;cursor:pointer}
+.gs-btns .two .send{color:#ffb950}
+@media (max-height:700px){.gp-opts button{height:60px}.gp-panel{height:128px}.gp-word{font-size:2rem}.gm-start{height:58px}.gm-lv .v{font-size:1.5rem}}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -1941,6 +2091,7 @@ header .kbar{display:none}
   <button id="navLib" aria-label="単語帳のライブラリ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h4v14H4zM10 5h4v14h-4zM16 6l3.5-1 2.5 13.5-3.5 1z"/></svg><span>ライブラリ</span></button>
   <button id="navNew" class="navplus" aria-label="新しい単語帳を作る"><i class="np"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i><span>追加</span></button>
   <button id="navShop" aria-label="ショップ"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg><span>ショップ</span></button>
+  <button id="navGame" aria-label="ゲーム"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10a5 5 0 0 1 4.9 6l-.7 3.6a2.6 2.6 0 0 1-4.6 1.1L14.8 15H9.2l-1.8 2.7a2.6 2.6 0 0 1-4.6-1.1L2.1 13A5 5 0 0 1 7 7z"/><path d="M7.5 10v4M5.5 12h4"/><circle cx="16" cy="11" r=".6" fill="currentColor"/><circle cx="17.8" cy="13" r=".6" fill="currentColor"/></svg><span>ゲーム</span></button>
   <button id="navSet" aria-label="設定"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span>設定</span></button>
 </nav>
 
@@ -1971,6 +2122,54 @@ header .kbar{display:none}
     <button class="sn-prem" id="snPrem"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg><span><b>プレミアムにする</b><small>広告なし・AIと写真がたっぷり・7日間無料</small></span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
   </div>
 </section>
+
+<section class="bv navv gamev" id="gamev" role="dialog" aria-labelledby="gmTitle" aria-hidden="true">
+  <div class="gm-top">
+    <div class="gm-deco" aria-hidden="true">
+      <div class="gm-dots"></div><div class="gm-beam l"></div><div class="gm-beam r"></div><div class="gm-cone"></div>
+      <svg viewBox="0 0 390 700" preserveAspectRatio="xMidYMin meet"><g fill="none" stroke="rgba(245,197,24,0.10)" stroke-width="2"><circle cx="195" cy="380" r="150"/><circle cx="195" cy="380" r="190"/><circle cx="195" cy="380" r="235" stroke-dasharray="4 10"/></g><g fill="#f5c518"><circle cx="40" cy="230" r="3.5" opacity=".8"/><circle cx="62" cy="200" r="3.5" opacity=".4"/><circle cx="88" cy="176" r="3.5" opacity=".8"/><circle cx="118" cy="158" r="3.5" opacity=".4"/><circle cx="150" cy="147" r="3.5" opacity=".8"/><circle cx="240" cy="147" r="3.5" opacity=".4"/><circle cx="272" cy="158" r="3.5" opacity=".8"/><circle cx="302" cy="176" r="3.5" opacity=".4"/><circle cx="328" cy="200" r="3.5" opacity=".8"/><circle cx="350" cy="230" r="3.5" opacity=".4"/></g><g fill="#ffe680" opacity=".55"><path d="M48 330l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/><path d="M338 300l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z"/><path d="M324 470l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M60 480l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></g><g font-family="Nunito,sans-serif" font-weight="900" fill="rgba(245,197,24,0.07)"><text x="14" y="420" font-size="58">A</text><text x="330" y="410" font-size="52">Z</text><text x="300" y="560" font-size="40">E</text><text x="24" y="575" font-size="44">Q</text></g></svg>
+    </div>
+    <div class="gm-bar"><b id="gmTitle">ミーモ・タイムアタック</b><button class="gm-pill" id="gmRank" aria-label="今週の順位"><svg viewBox="0 0 24 24" width="15" height="15" fill="#f5c518" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0zM10 14h4v3h-4zM8 17h8v3H8z"/></svg><span id="gmRankT">--位</span></button></div>
+    <div class="gm-seg" role="tablist" aria-label="モード"><button role="tab" data-m="read">読んで4択</button><button role="tab" data-m="listen">聞いて4択</button></div>
+    <div class="gm-lv"><button id="gmPrev" aria-label="前のレベル"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div><div class="k">今週の問題</div><div class="v" id="gmLv">中級</div><div class="s" id="gmReset">リセットまで 3日</div></div><button id="gmNext" aria-label="次のレベル"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
+    <div class="gm-chal" id="gmChal" hidden></div>
+    <div class="gm-stage">
+      <div class="gm-bub" id="gmBub">がんばろ！</div>
+      <div class="gm-fig" id="gmFig"></div>
+      <div class="gm-ring" aria-hidden="true"></div>
+      <div class="gm-plate"><span>あなた</span><span><small>ベスト</small><b id="gmBest">--</b></span></div>
+    </div>
+    <div class="gm-who" role="radiogroup" aria-label="だれと遊ぶ"><button role="radio" data-w="solo">ひとりで</button><button role="radio" data-w="friend">友達と</button><button role="radio" data-w="online">オンライン<small>準備中</small></button></div>
+    <button class="gm-start" id="gmStart">スタート</button>
+  </div>
+</section>
+
+<div class="gplay" id="gplay" data-s="ready" role="dialog" aria-modal="true" aria-label="ミーモ・タイムアタック">
+  <div class="gp-beam l" aria-hidden="true"></div><div class="gp-beam r" aria-hidden="true"></div>
+  <div class="gscr g-ready">
+    <div style="position:relative;margin-top:60px;text-align:center"><span class="gr-tag" id="grTag">中級 ・ 読んで4択</span><div style="margin-top:10px;font-size:.85rem;color:#8f8670">持ち時間</div><div style="font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;color:#ffe680">1:00</div></div>
+    <div class="gr-circ" aria-hidden="true"></div>
+    <div class="gr-num" id="grNum" aria-live="assertive">3</div>
+    <div class="gr-rules"><span>パス −3秒</span><span>まちがい −2秒</span></div>
+    <div class="gr-mas" id="grFig"></div>
+    <div class="gr-bub">いくよー！</div>
+  </div>
+  <div class="gscr g-play">
+    <div class="gp-head"><button class="gp-x" id="gpQuit" aria-label="やめる"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><span id="gpTag">中級 ・ 今週の問題</span></div>
+    <div class="gp-row">
+      <div class="gp-clock"><b id="gpTime">1:00</b><div class="gp-meter" id="gpMeter" aria-hidden="true"></div><span class="gp-minus" id="gpMinus">−2</span></div>
+      <div class="gp-score"><small>正解</small><b id="gpScore">0</b></div>
+    </div>
+    <div class="gp-area">
+      <div class="gp-bub" id="gpBub">がんばろ！</div>
+      <div class="gp-fig" id="gpFig"></div>
+      <div class="gp-panel"><small id="gpAsk">意味は？</small><div id="gpQ"></div><div class="gp-stamp" id="gpStamp"><span>パス −3</span></div></div>
+    </div>
+    <div class="gp-opts" id="gpOpts"></div>
+    <button class="gp-pass" id="gpPass">パス <small>−3秒</small></button>
+  </div>
+  <div class="gscr g-res" id="gsBody"></div>
+</div>
 
 <section class="bv navv setv" id="setv" role="dialog" aria-labelledby="setTitle" aria-hidden="true">
   <div class="bv-hero"><div class="sv-in"><div class="sv-bar"><span></span><h2 id="setTitle">設定</h2><span></span></div></div></div>
@@ -2654,7 +2853,7 @@ function openPrem(){const v=$('premv');v.classList.add('open');v.setAttribute('a
 function closePrem(){const v=$('premv');v.classList.remove('open');v.setAttribute('aria-hidden','true');if(!document.querySelector('.bv.open'))document.body.classList.remove('sv-lock')}
 function renderPrem(){document.querySelectorAll('.pm-plan').forEach(b=>b.setAttribute('aria-checked',b.dataset.plan===pmPlan))}
 function navOn(id){for(const b of document.querySelectorAll('.bnav button'))b.classList.toggle('on',b.id===id)}
-function closeNavViews(){libSel=null;libArm=false;for(const id of ['libv','setv','shopnv']){const v=$(id);v.classList.remove('open');v.setAttribute('aria-hidden','true')} document.body.classList.remove('sv-lock')}
+function closeNavViews(){libSel=null;libArm=false;for(const id of ['libv','setv','shopnv','gamev']){const v=$(id);v.classList.remove('open');v.setAttribute('aria-hidden','true')} document.body.classList.remove('sv-lock')}
 function openNavView(id){if(deckOpen())closeDeckEdit();closeNavViews();closeOpt();const v=$(id);v.classList.add('open');v.setAttribute('aria-hidden','false');v.scrollTop=0;document.body.classList.add('sv-lock')}
 function goHome(){if(deckOpen())closeDeckEdit();closeNavViews();closeOpt();navOn('navHome');scrollTo({top:0,behavior:'smooth'})}
 function setLibSel(on){libSel=on?new Set():null;libArm=false;renderLib()}
@@ -4011,7 +4210,8 @@ $('navNew').onclick=()=>{if(deckOpen())return;openDeckEdit('new')};
 $('navLib').onclick=()=>{renderLib();openNavView('libv');navOn('navLib')};
 $('navSet').onclick=()=>{renderAiStats();openNavView('setv');navOn('navSet')};
 $('navShop').onclick=()=>{renderShopTab();openNavView('shopnv');navOn('navShop')};
-{const ids=['libv','setv','shopnv','deckv'];const sync=()=>document.body.classList.toggle('navopen',ids.some(id=>$(id).classList.contains('open')));
+$('navGame').onclick=()=>{renderGameTop();openNavView('gamev');navOn('navGame')};
+{const ids=['libv','setv','shopnv','gamev','deckv'];const sync=()=>document.body.classList.toggle('navopen',ids.some(id=>$(id).classList.contains('open')));
   const mo=new MutationObserver(sync);ids.forEach(id=>mo.observe($(id),{attributes:true,attributeFilter:['class']}));sync();}
 // ---- iPhone-like feel ----------------------------------------------------
 // real spring curves (where the browser can draw them): --ease-ios settles without bouncing, --spring overshoots a little
@@ -4051,11 +4251,11 @@ $('navShop').onclick=()=>{renderShopTab();openNavView('shopnv');navOn('navShop')
 
 // swipe left/right on a bottom-nav screen: the screen follows the finger and the neighbouring one slides in beside it
 (function(){
-  const ORDER=['navHome','navLib','navNew','navShop','navSet'];
-  const viewOf=id=>({navHome:document.querySelector('.wrap'),navLib:$('libv'),navNew:$('deckv'),navShop:$('shopnv'),navSet:$('setv')})[id];
+  const ORDER=['navHome','navLib','navNew','navShop','navGame','navSet'];
+  const viewOf=id=>({navHome:document.querySelector('.wrap'),navLib:$('libv'),navNew:$('deckv'),navShop:$('shopnv'),navGame:$('gamev'),navSet:$('setv')})[id];
   const curNav=()=>{const b=document.querySelector('.bnav button.on');return b?b.id:'navHome'};
-  const overlayOpen=()=>['askv','shopv','premv','bv'].some(id=>{const v=$(id);return v&&v.classList.contains('open')})||($('wardrobe')&&!$('wardrobe').hidden)||document.querySelector('.sheet.open,.optsheet.open,dialog[open]');
-  const SKIP='#scene,.tabs,.bnav,.dk-seg,input,textarea,select,[contenteditable],.sn-shelf,.ph-thumbs,#askv,#shopv,#bv,.wardrobe,.modal,.sheet';
+  const overlayOpen=()=>['askv','shopv','premv','bv','gplay'].some(id=>{const v=$(id);return v&&v.classList.contains('open')})||($('wardrobe')&&!$('wardrobe').hidden)||document.querySelector('.sheet.open,.optsheet.open,dialog[open]');
+  const SKIP='#gplay,#scene,.tabs,.bnav,.dk-seg,input,textarea,select,[contenteditable],.sn-shelf,.ph-thumbs,#askv,#shopv,#bv,.wardrobe,.modal,.sheet';
   const scrollsX=el=>{for(let e=el;e&&e!==document.body;e=e.parentElement){const cs=getComputedStyle(e);if(/(auto|scroll)/.test(cs.overflowX)&&e.scrollWidth>e.clientWidth+2)return true}return false};
   const reduce=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
   const W=()=>innerWidth;
@@ -4065,7 +4265,7 @@ $('navShop').onclick=()=>{renderShopTab();openNavView('shopnv');navOn('navShop')
   // show the neighbouring screen without switching to it yet; returns how to put it away again
   function peek(to){
     const tv=viewOf(to);
-    if(to==='navLib')renderLib(); else if(to==='navSet')renderAiStats(); else if(to==='navShop')renderShopTab();
+    if(to==='navLib')renderLib(); else if(to==='navSet')renderAiStats(); else if(to==='navShop')renderShopTab(); else if(to==='navGame')renderGameTop();
     if(to==='navNew'){if(deckOpen())return null;
       window.__swNav=window.__swPeek=1;try{openDeckEdit('new')}finally{window.__swNav=window.__swPeek=0}
       return ()=>{const v=$('deckv');v.classList.remove('open');v.setAttribute('aria-hidden','true');dkDraft=null;dkId=null}}
@@ -4248,6 +4448,197 @@ header(); setTab(tab); initSync(); initAcct();
     }
     leftAt=0;
   });
+})();
+
+// ===== game: ミーモ・タイムアタック (60 seconds, same questions for everyone each week) =====
+(function(){
+  const GKEY=KEY+'-game', LV=['初級','中級','上級'], TOTAL=60000;
+  let G={mode:'read',lv:1,who:'solo',best:{},wk:{},rank:{},pid:''};
+  try{Object.assign(G,JSON.parse(localStorage.getItem(GKEY)||'{}'))}catch(e){}
+  if(!G.pid){G.pid=Array.from(crypto.getRandomValues(new Uint8Array(10)),b=>(b%36).toString(36)).join('')}
+  const gSave=()=>{try{localStorage.setItem(GKEY,JSON.stringify(G))}catch(e){}};
+  gSave();
+  let GC=null; // a friend's challenge opened from a link: {mode,lv,seed,score}
+  const jstDay=()=>Math.floor((Date.now()+9*3600e3)/864e5);
+  const weekNo=()=>Math.floor((jstDay()+3)/7);          // weeks start on Monday (Japan time)
+  const resetDays=()=>7-((jstDay()+3)%7);
+  const setKey=(m,lv)=>m+'-'+lv;
+  const curMode=()=>GC?GC.mode:G.mode, curLv=()=>GC?GC.lv:G.lv;
+  const weekSeed=(m,lv)=>weekNo()*100+lv*10+(m==='listen'?1:0)+7;
+  function rng(seed){let a=seed>>>0;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  function pool(lv){
+    const seen=new Set(),out=[];
+    for(const d of BUILTIN){const g=d.g&&d.g[0];if(!g||!g[0]||!g[1])continue;
+      const en=String(g[0]).trim(),ja=String(g[1]).split(/[、,，;；]/)[0].trim(),k=en.toLowerCase();
+      if(!en||!ja||seen.has(k))continue;seen.add(k);out.push({id:d.id,en,ja})}
+    const n=out.length,a=Math.floor(n*lv/3),b=Math.floor(n*(lv+1)/3),p=out.slice(a,b);
+    return p.length>=8?p:out;
+  }
+  function deal(p,r){const a=p.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+  function makeQs(lv,seed){
+    const p=pool(lv),r=rng(seed),order=deal(p,r);
+    return order.map(q=>{const others=deal(p.filter(x=>x.ja!==q.ja),r);const opts=[q.ja];
+      for(const o of others){if(opts.length>=4)break;if(!opts.includes(o.ja))opts.push(o.ja)}
+      return {...q,opts:deal(opts,r)}});
+  }
+  const figHTML=()=>{const c=cur();return `<span class="mfig">${fig(c.skin,c.face,c.hat,c.neck)}</span>`};
+  const mmss=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+
+  // ---- sounds (original synthesized tones) ----
+  function gS(k){
+    if($('sound').value!=='on')return; const c=ac(); if(!c)return; const t0=c.currentTime+0.01;
+    const tn=(f,st,d,type,g,f2)=>{const o=c.createOscillator(),v=c.createGain(),t=t0+st;o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+      v.gain.setValueAtTime(0.0001,t);v.gain.exponentialRampToValueAtTime(g,t+0.01);v.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(v);v.connect(c.destination);o.start(t);o.stop(t+d+0.05)};
+    if(k==='beep')tn(660,0,0.18,'square',0.1);
+    if(k==='go')tn(1320,0,0.55,'square',0.12);
+    if(k==='tick')tn(1300,0,0.04,'square',0.06);
+    if(k==='tock')tn(900,0,0.04,'square',0.06);
+    if(k==='fast'){tn(1400,0,0.04,'square',0.1)}
+    if(k==='ok'){tn(880,0,0.12,'triangle',0.28);tn(1320,0.07,0.26,'triangle',0.28)}
+    if(k==='ng'){tn(150,0,0.32,'sawtooth',0.16);tn(110,0,0.32,'square',0.1)}
+    if(k==='pass'){tn(700,0,0.25,'sine',0.22,180);tn(300,0.05,0.2,'triangle',0.1,120)}
+    if(k==='up'){tn(220,0,1.1,'sawtooth',0.14);tn(277,0,1.1,'sawtooth',0.1);tn(330,0,1.1,'square',0.07)}
+    if(k==='best'){[523,659,784,1047].forEach((f,i)=>tn(f,i*0.11,0.3,'triangle',0.22));tn(1568,0.5,0.5,'sine',0.13)}
+  }
+
+  // ---- ranking (week × mode × level), stored under a random id that is not linked to anything else ----
+  async function sendRank(key,score){
+    if(!FB_ON)return null; const wk=weekNo();
+    try{
+      const prev=G.wk[wk+'-'+key]||0;
+      if(score>=prev){const w=await fetch(`${FB_URL}/ranks/${wk}/${key}/${G.pid}.json`,{method:'PUT',body:JSON.stringify(score),headers:{'Content-Type':'application/json'}});if(!w.ok)return null}
+      const r=await fetch(`${FB_URL}/ranks/${wk}/${key}.json`); if(!r.ok)return null;
+      const all=await r.json()||{}; const mine=all[G.pid]||score; const vals=Object.values(all).filter(v=>typeof v==='number');
+      const rank=1+vals.filter(v=>v>mine).length; G.rank[key]={wk,r:rank,n:vals.length}; gSave(); return G.rank[key];
+    }catch(e){return null}
+  }
+  const rankNow=key=>{const x=G.rank[key];return x&&x.wk===weekNo()?x:null};
+
+  // ---- top screen (M1) ----
+  function renderTop(){
+    const m=curMode(),lv=curLv(),key=setKey(m,lv),best=G.best[key]||0;
+    document.querySelectorAll('#gamev .gm-seg button').forEach(b=>b.setAttribute('aria-selected',b.dataset.m===m));
+    $('gmLv').textContent=LV[lv]; $('gmReset').textContent=GC?'友達と同じ問題':`リセットまで ${resetDays()}日`;
+    $('gmPrev').disabled=!!GC||lv<=0; $('gmNext').disabled=!!GC||lv>=2;
+    $('gmBest').textContent=best||'--';
+    const rk=rankNow(key); $('gmRankT').textContent=rk?`${rk.r}位`:'--位';
+    $('gmBub').textContent=GC?`${GC.score}問に勝てる？`:best?`ベスト ${best}問を こえよう！`:'まずは1回 やってみよう！';
+    $('gmChal').hidden=!GC; if(GC)$('gmChal').innerHTML=`友達の記録 <b>${GC.score}問</b> に挑戦！ <button id="gmChalX" style="margin-left:6px;border:0;background:none;color:#8f8670;font:inherit;text-decoration:underline;cursor:pointer">やめる</button>`;
+    if(GC)$('gmChalX').onclick=()=>{GC=null;renderTop()};
+    document.querySelectorAll('#gamev .gm-who button').forEach(b=>b.setAttribute('aria-checked',b.dataset.w===(GC?'friend':G.who)));
+    $('gmFig').innerHTML=figHTML();
+  }
+  window.renderGameTop=renderTop;
+  document.querySelectorAll('#gamev .gm-seg button').forEach(b=>b.onclick=()=>{if(GC)return;G.mode=b.dataset.m;gSave();renderTop()});
+  $('gmPrev').onclick=()=>{if(G.lv>0){G.lv--;gSave();renderTop()}};
+  $('gmNext').onclick=()=>{if(G.lv<2){G.lv++;gSave();renderTop()}};
+  document.querySelectorAll('#gamev .gm-who button').forEach(b=>b.onclick=()=>{
+    if(b.dataset.w==='online'){toast('<div><strong>オンライン対戦は準備中です</strong><span>使う人が増えたら、ほかの人とすぐ対戦できるようになります</span></div>');return}
+    if(GC&&b.dataset.w==='solo')GC=null; G.who=b.dataset.w; gSave(); renderTop()});
+  $('gmRank').onclick=()=>{const rk=rankNow(setKey(curMode(),curLv()));
+    toast(rk?`<div><strong>今週 ${rk.n}人中 ${rk.r}位</strong><span>${LV[curLv()]}・${curMode()==='listen'?'聞いて':'読んで'}4択の記録です</span></div>`:'<div><strong>今週の順位はまだありません</strong><span>1回遊ぶと、同じ問題を遊んだ人の中での順位が出ます</span></div>')};
+
+  // ---- play (M2 → M3 → M5) ----
+  const gp=$('gplay'); let R=null, timers=[];
+  const later=(f,ms)=>timers.push(setTimeout(f,ms));
+  function stopAll(){timers.forEach(clearTimeout);timers=[];if(R&&R.raf)cancelAnimationFrame(R.raf);try{speechSynthesis.cancel()}catch(e){}}
+  function closePlay(){stopAll();R=null;gp.classList.remove('open','last','lock');document.body.classList.remove('sv-lock');renderTop();if($('gamev').classList.contains('open'))document.body.classList.add('sv-lock')}
+  function start(){
+    const m=curMode(),lv=curLv(),seed=GC?GC.seed:weekSeed(m,lv);
+    R={m,lv,seed,key:setKey(m,lv),qs:makeQs(lv,seed),i:0,score:0,wrong:0,pass:0,miss:[],streak:0,left:TOTAL,lastSec:61,lastHalf:0,lock:false,t:0,times:[]};
+    gp.classList.remove('last','lock'); gp.classList.add('open'); gp.dataset.s='ready'; document.body.classList.add('sv-lock');
+    $('grTag').textContent=`${LV[lv]} ・ ${m==='listen'?'聞いて':'読んで'}4択`; $('grFig').innerHTML=figHTML(); $('gpFig').innerHTML=figHTML();
+    $('gpTag').textContent=`${LV[lv]} ・ ${GC?'友達と同じ問題':'今週の問題'}`;
+    $('gpMeter').innerHTML='<i></i>'.repeat(10);
+    const n=$('grNum'); let k=3;
+    const step=()=>{if(!R)return; if(k>0){n.textContent=k;n.classList.remove('pop');void n.offsetWidth;n.classList.add('pop');gS('beep');k--;later(step,700)}
+      else{gS('go');gp.dataset.s='play';$('gpBub').textContent='がんばろ！';showQ();R.t=performance.now();loop()}};
+    step();
+  }
+  function loop(){if(!R)return; const now=performance.now(),dt=now-R.t; R.t=now; R.left-=dt; drawClock();
+    if(R.left<=0){finish();return}
+    if(R.left>10000){const sec=Math.ceil(R.left/1000);if(sec!==R.lastSec){R.lastSec=sec;gS(sec%2?'tick':'tock')}}
+    else{const h=Math.ceil(R.left/500);if(h!==R.lastHalf){R.lastHalf=h;gS('fast')}}
+    R.raf=requestAnimationFrame(loop)}
+  function drawClock(){const l=Math.max(0,R.left);$('gpTime').textContent=mmss(l);
+    const on=Math.ceil(l/6000); $('gpMeter').querySelectorAll('i').forEach((x,i)=>x.classList.toggle('on',i<on));
+    gp.classList.toggle('last',l<=10000)}
+  function q(){if(R.i>=R.qs.length){R.qs=R.qs.concat(makeQs(R.lv,R.seed+R.i));}return R.qs[R.i]}
+  function showQ(){const x=q(); R.qStart=performance.now(); R.lock=false; gp.classList.remove('lock');
+    if(R.m==='listen'){$('gpAsk').textContent='聞こえた単語の意味は？';
+      $('gpQ').innerHTML=`<button class="gp-say" id="gpSay" aria-label="もう一度聞く"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>`;
+      $('gpSay').onclick=()=>speak(x.en); speak(x.en)}
+    else{$('gpAsk').textContent='意味は？';$('gpQ').innerHTML=`<div class="gp-word${x.en.length>12?' sm':''}">${esc(x.en)}</div>`}
+    $('gpOpts').innerHTML=x.opts.map((o,k)=>`<button data-k="${k}">${esc(o)}</button>`).join('');
+    $('gpOpts').querySelectorAll('button').forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+  }
+  function reveal(){if(R.m==='listen'){const x=q();$('gpQ').innerHTML=`<div class="gp-word${x.en.length>12?' sm':''}">${esc(x.en)}</div>`}}
+  function bubble(){const best=G.best[R.key]||0,s=R.score;
+    if(best&&s===best)return 'ベストに並んだ！'; if(best&&s>best)return 'ベスト更新中！'; if(best&&best-s<=3)return `ベストまで あと${best-s}問`;
+    if(R.streak>=3)return `${R.streak}問れんぞく！`; return ['いいね！','その調子！','ナイス！'][s%3]}
+  function answer(k){if(!R||R.lock)return; R.lock=true; gp.classList.add('lock');
+    const x=q(),ok=x.opts[k]===x.ja; const bs=$('gpOpts').querySelectorAll('button');
+    bs.forEach((b,i)=>b.classList.add(x.opts[i]===x.ja?'ok':(i===k?'ng':'fade')));
+    reveal();
+    if(ok){R.score++;R.streak++;R.times.push(performance.now()-R.qStart);$('gpScore').textContent=R.score;gS('ok');
+      const f=$('gpFig');f.classList.remove('happy');void f.offsetWidth;f.classList.add('happy');$('gpBub').textContent=bubble();
+      later(next,380)}
+    else{R.left-=2000;R.wrong++;R.streak=0;R.miss.push(x);gS('ng');buzz(false);
+      const mm=$('gpMinus');mm.textContent='−2';mm.classList.remove('show');void mm.offsetWidth;mm.classList.add('show');
+      gp.classList.remove('hit');void gp.offsetWidth;gp.classList.add('hit');$('gpBub').textContent='おしい！';
+      later(next,850)}}
+  function pass(){if(!R||R.lock)return; R.lock=true; gp.classList.add('lock'); const x=q();
+    R.left-=3000;R.pass++;R.streak=0;R.miss.push(x);gS('pass');reveal();$('gpBub').textContent='つぎ いこう！';
+    $('gpOpts').querySelectorAll('button').forEach(b=>b.classList.add('fade'));document.querySelector('.gp-panel').classList.add('passing');
+    const st=$('gpStamp');st.classList.remove('show');void st.offsetWidth;st.classList.add('show');
+    const mm=$('gpMinus');mm.textContent='−3';mm.classList.remove('show');void mm.offsetWidth;mm.classList.add('show');
+    gp.classList.remove('hit');void gp.offsetWidth;gp.classList.add('hit');
+    later(()=>{st.classList.remove('show');document.querySelector('.gp-panel').classList.remove('passing');next()},650)}
+  function next(){if(!R)return; if(R.left<=0)return; R.i++; showQ()}
+  function finish(){const r=R; cancelAnimationFrame(r.raf); r.left=0; drawClock(); r.lock=true; gp.classList.add('lock'); gS('up');
+    try{speechSynthesis.cancel()}catch(e){}
+    const prev=G.best[r.key]||0, wk=weekNo()+'-'+r.key, isBest=r.score>prev;
+    if(isBest)G.best[r.key]=r.score; const rankP=sendRank(r.key,r.score); G.wk[wk]=Math.max(G.wk[wk]||0,r.score); gSave();
+    later(()=>{gp.classList.remove('last');gp.dataset.s='res';renderRes(r,prev,isBest,rankP);if(isBest&&prev)gS('best')},1100)}
+  function renderRes(r,prev,isBest,rankP){
+    const avg=r.times.length?(r.times.reduce((a,b)=>a+b,0)/r.times.length/1000).toFixed(1):'-';
+    const fr=GC?`<div class="gs-box"><h3>友達との勝負<small>同じ問題</small></h3><div class="gs-vs"><div class="me"><small>あなた</small><b>${r.score}</b></div><em>VS</em><div class="fr"><small>友達</small><b>${GC.score}</b></div></div><div class="gs-verdict">${r.score>GC.score?'あなたの勝ち！':r.score<GC.score?'友達の勝ち…':'引き分け！'}</div></div>`:'';
+    const miss=r.miss.slice(-4).reverse();
+    $('gsBody').innerHTML=`<div class="gs-up"><span>タイムアップ</span></div>
+      <div class="gs-main"><div class="gs-fig">${figHTML()}</div><div><small>${LV[r.lv]} ・ ${r.m==='listen'?'聞いて':'読んで'}4択</small><div style="display:flex;align-items:baseline;gap:6px"><b>${r.score}</b><span>問</span></div>
+        <span class="gs-best${isBest?'':' no'}">${isBest?(prev?'自己ベスト更新！':'はじめての記録！'):prev?`ベスト ${prev}問`:'つぎは1問めざそう'}</span></div></div>
+      ${fr}
+      <div class="gs-box"><h3>今週のランキング<small>同じ問題を遊んだ人</small></h3><div class="gs-me"><span>あなた</span><span class="r" id="gsRank">集計中…</span><b>${r.score}</b></div><div class="gs-note" id="gsRankN"></div></div>
+      <div class="gs-stats"><div><small>まちがい</small><b style="color:#ff9b9b">${r.wrong}</b></div><div><small>パス</small><b>${r.pass}</b></div><div><small>平均</small><b>${avg}<span style="font-family:var(--f-jp);font-size:.7rem">秒</span></b></div></div>
+      ${miss.length?`<div class="gs-miss"><h4>まちがえた・パスした単語</h4>${miss.map(x=>`<div><b>${esc(x.en)}</b><span>${esc(x.ja)}</span></div>`).join('')}</div>`:''}
+      <div class="gs-btns"><button class="again" id="gsAgain">もう一度</button><div class="two"><button class="send" id="gsSend">友達に送る</button><button id="gsEnd">おわる</button></div></div>`;
+    $('gsAgain').onclick=()=>{stopAll();start()};
+    $('gsEnd').onclick=closePlay;
+    $('gsSend').onclick=()=>sendChallenge(r);
+    Promise.resolve(rankP).then(rk=>{const a=$('gsRank'),n=$('gsRankN');if(!a)return;
+      if(rk){a.innerHTML=`<b>${rk.r}</b>位 / ${rk.n}人`;n.textContent=`リセットまで ${resetDays()}日。順位は週のいちばんいい記録で決まります。`}
+      else{a.textContent='--位';n.textContent='ランキングは準備中です。記録はこの端末に保存されています。'}});
+  }
+  async function sendChallenge(r){
+    const url=location.origin+location.pathname+'?gc='+[r.m==='listen'?1:0,r.lv,r.seed,r.score].join('.');
+    const text=`ミーモ・タイムアタック（${LV[r.lv]}）で ${r.score}問 正解！ 同じ問題で勝負しよう`;
+    try{if(navigator.share){await navigator.share({title:'ミーモ・タイムアタック',text,url});return}}catch(e){if(e&&e.name==='AbortError')return}
+    try{await navigator.clipboard.writeText(text+' '+url);toast('<div><strong>挑戦状のリンクをコピーしました</strong><span>友達に送ると、同じ問題で勝負できます</span></div>')}
+    catch(e){toast('<div><strong>リンクをコピーできませんでした</strong><span>'+esc(url)+'</span></div>')}
+  }
+  $('gmStart').onclick=()=>{uiClick();start()};
+  $('gpQuit').onclick=closePlay;
+  $('gpPass').onclick=pass;
+  document.addEventListener('keydown',e=>{if(!gp.classList.contains('open'))return;
+    if(e.key==='Escape'){closePlay();return}
+    if(gp.dataset.s==='play'&&/^[1-4]$/.test(e.key))answer(+e.key-1)});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&R&&gp.dataset.s==='play'){R.left=0}});
+
+  // ---- a friend's challenge link: ?gc=mode.level.seed.score ----
+  try{const p=new URLSearchParams(location.search),gc=p.get('gc');
+    if(gc&&/^[01]\.[0-2]\.\d{1,9}\.\d{1,3}$/.test(gc)){const [m,lv,seed,sc]=gc.split('.').map(Number);GC={mode:m?'listen':'read',lv,seed,score:sc};
+      p.delete('gc');history.replaceState(null,'',location.pathname+(p.toString()?'?'+p:'')+location.hash);
+      setTimeout(()=>{try{$('navGame').onclick()}catch(e){}},400)}}catch(e){}
 })();
 </script>
 
