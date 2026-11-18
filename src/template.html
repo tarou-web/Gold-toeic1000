@@ -1199,7 +1199,7 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .mcd-t small{font-size:.8rem;color:var(--muted);font-weight:700}.mcd-t small b{color:var(--fg)}
 .mcd-t .rd-c{margin-top:4px}
 .rd-c .r{background:var(--red-s);color:var(--red-ink)}
-.mcdone .rd-list{max-height:230px}
+.mcdone .rd-list{max-height:min(190px,calc(100dvh - 520px));min-height:138px}
 .rd-row .mk.r{background:var(--red);color:#18181a}
 .mc-r.ng{background:var(--red-s);align-items:flex-start;padding-top:8px;padding-bottom:8px}
 .mc-r.ng .mk{margin-top:3px}
@@ -3414,7 +3414,7 @@ function showSheet(ok,title,sub,d,next){
 const MC_N=10;
 let MQ=[],mi=0,ms={r:0,n:0,res:{},pick:{}},manswered=false,mOpts=null; var mT=0;
 function startMc(){clearTimeout(mT);MQ=shuf(pool()).slice(0,MC_N);mi=0;ms={r:0,n:0,res:{},pick:{}};mOpts=null}
-function renderMc(){ try{ return renderMc0() } finally { qmodeSync(); fitMc() } }
+function renderMc(){ try{ return renderMc0() } finally { qmodeSync(); fitMc(); if(mi>=MQ.length){requestAnimationFrame(fitMc);setTimeout(fitMc,350);setTimeout(fitMc,1200)} } }
 // shrink the 4択 text only as much as needed so all four choices stay above the bottom menu
 function fitMc(){
   const v=$('v-mc'), nav=document.querySelector('.bnav'); if(!v||v.hidden||!nav)return;
