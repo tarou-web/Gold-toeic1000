@@ -620,7 +620,7 @@ html.ask-open,html.ask-open body{overflow:hidden;overscroll-behavior:none}
 .quiz .bubble .say-box{padding:10px 14px}
 .quiz .opts{gap:8px}
 .quiz .opt{padding:10px 14px;border-bottom-width:4px}
-.sheet{bottom:var(--bnavh,0px);padding-block:12px 12px;z-index:57}
+.sheet{bottom:var(--bnavh,0px);padding-block:12px calc(12px + max(0px, env(safe-area-inset-bottom,0px) - var(--bnavh,0px)));z-index:57}
 .sheet h3{font-size:1.15rem}
 .sheet .acts .btn{padding:10px}
 body.sheet-open .wrap{padding-bottom:calc(var(--bnavh,0px) + 180px)!important}
@@ -3381,7 +3381,7 @@ function showSheet(ok,title,sub,d,next){
   sh.className='sheet '+(ok?'good':'miss');
   $('sheetin').innerHTML=`<div class="msg"><img class="smas" src="mascot.png" alt=""><div><h3>${title}</h3>${sub?`<p>${sub}</p>`:''}</div></div>
     <div class="acts"><button class="btn blue" id="qsay" aria-label="発音を聞く"><svg class="spk" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6"/><path d="M18.3 6.6a7.8 7.8 0 0 1 0 10.8"/></svg></button><button class="btn ${ok?'ok':'red'}" id="qnext">続ける</button></div>`;
-  void sh.offsetWidth; sh.classList.add('show'); document.body.classList.add('sheet-open');
+  setBnavH(); void sh.offsetWidth; sh.classList.add('show'); document.body.classList.add('sheet-open');
   $('qsay').onclick=()=>speak(d.en);
   const n=$('qnext'); n.onclick=()=>{hideSheet();(next||renderQuiz)()}; n.focus({preventScroll:true});
 }
@@ -3569,7 +3569,9 @@ function renderList(){
 }
 
 // shrink the card (only as much as needed) so the まだ / 覚えた buttons stay above the bottom menu
-function setBnavH(){const n=document.querySelector('.bnav');if(n)document.documentElement.style.setProperty('--bnavh',Math.max(0,document.documentElement.clientHeight-n.getBoundingClientRect().top)+'px')}
+// how much of the bottom the menu bar covers; 0 while the bar is hidden (during a quiz it is), so the answer sheet sits at the very bottom
+function setBnavH(){const n=document.querySelector('.bnav');if(!n)return;const cs=getComputedStyle(n),hidden=cs.display==='none'||cs.visibility==='hidden'||!n.getClientRects().length;
+  document.documentElement.style.setProperty('--bnavh',(hidden?0:Math.max(0,Math.min(200,document.documentElement.clientHeight-n.getBoundingClientRect().top)))+'px')}
 function fitCard(){if(document.documentElement.classList.contains('ask-open'))return; // the page is pinned under the chat sheet; measuring now would shrink the card
   setBnavH();
   if(bigCard){const f=$('flip');if(f){f.style.height='';f.style.minHeight=''}return}
@@ -3665,7 +3667,7 @@ slideBar(document.querySelector('#deckv .dk-seg'),b=>setDm(b.dataset.dm),()=>set
 function qmodeSync(){
   const on=tab==='quiz'&&!!(LR&&LR.started), v=$('v-quiz');
   document.body.classList.toggle('qmode',on);
-  document.body.classList.toggle('qactive',on&&!!v&&!v.querySelector('.done,.empty'));
+  document.body.classList.toggle('qactive',on&&!!v&&!v.querySelector('.done,.rdone,.empty'));
   setBnavH&&setBnavH();
 }
 function setTab(t){
