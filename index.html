@@ -3480,6 +3480,7 @@ function renderQuiz0(){
      <h2 class="ask">英語に並べ替えてください</h2>${bubble(d.jp,'jp')}
      <div class="ordans" id="ordAns"></div>
      <div class="ordpool" id="ordPool">${tiles.map((w,i)=>`<button class="tile" data-t="${i}">${esc(w)}</button>`).join('')}</div>
+     <div class="mc-tm" aria-hidden="true"><i></i></div><p class="mc-fb" aria-live="polite"></p>
      <div class="qacts one"><button class="btn" id="qskip">わからない</button></div></div>`;
     const draw=()=>{
       $('ordAns').innerHTML=picked.map((t,k)=>`<button class="tile" data-k="${k}">${esc(tiles[t])}</button>`).join('');
@@ -3487,9 +3488,9 @@ function renderQuiz0(){
       $('ordAns').querySelectorAll('.tile').forEach(b=>b.onclick=()=>{if(answered)return;picked.splice(+b.dataset.k,1);draw()});
       if(picked.length===words.length&&!answered)setTimeout(()=>{if(!answered&&picked.length===words.length)fin(normAns(picked.map(t=>tiles[t]).join(' '))===normAns(d.en))},250);
     };
-    v.querySelectorAll('#ordPool .tile').forEach(b=>b.onclick=()=>{if(answered)return;const t=+b.dataset.t;if(picked.includes(t))return;picked.push(t);draw()});
+    v.querySelectorAll('#ordPool .tile').forEach(b=>b.onclick=()=>{if(answered||picked.length>=words.length)return;const t=+b.dataset.t;if(picked.includes(t))return;picked.push(t);draw()});
     draw();
-    const fin=ok=>{if(answered)return;v.querySelectorAll('.tile,#qskip').forEach(x=>x.disabled=true);$('ordAns').classList.add(ok?'ok':'ng');lrJudge(d,ok,ok?'':`正解：${esc(d.en)}`)};
+    const fin=ok=>{if(answered)return;v.querySelectorAll('.tile,#qskip').forEach(x=>x.disabled=true);$('ordAns').classList.add(ok?'ok':'ng');lrJudge(d,ok,ok?'':`正解：${esc(d.en)}`,true,true)};
     $('qskip').onclick=()=>{if(answered)return;fin(false)};
   }else{
     const cl=clozeOf(d);
@@ -3504,7 +3505,7 @@ function renderQuiz0(){
      <p class="czlab">穴埋め ・ 空いているところを英語で（最初の1文字はヒント）</p>
      <div class="czcard"><div class="czjp">${esc(d.jp)}</div>
        <p class="cloze czs">${esc(cl.pre)}${cl.pre?' ':''}${esc(cl.lead)}<span class="czbx" style="--bw:${bw}px" aria-label="答えのマス ${n}文字">${W.split('').map((c,i)=>`<i class="${fixed(i)?'fx':''}">${fixed(i)?esc(c):''}</i>`).join('')}</span>${esc(cl.trail)}${cl.post?' ':''}${esc(cl.post)}</p>
-       <p class="czmsg" aria-live="polite"></p></div>
+       <div class="mc-tm" aria-hidden="true"><i></i></div><p class="mc-fb" aria-live="polite"></p></div>
      <div class="czkb" role="group" aria-label="キーボード">
        <div class="czr">${keys('qwertyuiop')}</div><div class="czr r2">${keys('asdfghjkl')}</div>
        <div class="czr r3">${keys('zxcvbnm')}<button class="czk del no-press" id="czdel" aria-label="1文字消す"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M17 9l-6 6M11 9l6 6"/></svg></button></div>
@@ -3513,7 +3514,7 @@ function renderQuiz0(){
     const draw=()=>{const nx=typed.findIndex(t=>!t);bx.forEach((b,i)=>{if(!fixed(i))b.textContent=typed[i];b.classList.toggle('cur',i===nx)})};
     const fin=(ok,near)=>{if(answered)return;v.querySelector('.czq').classList.add('czdone');
       bx.forEach((b,i)=>{b.textContent=W[i];b.classList.add(ok?'ok':(normAns(typed[i]||'')===normAns(W[i])?'ok':'ng'))});
-      lrJudge(d,ok,ok?(near?`つづりに注意：${esc(cl.word)}`:''):`正解：${clozeAns(cl)}`)};
+      lrJudge(d,ok,ok?(near?`つづりに注意：${esc(cl.word)}`:''):`正解：${clozeAns(cl)}`,true,true)};
     const press=c=>{if(answered)return;const i=typed.findIndex(t=>!t);if(i<0)return;typed[i]=c;draw();bx[i].classList.remove('pop');void bx[i].offsetWidth;bx[i].classList.add('pop');
       if(typed.every(t=>t)){setTimeout(()=>{if(answered)return;const k=clozeOk(typed.join(''),cl);fin(k>0,k===1)},180)}};
     const del=()=>{if(answered)return;for(let i=n-1;i>=0;i--)if(!fixed(i)&&typed[i]){typed[i]='';break}draw()};
@@ -3529,9 +3530,13 @@ function renderQuiz0(){
     draw();
   }
 }
-function lrNext(){clearTimeout(mT);if(tab==='quiz')renderQuiz()}
-function lrJudge(d,ok,sub,auto){
-  answered=true; LR.step++; LR.q.shift();
+var lrTap=false;
+function lrNext(){clearTimeout(mT);lrTap=false;if(tab==='quiz')renderQuiz()}
+// 並べ替え・穴埋め: after the answer shows, a tap anywhere moves on
+document.addEventListener('click',e=>{if(lrTap&&answered&&tab==='quiz'&&Date.now()-lrAt>250&&!e.target.closest('.czx,.qhead,.bnav,.tabs,header'))lrNext()});
+var lrAt=0;
+function lrJudge(d,ok,sub,auto,long){
+  answered=true; lrAt=Date.now(); LR.step++; LR.q.shift();
   const later=(id,gap)=>LR.q.splice(Math.min(gap,LR.q.length),0,id);
   let title;
   if(ok){
@@ -3545,9 +3550,11 @@ function lrJudge(d,ok,sub,auto){
   sfx(ok); buzz(ok); save(); header(); mascotSay(ok?'ok':'ng');
   const v=$('v-quiz');
   if(auto){
-    const ms_=ok?800:1600, q=v.querySelector('.quiz'), fb=v.querySelector('.mc-fb'), tm=v.querySelector('.mc-tm');
+    const ms_=ok?(long?1100:800):(long?2400:1600), q=v.querySelector('.quiz'), fb=v.querySelector('.mc-fb'), tm=v.querySelector('.mc-tm');
     q&&q.classList.add(ok?'ans-ok':'ans-ng');
-    if(fb)fb.innerHTML=(ok?`<b>${esc(title)}</b><small>もう一度押すとすぐ次へ</small>`:`<b>${sub.split('<br>')[0]}</b><small>あとでもう一度出ます</small>`);
+    const skip=long?'画面を押すとすぐ次へ':'もう一度押すとすぐ次へ';
+    if(fb)fb.innerHTML=(ok?`<b>${esc(title)}</b><small>${sub&&long?sub:skip}</small>`:`<b>${sub.split('<br>')[0]}</b><small>あとでもう一度出ます</small>`);
+    if(long)lrTap=true;
     if(tm){tm.style.setProperty('--d',ms_+'ms');void tm.offsetWidth;tm.classList.add('go')}
     clearTimeout(mT); mT=setTimeout(lrNext,ms_); return}
   showSheet(ok,title,sub,d);
