@@ -730,8 +730,10 @@ body.czmode .wrap{padding-bottom:300px!important}
 .czr.r2{grid-template-columns:repeat(9,minmax(0,1fr));padding:0 17px}
 .czr.r3{grid-template-columns:repeat(7,minmax(0,1fr)) 1.6fr;padding:0 17px}
 .czk{height:48px;border:0;border-radius:10px;background:#3d3d42;color:var(--fg);font:inherit;font-size:21px;font-weight:800;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;-webkit-user-select:none;user-select:none}
-.czk{position:relative}
-.czk.pr{background:#6a6a70}
+.czk{position:relative;box-shadow:0 3px 0 #1e1e21;transition:transform .16s cubic-bezier(.3,1.5,.5,1),box-shadow .16s,background .16s}
+.czk.del{box-shadow:0 3px 0 #18181a}
+/* press: the key sinks (moves down onto its shadow and shrinks a little), then springs back */
+.czk.pr{background:#6a6a70;transform:translateY(3px) scale(.94);box-shadow:0 0 0 #1e1e21;transition-duration:.06s}
 .czk.pr[data-k]::after{content:attr(data-k);position:absolute;left:50%;bottom:calc(100% + 4px);transform:translateX(-50%);width:calc(100% + 16px);min-width:44px;height:58px;border-radius:12px;background:#f2f2f3;color:#18181a;font-size:30px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.45);pointer-events:none;z-index:2}
 .czbx i.pop{animation:czpop .22s ease-out}
 @keyframes czpop{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
@@ -3410,7 +3412,7 @@ function renderQuiz0(){
     const typed=W.split('').map((c,i)=>fixed(i)?c:'');
     const n=W.length, bw=Math.max(18,Math.min(30,Math.floor(300/n)-3));
     const czx='<button class="czx" id="czx" aria-label="復習をやめる"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
-    const keys=r=>r.split('').map(c=>`<button class="czk" data-k="${c}" aria-label="${c}">${c}</button>`).join('');
+    const keys=r=>r.split('').map(c=>`<button class="czk no-press" data-k="${c}" aria-label="${c}">${c}</button>`).join('');
     v.innerHTML=`<div class="quiz czq">${head.replace('<div class="qhead">','<div class="qhead">'+czx)}
      <p class="czlab">穴埋め ・ 空いているところを英語で（最初の1文字はヒント）</p>
      <div class="czcard"><div class="czjp">${esc(d.jp)}</div>
@@ -3418,7 +3420,7 @@ function renderQuiz0(){
        <p class="czmsg" aria-live="polite"></p></div>
      <div class="czkb" role="group" aria-label="キーボード">
        <div class="czr">${keys('qwertyuiop')}</div><div class="czr r2">${keys('asdfghjkl')}</div>
-       <div class="czr r3">${keys('zxcvbnm')}<button class="czk del" id="czdel" aria-label="1文字消す"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M17 9l-6 6M11 9l6 6"/></svg></button></div>
+       <div class="czr r3">${keys('zxcvbnm')}<button class="czk del no-press" id="czdel" aria-label="1文字消す"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5H9l-6 7 6 7h12z"/><path d="M17 9l-6 6M11 9l6 6"/></svg></button></div>
        <button class="btn czskip" id="qskip">わからない</button></div></div>`;
     const bx=[...v.querySelectorAll('.czbx i')];
     const draw=()=>{const nx=typed.findIndex(t=>!t);bx.forEach((b,i)=>{if(!fixed(i))b.textContent=typed[i];b.classList.toggle('cur',i===nx)})};
