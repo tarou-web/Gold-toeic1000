@@ -1219,7 +1219,7 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 .mcd-t small{font-size:.8rem;color:var(--muted);font-weight:700}.mcd-t small b{color:var(--fg)}
 .mcd-t .rd-c{margin-top:4px}
 .rd-c .r{background:var(--red-s);color:var(--red-ink)}
-.mcdone .rd-list{max-height:280px}
+.mcdone .rd-list{max-height:230px}
 .rd-row .mk.r{background:var(--red);color:#18181a}
 .mc-r.ng{background:var(--red-s);align-items:flex-start;padding-top:8px;padding-bottom:8px}
 .mc-r.ng .mk{margin-top:3px}
@@ -3440,6 +3440,11 @@ function renderMc(){ try{ return renderMc0() } finally { qmodeSync(); fitMc() } 
 // shrink the 4択 text only as much as needed so all four choices stay above the bottom menu
 function fitMc(){
   const v=$('v-mc'), nav=document.querySelector('.bnav'); if(!v||v.hidden||!nav)return;
+  const dn=v.querySelector('.mcdone');
+  if(dn){ // done screen: shrink the scroll box so the buttons stay above the menu bar
+    const L=dn.querySelector('.rd-list'),B=dn.querySelector('.rd-btns'); if(!L||!B)return; L.style.maxHeight='';
+    const over=B.getBoundingClientRect().bottom-(nav.getBoundingClientRect().top-12);
+    if(over>0)L.style.maxHeight=Math.max(138,L.getBoundingClientRect().height-over)+'px'; return}
   v.style.setProperty('--mcf',1); const last=v.querySelector('.opts .opt:last-child'); if(!last)return;
   const lim=nav.getBoundingClientRect().top-10;
   for(let f=1;f>=.72;f-=.04){v.style.setProperty('--mcf',f.toFixed(2)); if(last.getBoundingClientRect().bottom+scrollY<=lim)break}
