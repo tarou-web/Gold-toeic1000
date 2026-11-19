@@ -1870,6 +1870,50 @@ header .kbar{display:none}
 .gs-btns .two button{height:52px;border-radius:16px;border:1px solid #2e2e33;border-bottom-width:4px;background:#18181b;color:#c9c9ce;font:inherit;font-size:.9rem;cursor:pointer}
 .gs-btns .two .send{color:#ffb950}
 @media (max-height:700px){.gp-opts button{height:60px}.gp-panel{height:128px}.gp-word{font-size:2rem}.gm-start{height:58px}.gm-lv .v{font-size:1.5rem}}
+
+/* game top: stats bar, ‹ › rows, records sheet */
+.gm-stats{position:relative;margin-top:6px;height:58px;flex:none;border-radius:14px;background:#111113;border:1px solid #2e2e33;display:flex;align-items:center;padding-left:4px}
+.gm-st{flex:1;min-width:0;text-align:center;white-space:nowrap}
+.gm-st+.gm-st{border-left:1px solid #2e2e33}
+.gm-st small{display:flex;align-items:center;justify-content:center;gap:4px;font-size:.62rem;color:#8f8670}
+.gm-st b{font-family:'Orbitron',var(--f-en),sans-serif;font-size:1.2rem;font-weight:900;color:#ffe680;text-shadow:0 0 4px rgba(245,197,24,.8),0 0 12px rgba(245,197,24,.35)}
+.gm-st span{font-size:.66rem;color:#c9c9ce;margin-left:3px}
+.gm-recb{flex:none;align-self:stretch;width:60px;margin-left:4px;border:0;border-left:1px solid #3a3420;border-radius:0 13px 13px 0;background:#16140c;color:#f5c518;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:inherit;font-size:.68rem;cursor:pointer}
+.gm-stage{justify-content:center}
+.gm-figw{position:relative;height:clamp(100px,calc(100% - 44px),250px);aspect-ratio:221/320;z-index:2;margin-bottom:-14px}
+.gm-figw .gm-fig{height:100%;margin:0}
+.gm-hang{position:absolute;right:-16px;bottom:16%;width:46px;height:46px;border-radius:50%;border:2px solid #3a3a40;background:#1c1c1f;color:#f2f2f3;display:grid;place-items:center;padding:0;z-index:4;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)}
+.gm-hang svg{width:22px;height:22px}
+.gm-hang:active{transform:scale(.92)}
+.wardrobe.ingame{right:16px;top:auto;bottom:calc(96px + env(safe-area-inset-bottom,0px));max-height:calc(100% - 220px);overflow:auto;z-index:9}
+.gm-rows{position:relative;margin-top:12px;display:flex;flex-direction:column;gap:6px;flex:none}
+.gm-row{height:52px;border-radius:16px;background:#141310;border:1.5px solid #d9b01a;box-shadow:0 0 4px rgba(245,197,24,.6),0 0 16px rgba(245,197,24,.22);display:grid;grid-template-columns:52px 1fr 52px;align-items:center}
+.gm-row button{height:100%;border:0;background:none;color:#d9b01a;display:grid;place-items:center;padding:0;cursor:pointer}
+.gm-row button:disabled{opacity:.25;cursor:default}
+.gm-row .v{font-size:1.2rem;font-weight:900;line-height:1.15;color:#fff3b8;text-shadow:0 0 4px rgba(245,197,24,.8),0 0 12px rgba(245,197,24,.35);text-align:center}
+.gm-row .s{font-size:.62rem;color:#8f8670;text-align:center}
+.gm-start{margin-top:10px;flex:none;height:64px;letter-spacing:10px}
+.gm-rec{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+.gm-rec[hidden]{display:none}
+.gm-recp{width:100%;max-width:520px;max-height:86vh;overflow:auto;box-sizing:border-box;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px));border-radius:24px 24px 0 0;background:#141416;border-top:1.5px solid #d9b01a;box-shadow:0 -8px 30px rgba(245,197,24,.12);color:#f2f2f3}
+.gm-rech{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.gm-rech b{font-size:1.15rem}
+.gm-rech button{width:40px;height:40px;border-radius:50%;border:1px solid #2e2e33;background:#1c1c1f;color:#c9c9ce;display:grid;place-items:center;cursor:pointer}
+.gm-rbig{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.gm-rbig div{border-radius:14px;background:#111113;border:1px solid #2e2e33;padding:10px 6px;text-align:center}
+.gm-rbig small{display:block;font-size:.66rem;color:#8f8670}
+.gm-rbig b{font-family:'Orbitron',var(--f-en),sans-serif;font-size:1.4rem;color:#ffe680}
+.gm-rbig span{display:block;font-size:.62rem;color:#8f8670}
+.gm-rh{margin:16px 0 8px;font-size:.8rem;color:#d9b01a}
+.gm-rtab{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #2e2e33;font-size:.82rem}
+.gm-rtab th,.gm-rtab td{padding:10px 8px;text-align:center;border-bottom:1px solid #2e2e33}
+.gm-rtab tr:last-child th,.gm-rtab tr:last-child td{border-bottom:0}
+.gm-rtab thead th{background:#111113;color:#8f8670;font-size:.7rem;font-weight:700}
+.gm-rtab tbody th{color:#c9c9ce;font-weight:800}
+.gm-rtab td b{font-family:'Orbitron',var(--f-en),sans-serif;color:#ffe680}
+.gm-rtab td.now{background:#16140c}
+.gm-rnote{margin-top:10px;font-size:.72rem;color:#8f8670;line-height:1.6}
+@media (max-height:700px){.gm-row{height:46px}.gm-stats{height:52px}.gm-start{height:56px}}
 /* ---- game: online (test build plays against a CPU) ---- */
 .gplay[data-s=wait] .g-on,.gplay[data-s=found] .g-on,.gplay[data-s=duel] .g-on,.gplay[data-s=dres] .g-on{display:flex}
 .g-on{overflow:hidden}
@@ -2232,17 +2276,25 @@ header .kbar{display:none}
       <svg viewBox="0 0 390 700" preserveAspectRatio="xMidYMin meet"><g fill="none" stroke="rgba(245,197,24,0.10)" stroke-width="2"><circle cx="195" cy="380" r="150"/><circle cx="195" cy="380" r="190"/><circle cx="195" cy="380" r="235" stroke-dasharray="4 10"/></g><g fill="#f5c518"><circle cx="40" cy="230" r="3.5" opacity=".8"/><circle cx="62" cy="200" r="3.5" opacity=".4"/><circle cx="88" cy="176" r="3.5" opacity=".8"/><circle cx="118" cy="158" r="3.5" opacity=".4"/><circle cx="150" cy="147" r="3.5" opacity=".8"/><circle cx="240" cy="147" r="3.5" opacity=".4"/><circle cx="272" cy="158" r="3.5" opacity=".8"/><circle cx="302" cy="176" r="3.5" opacity=".4"/><circle cx="328" cy="200" r="3.5" opacity=".8"/><circle cx="350" cy="230" r="3.5" opacity=".4"/></g><g fill="#ffe680" opacity=".55"><path d="M48 330l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/><path d="M338 300l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z"/><path d="M324 470l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M60 480l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></g><g font-family="Nunito,sans-serif" font-weight="900" fill="rgba(245,197,24,0.07)"><text x="14" y="420" font-size="58">A</text><text x="330" y="410" font-size="52">Z</text><text x="300" y="560" font-size="40">E</text><text x="24" y="575" font-size="44">Q</text></g></svg>
     </div>
     <div class="gm-bar"><b id="gmTitle">ミーモ・タイムアタック</b><button class="gm-pill" id="gmRank" aria-label="今週の順位"><svg viewBox="0 0 24 24" width="15" height="15" fill="#f5c518" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0zM10 14h4v3h-4zM8 17h8v3H8z"/></svg><span id="gmRankT">--位</span></button></div>
-    <div class="gm-seg" role="tablist" aria-label="モード"><button role="tab" data-m="read">読んで4択</button><button role="tab" data-m="listen">聞いて4択</button></div>
-    <div class="gm-lv"><button id="gmPrev" aria-label="前のレベル"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div><div class="k">今週の問題</div><div class="v" id="gmLv">中級</div><div class="s" id="gmReset">リセットまで 3日</div></div><button id="gmNext" aria-label="次のレベル"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
-    <div class="gm-chal" id="gmChal" hidden></div>
-    <div class="gm-stage">
-      <div class="gm-bub" id="gmBub">がんばろ！</div>
-      <div class="gm-fig" id="gmFig"></div>
-      <div class="gm-ring" aria-hidden="true"></div>
-      <div class="gm-plate"><span>あなた</span><span><small>ベスト</small><b id="gmBest">--</b></span></div>
+    <div class="gm-stats">
+      <div class="gm-st"><small><svg viewBox="0 0 24 24" width="13" height="13" fill="#ff9f0a" aria-hidden="true"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-3 1.5-4.5 2.5-6 .3 2 1.3 3 2.5 3 0-3-1-5 0-8z"/></svg>連勝中</small><b id="gmWs">0</b><span>連勝</span></div>
+      <div class="gm-st"><small><svg viewBox="0 0 24 24" width="13" height="13" fill="#f5c518" aria-hidden="true"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.6 7-6.2-3.8-6.2 3.8 1.6-7L2 9.5l7.1-.6z"/></svg>最大</small><b id="gmMax">--</b><span>問</span></div>
+      <div class="gm-st"><small><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f5c518"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#b38f00" stroke-width="2"/></svg>コイン</small><b id="gmCoin">0</b></div>
+      <button class="gm-recb" id="gmRecB" aria-label="記録を見る"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>記録</button>
     </div>
-    <div class="gm-who" role="radiogroup" aria-label="だれと遊ぶ"><button role="radio" data-w="solo">ひとりで</button><button role="radio" data-w="friend">友達と</button><button role="radio" data-w="online">オンライン<small>準備中</small></button></div>
-    <button class="gm-start" id="gmStart">スタート</button>
+    <div class="gm-chal" id="gmChal" hidden></div>
+    <div class="gm-stage" id="gmStage">
+      <div class="gm-bub" id="gmBub">がんばろ！</div>
+      <div class="gm-figw"><div class="gm-fig" id="gmFig"></div><button class="gm-hang" id="gmHang" aria-label="着せ替え"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7.5a2.3 2.3 0 1 1 2.3-2.3c0 1.3-1 1.7-2.3 2.6L3 14.6c-1 .8-.4 2.4.9 2.4h16.2c1.3 0 1.9-1.6.9-2.4L12 8.1"/></svg></button></div>
+      <div class="gm-ring" aria-hidden="true"></div>
+    </div>
+    <div class="gm-rows">
+      <div class="gm-row" role="group" aria-label="モード"><button id="gmModeP" aria-label="前のモード"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div><div class="v" id="gmMode" aria-live="polite">リーディング</div><div class="s" id="gmModeS">読んで4択</div></div><button id="gmModeN" aria-label="次のモード"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
+      <div class="gm-row" role="group" aria-label="レベル"><button id="gmLvP" aria-label="前のレベル"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div><div class="v" id="gmLv" aria-live="polite">中級</div><div class="s" id="gmLvS">今週の問題</div></div><button id="gmLvN" aria-label="次のレベル"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
+      <div class="gm-row" role="group" aria-label="だれと"><button id="gmWhoP" aria-label="前のだれと"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div><div class="v" id="gmWho" aria-live="polite">ひとりで</div><div class="s" id="gmWhoS">60秒で何問とけるか</div></div><button id="gmWhoN" aria-label="次のだれと"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
+    </div>
+    <button class="gm-start" id="gmStart">プレイ</button>
+    <div class="gm-rec" id="gmRec" hidden><div class="gm-recp" role="dialog" aria-modal="true" aria-labelledby="gmRecT"><div class="gm-rech"><b id="gmRecT">記録</b><button id="gmRecX" aria-label="閉じる"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div id="gmRecBody"></div></div></div>
   </div>
 </section>
 
@@ -4357,7 +4409,7 @@ $('navGame').onclick=()=>{renderGameTop();openNavView('gamev');navOn('navGame')}
   const ORDER=['navHome','navLib','navNew','navShop','navGame','navSet'];
   const viewOf=id=>({navHome:document.querySelector('.wrap'),navLib:$('libv'),navNew:$('deckv'),navShop:$('shopnv'),navGame:$('gamev'),navSet:$('setv')})[id];
   const curNav=()=>{const b=document.querySelector('.bnav button.on');return b?b.id:'navHome'};
-  const overlayOpen=()=>['askv','shopv','premv','bv','gplay'].some(id=>{const v=$(id);return v&&v.classList.contains('open')})||($('wardrobe')&&!$('wardrobe').hidden)||document.querySelector('.sheet.open,.optsheet.open,dialog[open]');
+  const overlayOpen=()=>['askv','shopv','premv','bv','gplay'].some(id=>{const v=$(id);return v&&v.classList.contains('open')})||($('wardrobe')&&!$('wardrobe').hidden)||($('gmRec')&&!$('gmRec').hidden)||document.querySelector('.sheet.open,.optsheet.open,dialog[open]');
   const SKIP='#gplay,#scene,.tabs,.bnav,.dk-seg,input,textarea,select,[contenteditable],.sn-shelf,.ph-thumbs,#askv,#shopv,#bv,.wardrobe,.modal,.sheet';
   const scrollsX=el=>{for(let e=el;e&&e!==document.body;e=e.parentElement){const cs=getComputedStyle(e);if(/(auto|scroll)/.test(cs.overflowX)&&e.scrollWidth>e.clientWidth+2)return true}return false};
   const reduce=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -4556,7 +4608,9 @@ header(); setTab(tab); initSync(); initAcct();
 // ===== game: ミーモ・タイムアタック (60 seconds, same questions for everyone each week) =====
 (function(){
   const GKEY=KEY+'-game', LV=['初級','中級','上級'], TOTAL=60000;
-  let G={mode:'read',lv:1,who:'solo',best:{},wk:{},rank:{},pid:''};
+  // At release set GAME_ONLINE_TEST=false: online goes back to 「準備中」.
+  const GAME_ONLINE_TEST=true;
+  let G={mode:'read',lv:1,who:'solo',best:{},wk:{},rank:{},pid:'',ws:0,wsMax:0,dw:0,dl:0,plays:0};
   try{Object.assign(G,JSON.parse(localStorage.getItem(GKEY)||'{}'))}catch(e){}
   if(!G.pid){G.pid=Array.from(crypto.getRandomValues(new Uint8Array(10)),b=>(b%36).toString(36)).join('')}
   const gSave=()=>{try{localStorage.setItem(GKEY,JSON.stringify(G))}catch(e){}};
@@ -4617,30 +4671,66 @@ header(); setTab(tab); initSync(); initAcct();
   }
   const rankNow=key=>{const x=G.rank[key];return x&&x.wk===weekNo()?x:null};
 
-  // ---- top screen (M1) ----
+  // ---- top screen: stats bar, ‹ › rows (mode / level / who), records ----
+  const WHO={solo:'ひとりで',friend:'友達と',online:'オンライン'};
+  const whoList=()=>GAME_ONLINE_TEST?['solo','friend','online']:['solo','friend'];
+  const whoNow=()=>GC?'friend':(whoList().includes(G.who)?G.who:'solo');
+  const cyc=(arr,v,d)=>arr[((arr.indexOf(v)<0?0:arr.indexOf(v))+d+arr.length)%arr.length];
   function renderTop(){
-    const m=curMode(),lv=curLv(),key=setKey(m,lv),best=G.best[key]||0;
-    document.querySelectorAll('#gamev .gm-seg button').forEach(b=>b.setAttribute('aria-selected',b.dataset.m===m));
-    $('gmLv').textContent=LV[lv]; $('gmReset').textContent=GC?'友達と同じ問題':`リセットまで ${resetDays()}日`;
-    $('gmPrev').disabled=!!GC||lv<=0; $('gmNext').disabled=!!GC||lv>=2;
-    $('gmBest').textContent=best||'--';
+    const m=curMode(),lv=curLv(),key=setKey(m,lv),best=G.best[key]||0,w=whoNow();
     const rk=rankNow(key); $('gmRankT').textContent=rk?`${rk.r}位`:'--位';
+    const mx=Math.max(0,...Object.values(G.best||{}).map(Number).filter(x=>x>0));
+    $('gmWs').textContent=G.ws||0; $('gmMax').textContent=mx||'--';
+    $('gmCoin').textContent=(+(typeof S!=='undefined'&&S.coins)||0).toLocaleString();
+    $('gmMode').textContent=m==='listen'?'リスニング':'リーディング'; $('gmModeS').textContent=m==='listen'?'聞いて4択':'読んで4択';
+    $('gmLv').textContent=LV[lv]; $('gmLvS').textContent=GC?'友達と同じ問題':`今週の問題・あと${resetDays()}日`;
+    $('gmWho').textContent=WHO[w];
+    $('gmWhoS').textContent=w==='solo'?'60秒で何問とけるか':w==='friend'?(GC?`友達の ${GC.score}問 に挑戦`:'終わったら記録を友達に送る'):'CPUとテスト対戦';
+    ['gmModeP','gmModeN','gmLvP','gmLvN'].forEach(id=>$(id).disabled=!!GC);
     $('gmBub').textContent=GC?`${GC.score}問に勝てる？`:best?`ベスト ${best}問を こえよう！`:'まずは1回 やってみよう！';
     $('gmChal').hidden=!GC; if(GC)$('gmChal').innerHTML=`友達の記録 <b>${GC.score}問</b> に挑戦！ <button id="gmChalX" style="margin-left:6px;border:0;background:none;color:#8f8670;font:inherit;text-decoration:underline;cursor:pointer">やめる</button>`;
     if(GC)$('gmChalX').onclick=()=>{GC=null;renderTop()};
-    document.querySelectorAll('#gamev .gm-who button').forEach(b=>b.setAttribute('aria-checked',b.dataset.w===(GC?'friend':G.who)));
     $('gmFig').innerHTML=figHTML();
-    $('gmStart').textContent=(!GC&&G.who==='online'&&GAME_ONLINE_TEST)?'対戦をさがす':'スタート';
+    $('gmStart').textContent='プレイ';
   }
   window.renderGameTop=renderTop;
-  document.querySelectorAll('#gamev .gm-seg button').forEach(b=>b.onclick=()=>{if(GC)return;G.mode=b.dataset.m;gSave();renderTop()});
-  $('gmPrev').onclick=()=>{if(G.lv>0){G.lv--;gSave();renderTop()}};
-  $('gmNext').onclick=()=>{if(G.lv<2){G.lv++;gSave();renderTop()}};
-  document.querySelectorAll('#gamev .gm-who button').forEach(b=>b.onclick=()=>{
-    if(b.dataset.w==='online'&&!GAME_ONLINE_TEST){toast('<div><strong>オンライン対戦は準備中です</strong><span>使う人が増えたら、ほかの人とすぐ対戦できるようになります</span></div>');return}
-    if(GC&&b.dataset.w!=='friend')GC=null; G.who=b.dataset.w; gSave(); renderTop()});
+  const mv=f=>()=>{uiClick();f();gSave();renderTop()};
+  $('gmModeP').onclick=$('gmModeN').onclick=mv(()=>{if(!GC)G.mode=G.mode==='listen'?'read':'listen'});
+  $('gmLvP').onclick=mv(()=>{if(!GC)G.lv=(G.lv+2)%3}); $('gmLvN').onclick=mv(()=>{if(!GC)G.lv=(G.lv+1)%3});
+  const whoMove=d=>mv(()=>{const nw=cyc(whoList(),whoNow(),d); if(GC&&nw!=='friend')GC=null; G.who=nw});
+  $('gmWhoP').onclick=whoMove(-1); $('gmWhoN').onclick=whoMove(1);
   $('gmRank').onclick=()=>{const rk=rankNow(setKey(curMode(),curLv()));
     toast(rk?`<div><strong>今週 ${rk.n}人中 ${rk.r}位</strong><span>${LV[curLv()]}・${curMode()==='listen'?'聞いて':'読んで'}4択の記録です</span></div>`:'<div><strong>今週の順位はまだありません</strong><span>1回遊ぶと、同じ問題を遊んだ人の中での順位が出ます</span></div>')};
+  // records sheet
+  function renderRec(){
+    const cm=curMode(),cl=curLv(),rk=rankNow(setKey(cm,cl));
+    const cell=(m,lv)=>{const v=G.best[setKey(m,lv)]||0;return `<td class="${m===cm&&lv===cl?'now':''}">${v?`<b>${v}</b> 問`:'--'}</td>`};
+    $('gmRecBody').innerHTML=`<div class="gm-rbig">
+      <div><small>連勝中</small><b>${G.ws||0}</b><span>最高 ${G.wsMax||0}連勝</span></div>
+      <div><small>対戦</small><b>${G.dw||0}</b><span>勝ち ・ ${G.dl||0}負け</span></div>
+      <div><small>遊んだ回数</small><b>${G.plays||0}</b><span>回</span></div></div>
+      <div class="gm-rh">ベスト記録（60秒で解けた数）</div>
+      <table class="gm-rtab"><thead><tr><th></th><th>リーディング</th><th>リスニング</th></tr></thead><tbody>
+      ${[0,1,2].map(lv=>`<tr><th>${LV[lv]}</th>${cell('read',lv)}${cell('listen',lv)}</tr>`).join('')}</tbody></table>
+      <div class="gm-rh">今週の順位</div>
+      <div class="gm-rnote">${rk?`${LV[cl]}・${cm==='listen'?'リスニング':'リーディング'}：<b style="color:#ffe680">${rk.n}人中 ${rk.r}位</b>`:'まだありません。1回遊ぶと、同じ問題を遊んだ人の中での順位が出ます。'}<br>連勝は、オンライン対戦と友達との勝負で数えます。引き分けでは変わりません。</div>`;
+  }
+  document.body.appendChild($('gmRec'));
+  function openRec(){renderRec();$('gmRec').hidden=false;setTimeout(()=>$('gmRecX').focus(),0)}
+  function closeRec(){$('gmRec').hidden=true;$('gmRecB').focus()}
+  $('gmRecB').onclick=()=>{uiClick();openRec()}; $('gmRecX').onclick=closeRec;
+  $('gmRec').onclick=e=>{if(e.target===$('gmRec'))closeRec()};
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('gmRec').hidden)closeRec()});
+  // dress-up from the game top: borrow the home wardrobe panel
+  const wd=$('wardrobe'), wdHome=wd.parentNode;
+  const wdBack=()=>{if(wd.parentNode!==wdHome){wdHome.appendChild(wd);wd.classList.remove('ingame')}};
+  $('hangerBtn').addEventListener('click',wdBack,true);
+  $('gmHang').onclick=e=>{e.stopPropagation();
+    if(!Object.keys((typeof S!=='undefined'&&S.owned)||{}).length){toast('<div><strong>まだ着せ替えできる物がありません</strong><span>ショップで服や小物を買うと、ここで着せ替えできます</span></div>');return}
+    if(!wd.hidden&&wd.parentNode!==wdHome){closeWardrobe();return}
+    $('gamev').querySelector('.gm-top').appendChild(wd); wd.classList.add('ingame'); openWardrobe()};
+  wd.addEventListener('click',()=>setTimeout(()=>{if($('gamev').classList.contains('open'))$('gmFig').innerHTML=figHTML()},0));
+  const winRec=win=>{if(win===null)return; G.ws=win?(G.ws||0)+1:0; G.wsMax=Math.max(G.wsMax||0,G.ws); if(win)G.dw=(G.dw||0)+1; else G.dl=(G.dl||0)+1};
 
   // ---- play (M2 → M3 → M5) ----
   const gp=$('gplay'); let R=null, timers=[];
@@ -4702,7 +4792,8 @@ header(); setTab(tab); initSync(); initAcct();
   function finish(){const r=R; cancelAnimationFrame(r.raf); r.left=0; drawClock(); r.lock=true; gp.classList.add('lock'); gS('up');
     try{speechSynthesis.cancel()}catch(e){}
     const prev=G.best[r.key]||0, wk=weekNo()+'-'+r.key, isBest=r.score>prev;
-    if(isBest)G.best[r.key]=r.score; const rankP=sendRank(r.key,r.score); G.wk[wk]=Math.max(G.wk[wk]||0,r.score); gSave();
+    if(isBest)G.best[r.key]=r.score; const rankP=sendRank(r.key,r.score); G.wk[wk]=Math.max(G.wk[wk]||0,r.score);
+    G.plays=(G.plays||0)+1; if(GC)winRec(r.score>GC.score?true:r.score<GC.score?false:null); gSave();
     later(()=>{gp.classList.remove('last');gp.dataset.s='res';renderRes(r,prev,isBest,rankP);if(isBest&&prev)gS('best')},1100)}
   function renderRes(r,prev,isBest,rankP){
     const avg=r.times.length?(r.times.reduce((a,b)=>a+b,0)/r.times.length/1000).toFixed(1):'-';
@@ -4730,7 +4821,7 @@ header(); setTab(tab); initSync(); initAcct();
     try{await navigator.clipboard.writeText(text+' '+url);toast('<div><strong>挑戦状のリンクをコピーしました</strong><span>友達に送ると、同じ問題で勝負できます</span></div>')}
     catch(e){toast('<div><strong>リンクをコピーできませんでした</strong><span>'+esc(url)+'</span></div>')}
   }
-  $('gmStart').onclick=()=>{uiClick();if(!GC&&G.who==='online'&&GAME_ONLINE_TEST)startOnline();else start()};
+  $('gmStart').onclick=()=>{uiClick();if(whoNow()==='online')startOnline();else start()};
   $('gpQuit').onclick=closePlay;
   $('gpPass').onclick=pass;
   document.addEventListener('keydown',e=>{if(!gp.classList.contains('open'))return;
@@ -4739,8 +4830,6 @@ header(); setTab(tab); initSync(); initAcct();
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&R&&gp.dataset.s==='play'){R.left=0}});
 
   // ---- online (test build: the opponent is a CPU) ----
-  // At release set GAME_ONLINE_TEST=false: the online button goes back to 「準備中」.
-  const GAME_ONLINE_TEST=true;
   const gOn=$('gOn'); let O=null;
   const cpuFig=()=>`<span class="mfig">${fig('','','','')}</span>`;
   const xSvg='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
@@ -4858,7 +4947,7 @@ header(); setTab(tab); initSync(); initAcct();
       later(()=>{if(!O||O.op.left<=0)return;O.i++;dShow();O.t=performance.now()},1000)}}
   function dEnd(){const o=O; o.ended=true; o.paused=true; o.lock=true; gp.classList.add('lock'); o.me.left=Math.max(0,o.me.left); o.op.left=Math.max(0,o.op.left); dClock();
     try{speechSynthesis.cancel()}catch(e){}
-    const win=o.op.left<=0; gS('up');
+    const win=o.op.left<=0; gS('up'); G.plays=(G.plays||0)+1; winRec(win); gSave();
     later(()=>{if(O!==o)return; gp.classList.remove('last','dng','dng-op','lock'); gOn.classList.remove('turn-op'); gp.dataset.s='dres';
       if(win)gS('best');
       const miss=o.miss.slice(0,4);
@@ -4871,7 +4960,6 @@ header(); setTab(tab); initSync(); initAcct();
       $('gwAgain').onclick=()=>{uiClick();startOnline()};
       $('gwEnd').onclick=closePlay;
     },1100)}
-  if(GAME_ONLINE_TEST){const ob=document.querySelector('#gamev .gm-who button[data-w=online]');if(ob){ob.innerHTML='オンライン<small>テスト・CPU</small>';ob.classList.add('test')}}
   document.addEventListener('keydown',e=>{if(!gp.classList.contains('open')||gp.dataset.s!=='duel')return;
     if(/^[1-4]$/.test(e.key))dAnswer(+e.key-1)});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&O&&gp.dataset.s==='duel'&&O.turn==='me'){O.me.left=0}});
