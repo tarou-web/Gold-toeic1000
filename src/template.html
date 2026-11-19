@@ -4867,9 +4867,9 @@ header(); setTab(tab); initSync(); initAcct();
         <div class="gw-st"><div class="a ${win?'lost':'won'}"><div class="fig">${cpuFig()}</div></div><div class="b ${win?'won':'lost'}"><div class="fig">${figHTML()}</div></div></div>
         <div class="gf-pl"><div><small>相手（CPU）</small><b>${o.op.s}問 正解</b><span>まちがい ${o.op.ng}</span></div><div class="me"><small>あなた</small><b>${o.me.s}問 正解</b><span>まちがい ${o.me.ng} ・ パス ${o.me.ps}</span></div></div>
         ${miss.length?`<div class="gs-miss" style="position:relative;margin-top:12px"><h4>まちがえた・パスした単語</h4>${miss.map(x=>`<div><b>${esc(x.en)}</b><span>${esc(x.ja)}</span></div>`).join('')}</div>`:''}
-        <div class="gs-btns" style="position:relative;bottom:auto;margin-top:auto"><button class="again" id="gwAgain">もう一度対戦</button><div class="two"><button id="gwTop">設定にもどる</button><button id="gwEnd">おわる</button></div></div>`;
+        <div class="gs-btns" style="position:relative;bottom:auto;margin-top:auto"><button class="again" id="gwAgain">もう一度対戦</button><div class="two" style="grid-template-columns:1fr"><button id="gwEnd">おわる</button></div></div>`;
       $('gwAgain').onclick=()=>{uiClick();startOnline()};
-      $('gwTop').onclick=closePlay; $('gwEnd').onclick=()=>{closePlay();try{closeNavViews()}catch(e){}};
+      $('gwEnd').onclick=closePlay;
     },1100)}
   if(GAME_ONLINE_TEST){const ob=document.querySelector('#gamev .gm-who button[data-w=online]');if(ob){ob.innerHTML='オンライン<small>テスト・CPU</small>';ob.classList.add('test')}}
   document.addEventListener('keydown',e=>{if(!gp.classList.contains('open')||gp.dataset.s!=='duel')return;
