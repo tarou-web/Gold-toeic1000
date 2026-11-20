@@ -1892,6 +1892,21 @@ header .kbar{display:none}
 @media (max-height:700px){.gp-opts button{height:60px}.gp-panel{height:128px}.gp-word{font-size:2rem}.gm-start{height:58px}.gm-lv .v{font-size:1.5rem}}
 
 
+
+/* clocks: red from 0:10, a heartbeat every second from 0:05 (T4) */
+.gp-clock b,.gd-c b{display:inline-block;transform-origin:30% 60%}
+.gd-c.low b{color:#ff9aaa}
+.gplay .gd-c.on.low{background:#1a070c;border-color:#ff4f6d;box-shadow:0 0 6px rgba(255,79,109,.6),0 0 22px rgba(255,79,109,.25)}
+.gplay .gd-c.on.low small{color:#ff9aaa}
+.gplay .gd-c.on.low b{color:#ffd6dc;text-shadow:0 0 6px rgba(255,79,109,.9),0 0 18px rgba(255,79,109,.45)}
+.gplay.last .gd-m.on .beam{background:rgba(255,79,109,.16)}
+.gplay.last .gd-m.on .glow{background:rgba(255,79,109,.4)}
+.gbeat{animation:gbeat 1s ease-out}
+@keyframes gbeat{0%,100%{transform:scale(1)}12%{transform:scale(1.22)}24%{transform:scale(1.02)}36%{transform:scale(1.14)}55%{transform:scale(1)}}
+.g-edge{position:absolute;inset:0;pointer-events:none;opacity:0;box-shadow:inset 0 0 90px rgba(255,40,70,.6);z-index:60}
+.g-edge.gbeat{animation:gedge 1s ease-out}
+@keyframes gedge{0%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.gbeat,.g-edge.gbeat{animation:none}}
 /* waiting screen (P6): two lanes of this week's words drift by */
 .gw-cone{position:absolute;left:50%;top:40px;transform:translateX(-50%);width:300px;height:56%;background:rgba(245,197,24,.08);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);pointer-events:none}
 .gw-stage{position:relative;flex:1;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
@@ -2344,6 +2359,7 @@ header .kbar{display:none}
 </section>
 
 <div class="gplay" id="gplay" data-s="ready" role="dialog" aria-modal="true" aria-label="ミーモ・タイムアタック">
+  <div class="g-edge" id="gEdge" aria-hidden="true"></div>
   <div class="gp-beam l" aria-hidden="true"></div><div class="gp-beam r" aria-hidden="true"></div>
   <div class="gscr g-ready">
     <div style="position:relative;margin-top:60px;text-align:center"><span class="gr-tag" id="grTag">中級 ・ 読んで4択</span><div style="margin-top:10px;font-size:.85rem;color:#8f8670">持ち時間</div><div style="font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;color:#ffe680">1:00</div></div>
@@ -4799,7 +4815,10 @@ header(); setTab(tab); initSync(); initAcct();
     if(R.left>10000){const sec=Math.ceil(R.left/1000);if(sec!==R.lastSec){R.lastSec=sec;gS(sec%2?'tick':'tock')}}
     else{const h=Math.ceil(R.left/500);if(h!==R.lastHalf){R.lastHalf=h;gS('fast')}}
     R.raf=requestAnimationFrame(loop)}
-  function drawClock(){const l=Math.max(0,R.left);$('gpTime').textContent=mmss(l);
+  // T4: from 0:05 the number and the screen edge beat once per second
+  const gBeat=el=>{if(!el)return;el.classList.remove('gbeat');void el.offsetWidth;el.classList.add('gbeat')};
+  const beatSec=(o,l,el)=>{if(l>5000||l<=0)return;const s=Math.ceil(l/1000);if(s===o.beatSec)return;o.beatSec=s;gBeat(el);gBeat($('gEdge'))};
+  function drawClock(){const l=Math.max(0,R.left);$('gpTime').textContent=mmss(l); beatSec(R,l,$('gpTime'));
     const on=Math.ceil(l/6000); $('gpMeter').querySelectorAll('i').forEach((x,i)=>x.classList.toggle('on',i<on));
     gp.classList.toggle('last',l<=10000)}
   function q(){if(R.i>=R.qs.length){R.qs=R.qs.concat(makeQs(R.lv,R.seed+R.i));}return R.qs[R.i]}
@@ -4934,8 +4953,9 @@ header(); setTab(tab); initSync(); initAcct();
     dClock(); if(O.me.left<=0||O.op.left<=0){dEnd();return}
     O.raf=requestAnimationFrame(dLoop)}
   function dClock(){for(const [w,id] of [['me','gdCm'],['op','gdCo']]){const c=$(id);if(!c)continue;
-      c.querySelector('b').textContent=mmss(O[w].left); c.classList.toggle('on',O.turn===w)}
-    gp.classList.toggle('last',O[O.turn].left<=10000)}
+      c.querySelector('b').textContent=mmss(O[w].left); c.classList.toggle('on',O.turn===w); c.classList.toggle('low',O[w].left<=10000)}
+    gp.classList.toggle('last',O[O.turn].left<=10000);
+    if(!O.paused){const a=$(O.turn==='me'?'gdCm':'gdCo');if(a)beatSec(O,Math.max(0,O[O.turn].left),a.querySelector('b'))}}
   function dFx(){gp.classList.remove('dng','dng-op');$('gdPanel').classList.remove('ok','ng');
     for(const id of ['gdCm','gdCo'])$(id).classList.remove('hit');
     for(const id of ['gdMm','gdMo'])$(id).classList.remove('happy','sad');
@@ -4944,7 +4964,7 @@ header(); setTab(tab); initSync(); initAcct();
     $('gdMm').classList.toggle('on',me); $('gdMo').classList.toggle('on',!me);
     gOn.classList.toggle('turn-op',!me); $('gdLock').textContent='相手が答えています';
     const b=$('gdBub'); b.className='gd-bub'+(me?' me':''); b.textContent=me?'あなたの番！':'相手の番…';
-    O.lastSec=0;O.lastHalf=0; dShow()}
+    O.lastSec=0;O.lastHalf=0;O.beatSec=0; dShow()}
   function dShow(){if(!O||O.ended)return; const x=dq(),me=O.turn==='me'; dFx();
     $('gdLock').textContent='相手が答えています'; {const b=$('gdBub'); b.className='gd-bub'+(me?' me':''); b.textContent=me?'あなたの番！':'相手の番…'} O.lock=!me; gp.classList.toggle('lock',!me);
     if(O.m==='listen'&&me){$('gdAsk').textContent='聞こえた単語の意味は？';
