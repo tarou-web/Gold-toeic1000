@@ -1871,6 +1871,29 @@ header .kbar{display:none}
 .gs-btns .two .send{color:#ffb950}
 @media (max-height:700px){.gp-opts button{height:60px}.gp-panel{height:128px}.gp-word{font-size:2rem}.gm-start{height:58px}.gm-lv .v{font-size:1.5rem}}
 
+
+/* waiting screen (P6): two lanes of this week's words drift by */
+.gw-cone{position:absolute;left:50%;top:40px;transform:translateX(-50%);width:300px;height:56%;background:rgba(245,197,24,.08);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);pointer-events:none}
+.gw-stage{position:relative;flex:1;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.gw-stage .fig{position:relative;height:clamp(110px,calc(100% - 30px),250px);aspect-ratio:221/320;z-index:2;margin-bottom:-14px}
+.gw-stage .fig .mfig{width:100%;height:100%}
+.gw-stage .ring{width:210px;height:30px;border-radius:50%;background:#16140c;border:2px solid #d9b01a;box-shadow:0 0 8px rgba(245,197,24,.5),0 0 24px rgba(245,197,24,.2)}
+.gw-s{position:relative;margin-top:16px;text-align:center;flex:none}
+.gw-s>div:first-child{font-size:1rem;font-weight:800}
+.gw-s .t{display:flex;justify-content:center;align-items:baseline;gap:10px;margin-top:4px}
+.gw-s .t b{font-family:'Orbitron',var(--f-en),sans-serif;font-size:1.75rem;font-weight:900;color:#fff0a8;text-shadow:0 0 4px rgba(245,197,24,.8),0 0 14px rgba(245,197,24,.3)}
+.gw-s .t small{font-size:.72rem;color:#8f8670}
+.gw-s .go-ld{justify-content:center}
+.gw-lanes{position:relative;margin:20px -16px 0;display:flex;flex-direction:column;gap:12px;flex:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 36px,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,transparent,#000 36px,#000 calc(100% - 36px),transparent)}
+.gw-lane{overflow:hidden;white-space:nowrap}
+.gw-trk{display:inline-block;animation:gwtick 22s linear infinite}
+.gw-lane.rev .gw-trk{animation-direction:reverse;animation-duration:26s}
+.gw-w{display:inline-flex;align-items:baseline;gap:8px;height:52px;padding:0 18px;margin-right:10px;border-radius:999px;background:#17171a;border:1px solid #2e2e33;vertical-align:top}
+.gw-w b{font-family:var(--f-en);font-size:1.2rem;line-height:52px;color:#f2f2f3}
+.gw-w span{font-size:.85rem;color:#ffe680}
+@keyframes gwtick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.gw-trk{animation:none}}
+.go-foot.sm{margin-top:6px;font-size:.66rem;color:#6e6e75}
 /* game top: stats bar, ‹ › rows, records sheet */
 .gm-stats{position:relative;margin-top:6px;height:58px;flex:none;border-radius:14px;background:#111113;border:1px solid #2e2e33;display:flex;align-items:center;padding-left:4px}
 .gm-st{flex:1;min-width:0;text-align:center;white-space:nowrap}
@@ -4837,22 +4860,21 @@ header(); setTab(tab); initSync(); initAcct();
   function oOpen(){stopAll();R=null;onStop();gp.classList.remove('last','lock','hit');gp.classList.add('open');document.body.classList.add('sv-lock')}
   function startOnline(){
     oOpen(); const m=G.mode,lv=G.lv;
-    O={m,lv,p:pool(lv),seen:0,card:null,t0:performance.now()};
+    O={m,lv,t0:performance.now()};
     gp.dataset.s='wait';
-    gOn.innerHTML=`<div class="go-dots" aria-hidden="true"></div><div class="go-search" aria-hidden="true"></div>
+    // P6: this week's words drift by in two lanes. Nothing to tap and no sound — waiting is just waiting.
+    const seen=new Set(), ws=[];
+    for(const q of makeQs(lv,weekSeed(m,lv))){const k=q.en.toLowerCase(); if(seen.has(k))continue; seen.add(k); ws.push(q); if(ws.length>=10)break}
+    const pill=q=>`<span class="gw-w" role="listitem"><b>${esc(q.en)}</b><span>${esc(q.ja)}</span></span>`;
+    const lane=(list,cls)=>{const s=list.map(pill).join('');return `<div class="gw-lane${cls}"><div class="gw-trk">${s}<span aria-hidden="true">${s}</span></div></div>`};
+    gOn.innerHTML=`<div class="go-dots" aria-hidden="true"></div><div class="gw-cone" aria-hidden="true"></div>
       <div class="go-top"><span>${LV[lv]} ・ オンライン対戦（テスト）</span><button class="go-x" id="goX">やめる</button></div>
-      <div class="go-wh"><div class="f"><div class="ring"></div><div class="fig">${figHTML()}</div></div><div class="t"><div>対戦相手を<br>さがしています</div><b id="goT" aria-live="off">0:00</b><small>めやす 約10秒</small><div class="go-ld" aria-hidden="true"><i></i><i></i><i></i></div></div></div>
-      <div class="go-h"><b>待っている間に復習</b><span>チェック <em id="goN">0</em>語</span></div>
-      <button class="go-card" id="goCard"></button>
-      <div class="go-yn"><button class="no" id="goNo">まだ</button><button class="yes" id="goYes">覚えた</button></div>
-      <div class="go-foot">相手が見つかると自動で始まります</div>`;
+      <div class="gw-stage"><div class="fig">${figHTML()}</div><div class="ring" aria-hidden="true"></div></div>
+      <div class="gw-s"><div>対戦相手をさがしています</div><div class="t"><b id="goT" aria-live="off">0:00</b><small>めやす 約10秒</small></div><div class="go-ld" aria-hidden="true"><i></i><i></i><i></i></div></div>
+      <div class="gw-lanes" role="list" aria-label="今週の${LV[lv]}の単語">${lane(ws.slice(0,5),'')}${lane(ws.slice(5),' rev')}</div>
+      <div class="go-foot">今週の${LV[lv]}の単語です。見ているだけで大丈夫</div>
+      <div class="go-foot sm">相手が見つかると、自動で対戦が始まります</div>`;
     $('goX').onclick=closePlay;
-    const nextCard=()=>{const p=O.p;O.card=p[Math.floor(Math.random()*p.length)];O.show=false;drawCard()};
-    const drawCard=()=>{const c=O.card;$('goCard').innerHTML=`<span class="tag">${LV[O.lv]}の単語</span><span class="w">${esc(c.en)}</span><span class="m">${O.show?esc(c.ja):''}</span><span class="hint">${O.show?'':'タップで意味を見る'}</span>`};
-    $('goCard').onclick=()=>{if(!O)return;O.show=true;drawCard();speak(O.card.en)};
-    const done=()=>{if(!O)return;O.seen++;$('goN').textContent=O.seen;nextCard()};
-    $('goNo').onclick=done;$('goYes').onclick=done;
-    nextCard();
     const tick=()=>{if(!O||gp.dataset.s!=='wait')return;$('goT').textContent=mmss(performance.now()-O.t0+999);later(tick,500)};tick();
     later(found,5000+Math.random()*4000);
   }
