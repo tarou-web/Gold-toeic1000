@@ -1992,8 +1992,7 @@ header .kbar{display:none}
 .gm-seg2 button:focus-visible{outline:2px solid #f5c518;outline-offset:1px}
 .gm-lvh{position:relative;flex:none;display:flex;justify-content:space-between;margin:10px 2px 6px;font-size:.75rem;color:#9a9aa1}
 #gmLvSeg{margin-top:0}
-.gm-bub{background:#2a2a2e;border:0;border-radius:16px;padding:10px 14px;font-size:.82rem;max-width:150px;word-break:keep-all;overflow-wrap:anywhere}
-.gm-shadow{width:190px;height:22px;border-radius:50%;background:rgba(0,0,0,.35)}
+.gm-shadow{width:220px;height:24px;border-radius:50%;background:rgba(0,0,0,.35)}
 .gm-hang{background:#2a2a2e}
 .gm-start{margin-top:14px;height:62px;border-radius:20px;border:0;font-size:1.4rem;letter-spacing:6px;box-shadow:none}
 /* match the N7 sample spacing on phones: header 56, cards 62/46, play sits 16px above the floating menu */
@@ -2001,11 +2000,10 @@ header .kbar{display:none}
 .gm-bar{height:56px}
 .gm-stats{margin-top:4px}
 .gm-stage{justify-content:flex-end;min-height:180px}
-.gm-figw{height:clamp(100px,calc(100% - 40px),246px)}
-.gm-lvh{margin:14px 2px 4px}
+.gm-figw{height:clamp(100px,calc(100% - 24px),310px)}
+.gm-lvh{margin:10px 2px 4px}
 .gm-seg2{margin-top:12px}
-.gm-start{margin-top:24px}
-.gm-bub{top:16%}
+.gm-start{margin-top:16px}
 @media (max-height:600px){.gm-stage{min-height:130px}.gm-lvh{display:none}#gmLvSeg{margin-top:8px}.gm-stats{height:48px!important}.gm-bar{height:42px}}
 @media (max-height:700px){.gm-stats{height:54px}.gm-seg2{height:42px;margin-top:8px}.gm-lvh{margin:6px 2px 4px}.gm-start{height:54px;margin-top:12px}.gm-bar{height:48px}}
 /* ---- game: online (test build plays against a CPU) ---- */
@@ -2381,7 +2379,6 @@ header .kbar{display:none}
     <div class="gm-seg2" role="radiogroup" aria-label="モード" id="gmModeSeg"><button role="radio" data-v="read">リーディング</button><button role="radio" data-v="listen">リスニング</button></div>
     <div class="gm-chal" id="gmChal" hidden></div>
     <div class="gm-stage" id="gmStage">
-      <div class="gm-bub" id="gmBub">がんばろ！</div>
       <div class="gm-figw"><div class="gm-fig" id="gmFig"></div><button class="gm-hang" id="gmHang" aria-label="着せ替え"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7.5a2.3 2.3 0 1 1 2.3-2.3c0 1.3-1 1.7-2.3 2.6L3 14.6c-1 .8-.4 2.4.9 2.4h16.2c1.3 0 1.9-1.6.9-2.4L12 8.1"/></svg></button></div>
       <div class="gm-shadow" aria-hidden="true"></div>
     </div>
@@ -4784,7 +4781,6 @@ header(); setTab(tab); initSync(); initAcct();
     const wl=whoList(); $('gmWhoSeg').querySelectorAll('button').forEach(b=>b.hidden=!wl.includes(b.dataset.v)); $('gmWhoSeg').classList.toggle('c3',wl.length===3);
     $('gmLvS').textContent=GC?'友達と同じ問題':`今週の問題・あと${resetDays()}日`;
     retroWords(m,lv); requestAnimationFrame(()=>{placeWords();startRetro()});
-    $('gmBub').textContent=GC?`${GC.score}問に勝てる？`:best?`ベスト ${best}問を こえよう！`:'まずは1回 やってみよう！';
     $('gmChal').hidden=!GC; if(GC)$('gmChal').innerHTML=`友達の記録 <b>${GC.score}問</b> に挑戦！ <button id="gmChalX" style="margin-left:6px;border:0;background:none;color:#8f8670;font:inherit;text-decoration:underline;cursor:pointer">やめる</button>`;
     if(GC)$('gmChalX').onclick=()=>{GC=null;renderTop()};
     $('gmFig').innerHTML=figHTML();
