@@ -1968,16 +1968,12 @@ header .kbar{display:none}
 /* game top (N7 + retro background): calm cards, tabs, ミーモ in the middle, pixel words drifting behind */
 .gamev{background:#18181a!important}
 .gm-retro{background:none}
-.gm-wr{position:absolute;left:0;top:26%;display:flex;white-space:nowrap;font-family:'Press Start 2P',monospace;font-weight:400;font-size:24px;line-height:1;color:rgba(245,197,24,.10);animation:gmwr 26s linear infinite}
+.gm-wr{position:absolute;left:0;top:var(--wr1,30%);display:flex;white-space:nowrap;font-family:'Press Start 2P',monospace;font-weight:400;font-size:24px;line-height:1;color:rgba(245,197,24,.10);will-change:transform}
 .gm-wr span{margin-right:32px}
-.gm-wr.sm{top:42%;font-size:18px;color:rgba(255,255,255,.07);animation-name:gmwrr;animation-duration:32s}
-#gmWr3{top:57%;animation-duration:30s}
-@keyframes gmwr{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@keyframes gmwrr{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+.gm-wr.sm{top:var(--wr2,45%);font-size:18px;color:rgba(255,255,255,.07)}
+#gmWr3{top:var(--wr3,60%)}
 .gm-scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 2px,transparent 2px 4px)}
-.gm-sweep{position:absolute;left:0;right:0;top:0;height:90px;background:linear-gradient(transparent,rgba(255,255,255,.03),transparent);animation:gmsweep 7s linear infinite}
-@keyframes gmsweep{from{transform:translateY(-120px)}to{transform:translateY(110vh)}}
-@media (prefers-reduced-motion:reduce){.gm-wr,.gm-sweep{animation:none}}
+.gm-sweep{position:absolute;left:0;right:0;top:0;height:90px;background:linear-gradient(transparent,rgba(255,255,255,.03),transparent);will-change:transform}
 .gm-bar b{font-size:clamp(1rem,5.2vw,1.3rem);font-weight:900;white-space:nowrap}
 .gm-pill{background:#222225;border:0;color:#f2f2f3;font-size:.85rem}
 .gm-stats{margin-top:4px;height:62px;border-radius:20px;background:#222225;border:0;padding-left:0}
@@ -4777,7 +4773,7 @@ header(); setTab(tab); initSync(); initAcct();
     $('gmModeSeg').querySelectorAll('button').forEach(b=>b.disabled=!!GC); $('gmLvSeg').querySelectorAll('button').forEach(b=>b.disabled=!!GC);
     const wl=whoList(); $('gmWhoSeg').querySelectorAll('button').forEach(b=>b.hidden=!wl.includes(b.dataset.v)); $('gmWhoSeg').classList.toggle('c3',wl.length===3);
     $('gmLvS').textContent=GC?'友達と同じ問題':`今週の問題・あと${resetDays()}日`;
-    retroWords(m,lv);
+    retroWords(m,lv); requestAnimationFrame(()=>{placeWords();startRetro()});
     $('gmBub').textContent=GC?`${GC.score}問に勝てる？`:best?`ベスト ${best}問を こえよう！`:'まずは1回 やってみよう！';
     $('gmChal').hidden=!GC; if(GC)$('gmChal').innerHTML=`友達の記録 <b>${GC.score}問</b> に挑戦！ <button id="gmChalX" style="margin-left:6px;border:0;background:none;color:#8f8670;font:inherit;text-decoration:underline;cursor:pointer">やめる</button>`;
     if(GC)$('gmChalX').onclick=()=>{GC=null;renderTop()};
@@ -4793,6 +4789,19 @@ header(); setTab(tab); initSync(); initAcct();
     if(ws.length<6)ws=['VENUE','REFUND','AGENDA','INVOICE','PROFIT','DEADLINE','BUDGET','MERGER','SUPPLY','HIRE','LAUNCH','SURVEY','QUOTE','POLICY','BRANCH','CLIENT','RENEW','AUDIT'];
     const n=Math.ceil(ws.length/3), esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
     ['gmWr1','gmWr2','gmWr3'].forEach((id,i)=>{let part=ws.slice(i*n,i*n+n); if(!part.length)part=ws.slice(0,n); const h=part.map(t=>`<span>${esc(t)}</span>`).join(''); $(id).innerHTML=h+h});
+  }
+  // keep the drifting words inside the space around ミーモ (between the mode tabs and the レベル label)
+  const gmTop=$('gamev').querySelector('.gm-top');
+  function placeWords(){const st=$('gmStage'); if(!st.offsetHeight)return; const t=st.offsetTop, h=st.offsetHeight;
+    gmTop.style.setProperty('--wr1',(t+10)+'px'); gmTop.style.setProperty('--wr2',Math.round(t+h*.45-9)+'px'); gmTop.style.setProperty('--wr3',Math.max(t+60,t+h-34)+'px')}
+  if(window.ResizeObserver)new ResizeObserver(placeWords).observe($('gmStage')); window.addEventListener('resize',placeWords);
+  // motion runs through the Web Animations API (steadier on iPhone than CSS keyframes); still respects 視差効果を減らす
+  const gmAnims=[];
+  function startRetro(){
+    if(gmAnims.length||!Element.prototype.animate||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    const go=(id,a,b,ms)=>gmAnims.push($(id).animate([{transform:a},{transform:b}],{duration:ms,iterations:Infinity,easing:'linear'}));
+    go('gmWr1','translateX(0)','translateX(-50%)',26000); go('gmWr2','translateX(-50%)','translateX(0)',32000); go('gmWr3','translateX(0)','translateX(-50%)',30000);
+    gmAnims.push(gmTop.querySelector('.gm-sweep').animate([{transform:'translateY(-120px)'},{transform:'translateY(110vh)'}],{duration:7000,iterations:Infinity}));
   }
   const segClick=(id,f)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button'); if(!b||b.disabled||b.getAttribute('aria-checked')==='true')return; uiClick(); f(b.dataset.v); gSave(); renderTop()});
   segClick('gmModeSeg',v=>{if(!GC)G.mode=v});
