@@ -1924,12 +1924,6 @@ header .kbar{display:none}
 .gm-hang svg{width:22px;height:22px}
 .gm-hang:active{transform:scale(.92)}
 .wardrobe.ingame{right:16px;top:auto;bottom:calc(96px + env(safe-area-inset-bottom,0px));max-height:calc(100% - 220px);overflow:auto;z-index:9}
-.gm-rows{position:relative;margin-top:12px;display:flex;flex-direction:column;gap:6px;flex:none}
-.gm-row{height:52px;border-radius:16px;background:#141310;border:1.5px solid #d9b01a;box-shadow:0 0 4px rgba(245,197,24,.6),0 0 16px rgba(245,197,24,.22);display:grid;grid-template-columns:52px 1fr 52px;align-items:center}
-.gm-row button{height:100%;border:0;background:none;color:#d9b01a;display:grid;place-items:center;padding:0;cursor:pointer}
-.gm-row button:disabled{opacity:.25;cursor:default}
-.gm-row .v{font-size:1.2rem;font-weight:900;line-height:1.15;color:#fff3b8;text-shadow:0 0 4px rgba(245,197,24,.8),0 0 12px rgba(245,197,24,.35);text-align:center}
-.gm-row .s{font-size:.62rem;color:#8f8670;text-align:center}
 .gm-start{margin-top:10px;flex:none;height:64px;letter-spacing:10px}
 .gm-rec{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
 .gm-rec[hidden]{display:none}
@@ -1951,7 +1945,43 @@ header .kbar{display:none}
 .gm-rtab td b{font-family:'Orbitron',var(--f-en),sans-serif;color:#ffe680}
 .gm-rtab td.now{background:#16140c}
 .gm-rnote{margin-top:10px;font-size:.72rem;color:#8f8670;line-height:1.6}
-@media (max-height:700px){.gm-row{height:46px}.gm-stats{height:52px}.gm-start{height:56px}}
+/* game top (N7 + retro background): calm cards, tabs, ミーモ in the middle, pixel words drifting behind */
+.gamev{background:#18181a!important}
+.gm-retro{background:none}
+.gm-wr{position:absolute;left:0;top:26%;display:flex;white-space:nowrap;font-family:'Press Start 2P',monospace;font-weight:400;font-size:24px;line-height:1;color:rgba(245,197,24,.10);animation:gmwr 26s linear infinite}
+.gm-wr span{margin-right:32px}
+.gm-wr.sm{top:42%;font-size:18px;color:rgba(255,255,255,.07);animation-name:gmwrr;animation-duration:32s}
+#gmWr3{top:57%;animation-duration:30s}
+@keyframes gmwr{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes gmwrr{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+.gm-scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 2px,transparent 2px 4px)}
+.gm-sweep{position:absolute;left:0;right:0;top:0;height:90px;background:linear-gradient(transparent,rgba(255,255,255,.03),transparent);animation:gmsweep 7s linear infinite}
+@keyframes gmsweep{from{transform:translateY(-120px)}to{transform:translateY(110vh)}}
+@media (prefers-reduced-motion:reduce){.gm-wr,.gm-sweep{animation:none}}
+.gm-bar b{font-size:clamp(1rem,5.2vw,1.3rem);font-weight:900;white-space:nowrap}
+.gm-pill{background:#222225;border:0;color:#f2f2f3;font-size:.85rem}
+.gm-stats{margin-top:4px;height:62px;border-radius:20px;background:#222225;border:0;padding-left:0}
+.gm-st+.gm-st{border-left:1px solid #34343a}
+.gm-st small{font-size:.68rem;color:#9a9aa1}
+.gm-st b{font-family:var(--f-en),sans-serif;font-size:1.25rem;font-weight:900;color:#f2f2f3;text-shadow:none}
+.gm-st span{font-size:.68rem;color:#9a9aa1}
+.gm-recb{width:58px;margin-left:0;border-left:1px solid #34343a;border-radius:0 20px 20px 0;background:transparent;color:#f2f2f3}
+.gm-seg2{position:relative;flex:none;margin-top:12px;height:46px;padding:4px;box-sizing:border-box;border-radius:18px;background:#222225;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+.gm-seg2.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.gm-seg2 button{border:0;border-radius:14px;background:transparent;color:#9a9aa1;font:inherit;font-size:.9rem;font-weight:800;padding:0;cursor:pointer;white-space:nowrap}
+.gm-seg2 button[aria-checked=true]{background:#f2f2f0;color:#18181a}
+.gm-seg2 button[hidden]{display:none}
+.gm-seg2 button:disabled{cursor:default}
+.gm-seg2 button:disabled:not([aria-checked=true]){opacity:.35}
+.gm-seg2 button:focus-visible{outline:2px solid #f5c518;outline-offset:1px}
+.gm-lvh{position:relative;flex:none;display:flex;justify-content:space-between;margin:10px 2px 6px;font-size:.75rem;color:#9a9aa1}
+#gmLvSeg{margin-top:0}
+.gm-bub{background:#2a2a2e;border:0;border-radius:16px;padding:10px 14px;font-size:.82rem;max-width:150px;word-break:keep-all;overflow-wrap:anywhere}
+.gm-shadow{width:190px;height:22px;border-radius:50%;background:rgba(0,0,0,.35)}
+.gm-hang{background:#2a2a2e}
+.gm-start{margin-top:14px;height:62px;border-radius:20px;border:0;font-size:1.4rem;letter-spacing:6px;box-shadow:none}
+@media (max-height:600px){.gm-stage{min-height:130px}.gm-lvh{display:none}#gmLvSeg{margin-top:8px}.gm-stats{height:48px!important}.gm-bar{height:42px}}
+@media (max-height:700px){.gm-stats{height:54px}.gm-seg2{height:42px}.gm-seg2{margin-top:8px}.gm-lvh{margin:6px 2px 4px}.gm-start{height:54px;margin-top:10px}}
 /* ---- game: online (test build plays against a CPU) ---- */
 .gplay[data-s=wait] .g-on,.gplay[data-s=found] .g-on,.gplay[data-s=duel] .g-on,.gplay[data-s=dres] .g-on{display:flex}
 .g-on{overflow:hidden}
@@ -2309,9 +2339,9 @@ header .kbar{display:none}
 
 <section class="bv navv gamev" id="gamev" role="dialog" aria-labelledby="gmTitle" aria-hidden="true">
   <div class="gm-top">
-    <div class="gm-deco" aria-hidden="true">
-      <div class="gm-dots"></div><div class="gm-beam l"></div><div class="gm-beam r"></div><div class="gm-cone"></div>
-      <svg viewBox="0 0 390 700" preserveAspectRatio="xMidYMin meet"><g fill="none" stroke="rgba(245,197,24,0.10)" stroke-width="2"><circle cx="195" cy="380" r="150"/><circle cx="195" cy="380" r="190"/><circle cx="195" cy="380" r="235" stroke-dasharray="4 10"/></g><g fill="#f5c518"><circle cx="40" cy="230" r="3.5" opacity=".8"/><circle cx="62" cy="200" r="3.5" opacity=".4"/><circle cx="88" cy="176" r="3.5" opacity=".8"/><circle cx="118" cy="158" r="3.5" opacity=".4"/><circle cx="150" cy="147" r="3.5" opacity=".8"/><circle cx="240" cy="147" r="3.5" opacity=".4"/><circle cx="272" cy="158" r="3.5" opacity=".8"/><circle cx="302" cy="176" r="3.5" opacity=".4"/><circle cx="328" cy="200" r="3.5" opacity=".8"/><circle cx="350" cy="230" r="3.5" opacity=".4"/></g><g fill="#ffe680" opacity=".55"><path d="M48 330l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/><path d="M338 300l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z"/><path d="M324 470l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M60 480l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></g><g font-family="Nunito,sans-serif" font-weight="900" fill="rgba(245,197,24,0.07)"><text x="14" y="420" font-size="58">A</text><text x="330" y="410" font-size="52">Z</text><text x="300" y="560" font-size="40">E</text><text x="24" y="575" font-size="44">Q</text></g></svg>
+    <div class="gm-deco gm-retro" aria-hidden="true">
+      <div class="gm-wr" id="gmWr1"></div><div class="gm-wr r sm" id="gmWr2"></div><div class="gm-wr" id="gmWr3"></div>
+      <div class="gm-scan"></div><div class="gm-sweep"></div>
     </div>
     <div class="gm-bar"><b id="gmTitle">ミーモ・タイムアタック</b><button class="gm-pill" id="gmRank" aria-label="今週の順位"><svg viewBox="0 0 24 24" width="15" height="15" fill="#f5c518" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0zM10 14h4v3h-4zM8 17h8v3H8z"/></svg><span id="gmRankT">--位</span></button></div>
     <div class="gm-stats">
@@ -2320,17 +2350,16 @@ header .kbar{display:none}
       <div class="gm-st"><small><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f5c518"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#b38f00" stroke-width="2"/></svg>コイン</small><b id="gmCoin">0</b></div>
       <button class="gm-recb" id="gmRecB" aria-label="記録を見る"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>記録</button>
     </div>
+    <div class="gm-seg2" role="radiogroup" aria-label="モード" id="gmModeSeg"><button role="radio" data-v="read">リーディング</button><button role="radio" data-v="listen">リスニング</button></div>
     <div class="gm-chal" id="gmChal" hidden></div>
     <div class="gm-stage" id="gmStage">
       <div class="gm-bub" id="gmBub">がんばろ！</div>
       <div class="gm-figw"><div class="gm-fig" id="gmFig"></div><button class="gm-hang" id="gmHang" aria-label="着せ替え"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7.5a2.3 2.3 0 1 1 2.3-2.3c0 1.3-1 1.7-2.3 2.6L3 14.6c-1 .8-.4 2.4.9 2.4h16.2c1.3 0 1.9-1.6.9-2.4L12 8.1"/></svg></button></div>
-      <div class="gm-ring" aria-hidden="true"></div>
+      <div class="gm-shadow" aria-hidden="true"></div>
     </div>
-    <div class="gm-rows">
-      <div class="gm-row" role="group" aria-label="モード"><button id="gmModeP" aria-label="前のモード"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div><div class="v" id="gmMode" aria-live="polite">リーディング</div><div class="s" id="gmModeS">読んで4択</div></div><button id="gmModeN" aria-label="次のモード"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
-      <div class="gm-row" role="group" aria-label="レベル"><button id="gmLvP" aria-label="前のレベル"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div><div class="v" id="gmLv" aria-live="polite">中級</div><div class="s" id="gmLvS">今週の問題</div></div><button id="gmLvN" aria-label="次のレベル"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
-      <div class="gm-row" role="group" aria-label="だれと"><button id="gmWhoP" aria-label="前のだれと"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div><div class="v" id="gmWho" aria-live="polite">ひとりで</div><div class="s" id="gmWhoS">60秒で何問とけるか</div></div><button id="gmWhoN" aria-label="次のだれと"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
-    </div>
+    <div class="gm-lvh"><span>レベル</span><span id="gmLvS">今週の問題</span></div>
+    <div class="gm-seg2 c3" role="radiogroup" aria-label="レベル" id="gmLvSeg"><button role="radio" data-v="0">初級</button><button role="radio" data-v="1">中級</button><button role="radio" data-v="2">上級</button></div>
+    <div class="gm-seg2 c3" role="radiogroup" aria-label="だれと" id="gmWhoSeg"><button role="radio" data-v="solo">ひとりで</button><button role="radio" data-v="friend">友達と</button><button role="radio" data-v="online">オンライン</button></div>
     <button class="gm-start" id="gmStart">プレイ</button>
     <div class="gm-rec" id="gmRec" hidden><div class="gm-recp" role="dialog" aria-modal="true" aria-labelledby="gmRecT"><div class="gm-rech"><b id="gmRecT">記録</b><button id="gmRecX" aria-label="閉じる"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div id="gmRecBody"></div></div></div>
   </div>
@@ -4721,11 +4750,12 @@ header(); setTab(tab); initSync(); initAcct();
     const mx=Math.max(0,...Object.values(G.best||{}).map(Number).filter(x=>x>0));
     $('gmWs').textContent=G.ws||0; $('gmMax').textContent=mx||'--';
     $('gmCoin').textContent=(+(typeof S!=='undefined'&&S.coins)||0).toLocaleString();
-    $('gmMode').textContent=m==='listen'?'リスニング':'リーディング'; $('gmModeS').textContent=m==='listen'?'聞いて4択':'読んで4択';
-    $('gmLv').textContent=LV[lv]; $('gmLvS').textContent=GC?'友達と同じ問題':`今週の問題・あと${resetDays()}日`;
-    $('gmWho').textContent=WHO[w];
-    $('gmWhoS').textContent=w==='solo'?'60秒で何問とけるか':w==='friend'?(GC?`友達の ${GC.score}問 に挑戦`:'終わったら記録を友達に送る'):'CPUとテスト対戦';
-    ['gmModeP','gmModeN','gmLvP','gmLvN'].forEach(id=>$(id).disabled=!!GC);
+    const pick=(id,v)=>$(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-checked',String(b.dataset.v===String(v))));
+    pick('gmModeSeg',m); pick('gmLvSeg',lv); pick('gmWhoSeg',w);
+    $('gmModeSeg').querySelectorAll('button').forEach(b=>b.disabled=!!GC); $('gmLvSeg').querySelectorAll('button').forEach(b=>b.disabled=!!GC);
+    const wl=whoList(); $('gmWhoSeg').querySelectorAll('button').forEach(b=>b.hidden=!wl.includes(b.dataset.v)); $('gmWhoSeg').classList.toggle('c3',wl.length===3);
+    $('gmLvS').textContent=GC?'友達と同じ問題':`今週の問題・あと${resetDays()}日`;
+    retroWords(m,lv);
     $('gmBub').textContent=GC?`${GC.score}問に勝てる？`:best?`ベスト ${best}問を こえよう！`:'まずは1回 やってみよう！';
     $('gmChal').hidden=!GC; if(GC)$('gmChal').innerHTML=`友達の記録 <b>${GC.score}問</b> に挑戦！ <button id="gmChalX" style="margin-left:6px;border:0;background:none;color:#8f8670;font:inherit;text-decoration:underline;cursor:pointer">やめる</button>`;
     if(GC)$('gmChalX').onclick=()=>{GC=null;renderTop()};
@@ -4733,11 +4763,23 @@ header(); setTab(tab); initSync(); initAcct();
     $('gmStart').textContent='プレイ';
   }
   window.renderGameTop=renderTop;
-  const mv=f=>()=>{uiClick();f();gSave();renderTop()};
-  $('gmModeP').onclick=$('gmModeN').onclick=mv(()=>{if(!GC)G.mode=G.mode==='listen'?'read':'listen'});
-  $('gmLvP').onclick=mv(()=>{if(!GC)G.lv=(G.lv+2)%3}); $('gmLvN').onclick=mv(()=>{if(!GC)G.lv=(G.lv+1)%3});
-  const whoMove=d=>mv(()=>{const nw=cyc(whoList(),whoNow(),d); if(GC&&nw!=='friend')GC=null; G.who=nw});
-  $('gmWhoP').onclick=whoMove(-1); $('gmWhoN').onclick=whoMove(1);
+  // background: this week's words for the chosen mode and level, in pixel letters drifting behind ミーモ
+  let wrKey='';
+  function retroWords(m,lv){
+    const k=weekNo()+'-'+m+'-'+lv; if(k===wrKey)return; wrKey=k;
+    let ws=[]; try{const seen=new Set(); for(const q of makeQs(lv,weekSeed(m,lv))){const t=String(q.en||'').toUpperCase(); if(!t||t.length>12||seen.has(t))continue; seen.add(t); ws.push(t); if(ws.length>=18)break}}catch(e){}
+    if(ws.length<6)ws=['VENUE','REFUND','AGENDA','INVOICE','PROFIT','DEADLINE','BUDGET','MERGER','SUPPLY','HIRE','LAUNCH','SURVEY','QUOTE','POLICY','BRANCH','CLIENT','RENEW','AUDIT'];
+    const n=Math.ceil(ws.length/3), esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    ['gmWr1','gmWr2','gmWr3'].forEach((id,i)=>{let part=ws.slice(i*n,i*n+n); if(!part.length)part=ws.slice(0,n); const h=part.map(t=>`<span>${esc(t)}</span>`).join(''); $(id).innerHTML=h+h});
+  }
+  const segClick=(id,f)=>$(id).addEventListener('click',e=>{const b=e.target.closest('button'); if(!b||b.disabled||b.getAttribute('aria-checked')==='true')return; uiClick(); f(b.dataset.v); gSave(); renderTop()});
+  segClick('gmModeSeg',v=>{if(!GC)G.mode=v});
+  segClick('gmLvSeg',v=>{if(!GC)G.lv=+v});
+  segClick('gmWhoSeg',v=>{if(GC&&v!=='friend')GC=null; G.who=v});
+  // arrow keys move within each group
+  ['gmModeSeg','gmLvSeg','gmWhoSeg'].forEach(id=>$(id).addEventListener('keydown',e=>{
+    if(!['ArrowLeft','ArrowRight'].includes(e.key))return; const bs=[...$(id).querySelectorAll('button')].filter(b=>!b.hidden&&!b.disabled); if(!bs.length)return;
+    const i=bs.indexOf(document.activeElement), nb=bs[(i+(e.key==='ArrowRight'?1:-1)+bs.length)%bs.length]; e.preventDefault(); nb.focus(); nb.click()}));
   $('gmRank').onclick=()=>{const rk=rankNow(setKey(curMode(),curLv()));
     toast(rk?`<div><strong>今週 ${rk.n}人中 ${rk.r}位</strong><span>${LV[curLv()]}・${curMode()==='listen'?'聞いて':'読んで'}4択の記録です</span></div>`:'<div><strong>今週の順位はまだありません</strong><span>1回遊ぶと、同じ問題を遊んだ人の中での順位が出ます</span></div>')};
   // records sheet
