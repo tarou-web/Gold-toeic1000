@@ -1976,8 +1976,18 @@ header .kbar{display:none}
 .gm-shadow{width:190px;height:22px;border-radius:50%;background:rgba(0,0,0,.35)}
 .gm-hang{background:#2a2a2e}
 .gm-start{margin-top:14px;height:62px;border-radius:20px;border:0;font-size:1.4rem;letter-spacing:6px;box-shadow:none}
+/* match the N7 sample spacing on phones: header 56, cards 62/46, play sits 16px above the floating menu */
+.gm-top{padding:env(safe-area-inset-top,0px) 16px calc(max(8px,env(safe-area-inset-bottom,0px) - 14px) + 76px)}
+.gm-bar{height:56px}
+.gm-stats{margin-top:4px}
+.gm-stage{justify-content:flex-end;min-height:180px}
+.gm-figw{height:clamp(100px,calc(100% - 40px),246px)}
+.gm-lvh{margin:14px 2px 4px}
+.gm-seg2{margin-top:12px}
+.gm-start{margin-top:24px}
+.gm-bub{top:16%}
 @media (max-height:600px){.gm-stage{min-height:130px}.gm-lvh{display:none}#gmLvSeg{margin-top:8px}.gm-stats{height:48px!important}.gm-bar{height:42px}}
-@media (max-height:700px){.gm-stats{height:54px}.gm-seg2{height:42px}.gm-seg2{margin-top:8px}.gm-lvh{margin:6px 2px 4px}.gm-start{height:54px;margin-top:10px}}
+@media (max-height:700px){.gm-stats{height:54px}.gm-seg2{height:42px;margin-top:8px}.gm-lvh{margin:6px 2px 4px}.gm-start{height:54px;margin-top:12px}.gm-bar{height:48px}}
 /* ---- game: online (test build plays against a CPU) ---- */
 .gplay[data-s=wait] .g-on,.gplay[data-s=found] .g-on,.gplay[data-s=duel] .g-on,.gplay[data-s=dres] .g-on{display:flex}
 .g-on{overflow:hidden}
