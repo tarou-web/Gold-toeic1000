@@ -1531,7 +1531,7 @@ body.navopen .wrap .bv.open,body.sw-anim .wrap{visibility:visible}
 #deckv .dk-bulk .sync-msg:empty{display:none}
 .dk-sep{height:1px;background:var(--line2);margin:2px 0}
 #deckv .dk-nbox input:focus,#deckv .dk-nbox input:focus-visible{outline:none!important;box-shadow:none!important}
-.dk-nbox{transition:box-shadow .15s}.dk-nbox:focus-within{box-shadow:0 0 0 2px var(--fg)}
+.dk-nbox{transition:box-shadow .15s}.dk-nbox:focus-within{box-shadow:0 0 0 2px var(--green)}
 #deckv .dk-list{gap:0}
 .dk-row2{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center;gap:2px;padding:8px 0 8px 2px;border-bottom:1px solid var(--line2)}
 .dk-row2:last-child{border-bottom:0}
@@ -1946,34 +1946,39 @@ header .kbar{display:none}
 .gm-rtab td.now{background:#16140c}
 .gm-rnote{margin-top:10px;font-size:.72rem;color:#8f8670;line-height:1.6}
 /* game top (N7 + retro background): calm cards, tabs, ミーモ in the middle, pixel words drifting behind */
-.gamev{background:#18181a!important}
+.gamev{--gt-bg:#18181a;--gt-card:var(--gt-card);--gt-card2:#2a2a2e;--gt-line:var(--gt-line);--gt-ink:var(--gt-ink);--gt-mut:var(--gt-mut);--gt-sel:#f2f2f0;--gt-selink:#18181a;--gt-w1:rgba(245,197,24,.10);--gt-w2:rgba(255,255,255,.07);--gt-scan:rgba(0,0,0,.28);--gt-shadow:rgba(0,0,0,.35);background:var(--gt-bg)!important;color:var(--gt-ink)}
+html.th-light .gamev{--gt-bg:#f3f2f7;--gt-card:#ffffff;--gt-card2:#ebe9f2;--gt-line:#e1dee9;--gt-ink:#24222b;--gt-mut:#625f6c;--gt-sel:#ffffff;--gt-selink:#24222b;--gt-w1:rgba(98,95,108,.10);--gt-w2:rgba(98,95,108,.08);--gt-scan:rgba(36,34,43,.035);--gt-shadow:rgba(36,34,43,.10)}
+html.th-light .gm-stats,html.th-light .gm-pill{box-shadow:0 3px 0 #e1dee9}
+html.th-light .gm-seg2{background:#e7e5ef}
+html.th-light .gm-seg2 button[aria-checked=true]{box-shadow:0 2px 0 #d9d5e3}
+html.th-light .gm-start{box-shadow:0 5px 0 #cfa400}
 .gm-retro{background:none}
-.gm-wr{position:absolute;left:0;top:var(--wr1,30%);display:flex;white-space:nowrap;font-family:'Press Start 2P',monospace;font-weight:400;font-size:24px;line-height:1;color:rgba(245,197,24,.10);will-change:transform}
+.gm-wr{position:absolute;left:0;top:var(--wr1,30%);display:flex;white-space:nowrap;font-family:'Press Start 2P',monospace;font-weight:400;font-size:24px;line-height:1;color:var(--gt-w1);will-change:transform}
 .gm-wr span{margin-right:32px}
-.gm-wr.sm{top:var(--wr2,45%);font-size:18px;color:rgba(255,255,255,.07)}
+.gm-wr.sm{top:var(--wr2,45%);font-size:18px;color:var(--gt-w2)}
 #gmWr3{top:var(--wr3,60%)}
-.gm-scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 2px,transparent 2px 4px)}
+.gm-scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,var(--gt-scan) 0 2px,transparent 2px 4px)}
 .gm-sweep{position:absolute;left:0;right:0;top:0;height:90px;background:linear-gradient(transparent,rgba(255,255,255,.03),transparent);will-change:transform}
 .gm-bar b{font-size:clamp(1rem,5.2vw,1.3rem);font-weight:900;white-space:nowrap}
-.gm-pill{background:#222225;border:0;color:#f2f2f3;font-size:.85rem}
-.gm-stats{margin-top:4px;height:62px;border-radius:20px;background:#222225;border:0;padding-left:0}
-.gm-st+.gm-st{border-left:1px solid #34343a}
-.gm-st small{font-size:.68rem;color:#9a9aa1}
-.gm-st b{font-family:var(--f-en),sans-serif;font-size:1.25rem;font-weight:900;color:#f2f2f3;text-shadow:none}
-.gm-st span{font-size:.68rem;color:#9a9aa1}
-.gm-recb{width:58px;margin-left:0;border-left:1px solid #34343a;border-radius:0 20px 20px 0;background:transparent;color:#f2f2f3}
-.gm-seg2{position:relative;flex:none;margin-top:12px;height:46px;padding:4px;box-sizing:border-box;border-radius:18px;background:#222225;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+.gm-pill{background:var(--gt-card);border:0;color:var(--gt-ink);font-size:.85rem}
+.gm-stats{margin-top:4px;height:62px;border-radius:20px;background:var(--gt-card);border:0;padding-left:0}
+.gm-st+.gm-st{border-left:1px solid var(--gt-line)}
+.gm-st small{font-size:.68rem;color:var(--gt-mut)}
+.gm-st b{font-family:var(--f-en),sans-serif;font-size:1.25rem;font-weight:900;color:var(--gt-ink);text-shadow:none}
+.gm-st span{font-size:.68rem;color:var(--gt-mut)}
+.gm-recb{width:58px;margin-left:0;border-left:1px solid var(--gt-line);border-radius:0 20px 20px 0;background:transparent;color:var(--gt-ink)}
+.gm-seg2{position:relative;flex:none;margin-top:12px;height:46px;padding:4px;box-sizing:border-box;border-radius:18px;background:var(--gt-card);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
 .gm-seg2.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.gm-seg2 button{border:0;border-radius:14px;background:transparent;color:#9a9aa1;font:inherit;font-size:.9rem;font-weight:800;padding:0;cursor:pointer;white-space:nowrap}
-.gm-seg2 button[aria-checked=true]{background:#f2f2f0;color:#18181a}
+.gm-seg2 button{border:0;border-radius:14px;background:transparent;color:var(--gt-mut);font:inherit;font-size:.9rem;font-weight:800;padding:0;cursor:pointer;white-space:nowrap}
+.gm-seg2 button[aria-checked=true]{background:var(--gt-sel);color:var(--gt-selink)}
 .gm-seg2 button[hidden]{display:none}
 .gm-seg2 button:disabled{cursor:default}
 .gm-seg2 button:disabled:not([aria-checked=true]){opacity:.35}
 .gm-seg2 button:focus-visible{outline:2px solid #f5c518;outline-offset:1px}
-.gm-lvh{position:relative;flex:none;display:flex;justify-content:space-between;margin:10px 2px 6px;font-size:.75rem;color:#9a9aa1}
+.gm-lvh{position:relative;flex:none;display:flex;justify-content:space-between;margin:10px 2px 6px;font-size:.75rem;color:var(--gt-mut)}
 #gmLvSeg{margin-top:0}
-.gm-shadow{width:220px;height:24px;border-radius:50%;background:rgba(0,0,0,.35)}
-.gm-hang{background:#2a2a2e}
+.gm-shadow{width:220px;height:24px;border-radius:50%;background:var(--gt-shadow)}
+.gm-hang{background:var(--gt-card2);color:var(--gt-ink);border-color:var(--gt-bg)}
 .gm-start{margin-top:14px;height:62px;border-radius:20px;border:0;font-size:1.4rem;letter-spacing:6px;box-shadow:none}
 /* match the N7 sample spacing on phones: header 56, cards 62/46, play sits 16px above the floating menu */
 .gm-top{padding:env(safe-area-inset-top,0px) 16px calc(max(8px,env(safe-area-inset-bottom,0px) - 14px) + 76px)}
@@ -2110,6 +2115,101 @@ header .kbar{display:none}
 .g-on .fig .mfig{width:100%;height:100%}
 .g-on .fig .mfig>img{width:100%;height:100%;object-fit:contain}
 .g-on .gp-opts button:disabled{pointer-events:none}
+
+/* ===== new look (11/26): A = dark (as before, tidied), B = light (soft lavender-grey, white cards, a little depth) ===== */
+html.th-light{--bg:#f3f2f7;--bg2:#ebe9f2;--surface:#ffffff;--surface2:#f7f6fa;--fg:#24222b;--muted:#625f6c;--line:#e1dee9;--line2:#e9e7f0;--chipbg:#ebe9f2;--seg:#e7e5ef;--cardback:#ffffff;--on-card-back:#24222b;
+  --green:#f5c518;--green-d:#cfa400;--green-s:#fff3c4;--green-ink:#7a5d00;--on-green:#24222b;--accent-s:#ebe9f2;--accent-ink:#24222b;--accent-line:#c9c4d6;--red:#d64545;--red-s:#fde8e8;--red-ink:#b42318;color-scheme:light}
+html.th-light .btn{border:0;background:var(--surface);box-shadow:0 3px 0 #d9d5e3}
+html.th-light .btn.ok{background:var(--green);box-shadow:0 4px 0 #cfa400}
+html.th-light .btn:active:not(:disabled){box-shadow:none;transform:translateY(3px)}
+html.th-light .tabs{background:var(--seg)}
+html.th-light .tabs button[aria-selected=true]{background:#fff;color:var(--fg);box-shadow:0 2px 0 #d9d5e3}
+html.th-light .bnav{background:rgba(255,255,255,.94);border-color:#e1dee9!important;box-shadow:0 8px 24px rgba(60,50,90,.12)}
+html.th-light .bnav button.on{background:#ebe9f2}
+/* home: Mimo avatar at the top left (head pops out of the circle), deck name, streak; goal bar under it */
+header.qh{display:flex;flex-direction:row;align-items:center;gap:12px;padding-top:14px}
+.mascot.qav{position:relative;right:auto;top:auto;flex:none;width:56px;height:56px;z-index:2}
+.qav-bg{position:absolute;inset:0;border-radius:50%;background:var(--chipbg);box-shadow:0 0 0 2px var(--line)}
+.mascot.qav .mfig{position:absolute;left:-4px;top:-14px;width:64px;clip-path:path('M -40 -40 H 104 V 42 H 60 A 28 28 0 0 1 4 42 H -40 Z')}
+.mascot.qav .msparks{inset:-10px}
+.qdeck{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.qdeck small{font-family:var(--f-jp);font-size:.72rem;font-weight:700;color:var(--muted)}
+.qdname{align-self:flex-start;max-width:100%;display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:2px 0;font:inherit;font-family:var(--f-jp);font-size:1.2rem;font-weight:800;color:var(--fg);cursor:pointer}
+.qdname span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qdname svg{flex:none;color:var(--muted)}
+.qstk{flex:none;display:inline-flex;align-items:center;gap:3px;border:0;background:none;padding:6px 0;font:inherit;color:var(--fg);cursor:pointer}
+.qstk svg{color:var(--green)}
+.qstk b{font-family:var(--f);font-weight:900;font-size:1.45rem;line-height:1}
+.qstk small{font-family:var(--f-jp);font-size:.72rem;font-weight:700;color:var(--muted)}
+#goalbox.qgoal{display:flex;flex-direction:column;align-items:stretch;gap:6px;height:auto;min-height:0;margin:0!important;padding:0!important;border:0;border-radius:0;background:none}
+#goalbox.qgoal::after{display:none}
+.qgl{display:flex;justify-content:space-between;font-family:var(--f-jp);font-size:.78rem;font-weight:700;color:var(--muted)}
+.qgl b{font-family:var(--f);font-weight:900;color:var(--fg)}
+.qgoal.done .qgl #goalTxt{color:var(--green-ink)}
+.qtrack{height:8px;border-radius:8px;background:var(--chipbg);overflow:hidden}
+.qtrack i{display:block;height:100%;width:0;border-radius:8px;background:var(--green);transition:width .5s cubic-bezier(.3,1.3,.5,1)}
+.gzone>.hanger{display:none!important}
+.mbub{right:auto;left:0;top:-4px;max-width:calc(100% - 8px)}
+.mbub::after{display:none}
+/* Mimo's page */
+.mev{z-index:59}
+.me-body{display:flex;flex-direction:column;gap:14px;padding-top:calc(12px + env(safe-area-inset-top,0px));padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
+.me-bar{display:flex;align-items:center;gap:12px}
+.me-bar h2{margin:0;font-family:var(--f-jp);font-size:1.25rem;font-weight:800}
+.me-x{width:44px;height:44px;border-radius:50%;border:0;background:var(--chipbg);color:var(--fg);display:grid;place-items:center;cursor:pointer}
+.me-hero{display:flex;align-items:flex-end;gap:14px;padding:14px;border-radius:20px;background:var(--surface)}
+.me-fig{flex:none;width:132px;height:164px;border-radius:18px;background:var(--chipbg);display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.me-fig .mfig{width:112px}
+.me-acts{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.me-acts p{margin:0 0 2px;font-family:var(--f-jp);font-size:.8rem;font-weight:700;color:var(--muted);line-height:1.5}
+.me-acts .btn{height:46px;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--f-jp);font-weight:800;font-size:.95rem}
+.mev h3{margin:6px 4px -4px;font-family:var(--f-jp);font-size:.95rem;font-weight:800}
+.me-none{margin:0;padding:14px;border-radius:16px;background:var(--surface);font-family:var(--f-jp);font-size:.82rem;color:var(--muted)}
+.me-none[hidden]{display:none}
+.wardrobe.inme{position:static;max-width:none;min-width:0;width:100%;box-shadow:none;border:0;border-radius:20px;background:var(--surface);padding:12px 14px}
+.me-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.me-t{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border-radius:18px;background:var(--surface);border:0;text-align:left;font:inherit;color:var(--fg)}
+button.me-t{cursor:pointer}
+.me-l{display:flex;align-items:center;gap:5px;font-family:var(--f-jp);font-size:.75rem;font-weight:700;color:var(--muted)}
+.me-l i{display:flex;color:var(--muted)}.me-l i.y{color:var(--green)}
+.me-l img{width:18px;height:18px;object-fit:contain}
+.me-v{font-family:var(--f-jp);font-size:.78rem;color:var(--muted)}
+.me-v b{font-family:var(--f);font-weight:900;font-size:1.5rem;color:var(--fg)}
+html.th-light .me-hero,html.th-light .me-t,html.th-light .me-none,html.th-light .wardrobe.inme{box-shadow:0 3px 0 #e1dee9}
+/* home bottom: nothing peeks out under the floating menu */
+.wrap{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))!important}
+
+html.th-light .tabs button[aria-selected=true]{background:#fff!important;color:var(--fg)!important;box-shadow:0 2px 0 #d9d5e3}
+html.th-light .bnav button{color:#625f6c!important}
+html.th-light .bnav button.on{background:#ebe9f2!important;color:#24222b!important}
+/* a soft fade under the floating menu so page content never peeks out below it */
+body::before{content:"";position:fixed;left:0;right:0;bottom:0;height:calc(92px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,transparent,var(--bg) 30%);z-index:58;pointer-events:none}
+body.sv-lock::before{display:none}
+/* library: one card style, the deck being studied is marked by its yellow icon + 勉強中, no outline; solid "new deck" button */
+.lib-item,.lib-item.cur{border:0!important}
+#libNew{border:0!important;background:var(--surface)!important;border-style:solid!important}
+.lib-guide{border:0}
+html.th-light .lib-item,html.th-light #libNew,html.th-light .lib-guide{box-shadow:0 3px 0 #e1dee9}
+/* add screen: every field the same shape */
+.dk-name input,.dk-add input,.dk-add #dkMemo{background:var(--surface)!important;border:1px solid var(--line)!important;border-style:solid!important;border-radius:16px!important}
+.dk-name input:focus,.dk-add input:focus{border-color:var(--green)!important;outline:none}
+html.th-light .dk-name input,html.th-light .dk-add input,html.th-light .dk-add #dkMemo{border:2px solid var(--line)!important}
+/* shop: long labels wrap instead of being cut */
+.sn-ad b{white-space:normal;overflow:visible;line-height:1.25}
+html.th-light .sn-ad,html.th-light .sn-adc,html.th-light .sn-top{box-shadow:0 3px 0 #e1dee9}
+html.th-light .sn-adc{box-shadow:inset 0 0 0 1px #ecd98a}
+/* settings: the signed-in card never breaks 「ログインしています」; the address stays on one line; log out sits under it */
+#acctIn.acard{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 14px;align-items:center}
+#acctIn .atx{min-width:0}
+#acctIn .atx b{white-space:nowrap}
+#acWho{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#acWho+br{display:none}
+#acctIn #acLogout{grid-column:1/-1;height:44px}
+html.th-light .sgroup,html.th-light .acard{box-shadow:0 3px 0 #e1dee9}
+
+html.th-light .rvg-pills button[aria-selected=true],html.th-light .dk-seg button[aria-selected=true],html.th-light .sn-cats button[aria-selected=true],html.th-light #shopnv .sn-cats button[aria-selected=true]{background:#fff;color:var(--fg);box-shadow:0 2px 0 #d9d5e3}
+html.th-light .sn-ad .sn-g{background:#ebe9f2;color:#24222b}
+.dk-name input:focus-visible,.dk-add input:focus-visible{outline:none}
 </style>
 
 <div class="rotate-msg" aria-live="polite">
@@ -2132,24 +2232,20 @@ header .kbar{display:none}
   <div class="sname">M<b>ee</b>mory</div>
 </div>
 <div class="wrap">
-  <header>
+  <header class="qh">
     <h1 class="vh">Meemory</h1>
-    <div class="stats">
-      <button class="stat bag rank" id="bagBtn" aria-label="ランキング（準備中）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0z" fill="currentColor"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7"/></svg><span>--位</span><span id="coins" hidden>0</span></button>
-      <button class="stat fire" id="fireBtn" aria-label="連続記録を見る"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.4 1.1-4 2.3-5.2.2 1.7 1 2.7 2 3.1C11 8 10.6 5 12 2z"/></svg><span id="streak">0</span></button>
-      <button class="stat pts" id="ptsBtn" aria-label="ポイントとバッジを見る"><img id="curBadge" src="badges/badge-0.png" alt=""></button>
-      <span class="stat know" title="覚えたフレーズ"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.3 14.3-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z"/></svg><span class="kwrap"><span class="knum"><span id="known">0</span><small> / <span id="knownOf">0</span></small></span><span class="kbar" title="全体の進み具合"><i id="bar"></i></span></span></span>
-    </div>
+    <button class="mascot qav" id="mascot" aria-label="ミーモのページを開く"><span class="qav-bg" aria-hidden="true"></span><span class="msparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="mfig"><img src="mascot.png" alt=""></span></button>
+    <div class="qdeck"><small>今の単語帳</small><button class="qdname" id="deckNameBtn" aria-label="単語帳を切り替える"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2zM5 16h13"/></svg><span id="deckName">金のフレーズ</span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
+    <button class="qstk" id="fireBtn" aria-label="連続記録を見る"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2.4 1.1-4 2.3-5.2.2 1.7 1 2.7 2 3.1C11 8 10.6 5 12 2z"/></svg><b id="streak">0</b><small>日連続</small></button>
   </header>
   <div class="gzone">
-  <button class="mascot" id="mascot" aria-label="ミーモに聞く"><span class="msparks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="mfig"><img src="mascot.png" alt=""></span></button>
   <button class="hanger" id="hangerBtn" aria-label="着せ替え" aria-expanded="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7.5a2.3 2.3 0 1 1 2.3-2.3c0 1.3-1 1.7-2.3 2.6L3 14.6c-1 .8-.4 2.4.9 2.4h16.2c1.3 0 1.9-1.6.9-2.4L12 8.1"/></svg></button>
   <div class="wardrobe" id="wardrobe" role="dialog" aria-label="着せ替え" hidden></div>
   <div class="mbub" id="mbub" aria-live="polite"></div>
-  <div class="goalbox" id="goalbox">
-    <span class="gring" id="goalRing" aria-hidden="true"><b id="goalNum">0</b></span>
-    <div class="gtx"><b id="goalTxt">今日もやろう！</b><span id="goalSub"></span><span class="gstk"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-3 2-4 2-6 1 1 2 2 3 2 0-2-1-4 0-6z"/></svg><span id="goalStk"></span></span></div>
-    <i id="goalBar" hidden></i>
+  <div class="qgoal" id="goalbox">
+    <div class="qgl"><span id="goalTxt">今日の目標</span><span><b id="goalNum">0</b> / <span id="goalOf">5</span>問</span></div>
+    <div class="qtrack"><i id="goalBar"></i></div>
+    <span id="goalRing" hidden></span><span id="goalSub" hidden></span><span id="goalStk" hidden></span>
   </div>
 
   <div class="tabs" role="tablist">
@@ -2203,6 +2299,26 @@ header .kbar{display:none}
     </div>
   </div>
 </section>
+  <section class="bv mev" id="mev" role="dialog" aria-modal="true" aria-labelledby="meTitle" aria-hidden="true">
+    <div class="sv-in me-body">
+      <div class="me-bar"><button class="me-x" id="meClose" aria-label="戻る"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><h2 id="meTitle">ミーモ</h2></div>
+      <div class="me-hero"><div class="me-fig"><span class="mfig" id="meFig"></span></div>
+        <div class="me-acts"><p>アイテムを選ぶと<br>すぐに着せ替えられます</p><button class="btn ok" id="meAsk"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c.6 4.5 2.5 6.4 7 7-4.5.6-6.4 2.5-7 7-.6-4.5-2.5-6.4-7-7 4.5-.6 6.4-2.5 7-7z"/></svg>ミーモに聞く</button><button class="btn" id="meShop">ショップへ</button></div></div>
+      <h3>着せ替え</h3>
+      <div class="me-wd" id="meWd"><p class="me-none" id="meNone">まだアイテムを持っていません。ショップで買うと、ここで着せ替えられます。</p></div>
+      <h3>実績</h3>
+      <div class="me-grid">
+        <button class="me-t" id="meStk"><span class="me-l"><i class="y"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-3 2-4 2-7 1 1 2 2 3 2 0-2 0-3 0-5z"/></svg></i>連続</span><span class="me-v"><b id="meStkN">0</b> 日</span></button>
+        <div class="me-t"><span class="me-l"><i class="y"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 20h6"/></svg></i>最高記録</span><span class="me-v"><b id="meBest">0</b> 日</span></div>
+        <div class="me-t"><span class="me-l"><i><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg></i>覚えた単語</span><span class="me-v"><b id="meKnown">0</b> 語</span></div>
+        <div class="me-t"><span class="me-l"><i class="y"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/></svg></i>コイン</span><span class="me-v"><b id="meCoins">0</b></span></div>
+        <button class="me-t" id="ptsBtn" aria-label="ポイントとバッジを見る"><span class="me-l"><img id="curBadge" src="badges/badge-0.png" alt="">ポイント</span><span class="me-v"><b id="mePts">0</b></span></button>
+        <div class="me-t"><span class="me-l"><i><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9h12a3 3 0 0 1 3 3l-1 4a2 2 0 0 1-3.5 1L15 15H9l-1.5 2A2 2 0 0 1 4 16l-1-4a3 3 0 0 1 3-3z"/></svg></i>ゲーム最高連勝</span><span class="me-v"><b id="meWs">0</b> 連勝</span></div>
+      </div>
+      <div hidden><button class="stat bag rank" id="bagBtn" aria-label="ランキング（準備中）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0z" fill="currentColor"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7"/></svg><span>--位</span><span id="coins" hidden>0</span></button><span class="stat know" title="覚えたフレーズ"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.3 14.3-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4z"/></svg><span class="kwrap"><span class="knum"><span id="known">0</span><small> / <span id="knownOf">0</span></small></span><span class="kbar" title="全体の進み具合"><i id="bar"></i></span></span></span></div>
+    </div>
+  </section>
+
   <section class="bv" id="bv" role="dialog" aria-modal="true" aria-labelledby="bvTitle" aria-hidden="true">
     <div class="bv-hero"><div class="sv-in">
       <div class="sv-bar"><button class="sv-x" id="bvClose" aria-label="戻る"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2 id="bvTitle">バッジへの道</h2><span class="bv-pts"><b id="bvNum">0</b><small>pt</small></span></div>
@@ -2431,6 +2547,7 @@ header .kbar{display:none}
     <label class="srow"><span>1日の目標</span><span class="sval"><select id="goal"><option value="5">5問</option><option value="10">10問</option><option value="15">15問</option><option value="20">20問</option><option value="30">30問</option></select><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></label>
     <label class="srow"><span>効果音</span><span class="sval"><select id="sound"><option value="on">オン</option><option value="off">オフ</option></select><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></label>
     <label class="srow"><span>振動</span><span class="sval"><select id="vib"><option value="on">オン</option><option value="off">オフ</option></select><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></label>
+    <label class="srow"><span>画面の明るさ</span><span class="sval"><select id="theme"><option value="auto">端末に合わせる</option><option value="dark">暗い</option><option value="light">明るい</option></select><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></label>
   </div>
   <h2 class="sgl" id="aiTitle">ミーモ（AI）に質問した回数</h2>
   <div class="sgroup aistats" id="aiStats"></div>
@@ -2475,6 +2592,16 @@ const BUILTIN = __DATA__;
 const BUILTIN_NAME = '__DECKNAME__';
 let DATA = BUILTIN; // the cards of the deck being studied (built-in 金のフレーズ, or one of your own decks)
 const KEY='toeic1000-v1';
+// light / dark: the setting wins; 「端末に合わせる」 follows the phone. html.th-light / th-dark carries the result for the CSS
+const darkMQ=matchMedia('(prefers-color-scheme: dark)');
+function applyTheme(){
+  let v='auto'; const el=document.getElementById('theme'); if(el)v=el.value; else try{v=(JSON.parse(localStorage.getItem(KEY+'-p')||'{}').theme)||'auto'}catch(e){}
+  const dark=v==='dark'||(v==='auto'&&darkMQ.matches), r=document.documentElement;
+  if(v==='auto')r.removeAttribute('data-theme'); else r.setAttribute('data-theme',v);
+  r.classList.toggle('th-dark',dark); r.classList.toggle('th-light',!dark);
+  const m=document.querySelector('meta[name=theme-color]'); if(m)m.setAttribute('content',dark?'#18181a':'#f3f2f7');
+}
+applyTheme(); darkMQ.addEventListener&&darkMQ.addEventListener('change',applyTheme);
 let S={known:{},miss:{},fav:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.known) S=s;}catch(e){}
 S.xp=S.xp||0; S.streak=S.streak||0; S.days=S.days||{}; S.points=S.points||0; S.goal=S.goal||10; S.td=S.td||{d:'',pts:{},done:{}}; S.coins=S.coins||0; S.owned=S.owned||{}; S.wear=S.wear||''; S.skin=S.skin||''; S.hat=S.hat||''; S.neck=S.neck||''; S.cpd=S.cpd||{d:'',ids:{}};
@@ -2692,7 +2819,8 @@ function buildRange(){
 }
 const prefs=(()=>{try{return JSON.parse(localStorage.getItem(KEY+'-p')||'{}')}catch(e){return{}}})();
 selectDeck(S.deck,true);
-for(const k of ['range','filter','dir','order','sound','vib']) if(prefs[k]) $(k).value=prefs[k];
+for(const k of ['range','filter','dir','order','sound','vib','theme']) if(prefs[k]) $(k).value=prefs[k];
+applyTheme();
 for(const k of ['range','filter']) if($(k).selectedIndex<0) $(k).selectedIndex=0; // a saved choice that no longer exists
 let tab=prefs.tab||'card';
 
@@ -2784,6 +2912,7 @@ function applyWear(){
   if(sk)m.classList.add('s-'+sk);
   const ai=$('askImg'); if(ai){ai.src=skinImg(sk)}
   const bf=document.querySelector('#bigAsk .bigfig'); if(bf)bf.innerHTML=fig(sk,c.face,c.hat,c.neck);
+  const mf=$('meFig'); if(mf&&$('mev').classList.contains('open'))mf.innerHTML=fig(sk,c.face,c.hat,c.neck);
   document.body.classList.toggle('has-hat',!!c.hat);
   $('hangerBtn').hidden=!Object.keys(S.owned).length;
 }
@@ -3231,7 +3360,7 @@ function closeAsk(){$('askProxy').blur();document.documentElement.classList.remo
   v.addEventListener('touchend',end); v.addEventListener('touchcancel',end);
 })();
 function openWardrobe(){renderWardrobe();$('wardrobe').hidden=false;$('hangerBtn').setAttribute('aria-expanded','true')}
-function closeWardrobe(){$('wardrobe').hidden=true;$('hangerBtn').setAttribute('aria-expanded','false')}
+function closeWardrobe(){if($('wardrobe').classList.contains('inme'))return;$('wardrobe').hidden=true;$('hangerBtn').setAttribute('aria-expanded','false')}
 const PARROT_FACE=`<svg class="bface" viewBox="0 0 100 100" aria-hidden="true">
   <circle cx="50" cy="51" r="31" fill="rgba(255,255,255,.2)"/>
   <g fill="none" stroke="rgba(255,255,255,.62)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
@@ -3259,8 +3388,21 @@ function badgeReward(p){
 function celebrateBadge(p){const n=badgeReward(p);save();header();
   toast(`${badgeHTML(p)}<div><strong>バッジ獲得！</strong><span>${p}ポイント達成${n?`・ショッピングポイント +${n}`:''}</span></div>`);fanfare();
   if(n){const b=$('navShop');b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}}
+// ---- Mimo's page: big Mimo, wardrobe, achievements (opened from the avatar at the top left)
+function renderMe(){
+  const c=cur(); $('meFig').innerHTML=fig(c.skin,c.face,c.hat,c.neck);
+  $('meStkN').textContent=curStreak(); $('meBest').textContent=bestStreak(); $('meKnown').textContent=Object.keys(S.known||{}).length;
+  $('meCoins').textContent=S.coins||0; $('mePts').textContent=S.points||0;
+  let gs={}; try{gs=JSON.parse(localStorage.getItem(KEY+'-game')||'{}')||{}}catch(e){} $('meWs').textContent=gs.wsMax||0;
+}
+function openMe(){
+  renderMe(); const wd=$('wardrobe'); $('meWd').appendChild(wd); wd.classList.add('inme'); renderWardrobe(); wd.hidden=!Object.keys(S.owned).length; $('meNone').hidden=!wd.hidden;
+  const v=$('mev'); v.classList.add('open'); v.setAttribute('aria-hidden','false'); v.scrollTop=0; document.body.classList.add('sv-lock'); setTimeout(()=>$('meClose').focus({preventScroll:true}),50)}
+function closeMe(){
+  const v=$('mev'); v.classList.remove('open'); v.setAttribute('aria-hidden','true'); document.body.classList.remove('sv-lock');
+  const wd=$('wardrobe'); wd.classList.remove('inme'); wd.hidden=true; document.querySelector('.gzone').insertBefore(wd,$('mbub')); $('mascot').focus({preventScroll:true})}
 function openBadges(){renderBadges();const v=$('bv');v.classList.add('open');v.setAttribute('aria-hidden','false');document.body.classList.add('sv-lock');setTimeout(()=>$('bvClose').focus({preventScroll:true}),50)}
-function closeBadges(){const v=$('bv');v.classList.remove('open');v.setAttribute('aria-hidden','true');document.body.classList.remove('sv-lock');$('ptsBtn').focus({preventScroll:true})}
+function closeBadges(){const v=$('bv');v.classList.remove('open');v.setAttribute('aria-hidden','true');if(!$('mev').classList.contains('open'))document.body.classList.remove('sv-lock');$('ptsBtn').focus({preventScroll:true})}
 function renderBadges(){
   const p=S.points, got=BADGES.filter(b=>b<=p), next=BADGES.find(b=>b>p), newest=got[got.length-1];
   $('bvNum').textContent=p;
@@ -3291,7 +3433,7 @@ const GOALS=[3,7,14,30,50,100,200,365,500,1000];
 let svY,svM;
 function openStreak(){const n=new Date();svY=n.getFullYear();svM=n.getMonth();renderStreak();
   const v=$('sv');v.classList.add('open');v.setAttribute('aria-hidden','false');document.body.classList.add('sv-lock');setTimeout(()=>$('svClose').focus({preventScroll:true}),50)}
-function closeStreak(){const v=$('sv');v.classList.remove('open');v.setAttribute('aria-hidden','true');document.body.classList.remove('sv-lock');$('fireBtn').focus({preventScroll:true})}
+function closeStreak(){const v=$('sv');v.classList.remove('open');v.setAttribute('aria-hidden','true');if(!$('mev').classList.contains('open'))document.body.classList.remove('sv-lock');$('fireBtn').focus({preventScroll:true})}
 function renderStreak(){
   const cs=curStreak(), studiedToday=S.last===today();
   $('svNum').textContent=cs;
@@ -3330,8 +3472,9 @@ function header(){
   $('known').textContent=k; $('coins').textContent=S.coins||0;
   const dc=doneCount(), g=S.goal, ok=S.last===today();
   {const d=Math.min(dc,g), left=Math.max(0,g-dc), st=curStreak();
-  $('goalNum').innerHTML=`${d}<small>/${g}</small>`; $('goalRing').style.setProperty('--p',(ok?100:d/g*100)+'%');
-  $('goalTxt').textContent=ok?'達成！すごい':dc===0?'今日もやろう！':left<=g/2?'あと少し！':'その調子！';
+  $('goalNum').textContent=d; $('goalOf').textContent=g; $('goalBar').style.width=(ok?100:d/g*100)+'%';
+  $('deckName').textContent=S.deck==='gold'?BUILTIN_NAME:((deckOf(S.deck)||{}).name||'名前なし');
+  $('goalTxt').textContent=ok?'今日の目標クリア！':'今日の目標';
   $('goalSub').textContent=ok?'今日の目標クリア':`あと${left}問`;
   $('goalStk').textContent=ok?`${st}日連続 達成中`:st?`達成で${st+1}日連続`:'達成で記録スタート';
   $('goalbox').setAttribute('aria-label',`今日の目標 ${d}/${g}問`);}
@@ -4398,7 +4541,7 @@ function setTab(t){
   for(const x of ['card','quiz','mc','test','list']){$('t-'+x).setAttribute('aria-selected',x===t);$('v-'+x).hidden=x!==t}
   savePrefs(); refresh(false); qmodeSync(); requestAnimationFrame(fitCard);
 }
-function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({lsort:typeof lsort==='string'?lsort:'no',range:rangeVal(),filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,tab,testN:testN||10,testLast:typeof testLast!=='undefined'?testLast:null,testKinds:typeof testKinds!=='undefined'?testKinds:undefined}))}catch(e){}}
+function savePrefs(){try{localStorage.setItem(KEY+'-p',JSON.stringify({lsort:typeof lsort==='string'?lsort:'no',range:rangeVal(),filter:$('filter').value,dir:$('dir').value,order:$('order').value,sound:$('sound').value,vib:$('vib').value,theme:$('theme').value,tab,testN:testN||10,testLast:typeof testLast!=='undefined'?testLast:null,testKinds:typeof testKinds!=='undefined'?testKinds:undefined}))}catch(e){}}
 function refresh(reset=true){
   ctlSync();
   if(reset||!P.length){P=pool();ci=0}
@@ -4415,6 +4558,7 @@ $('ceCancel').onclick=closeCardEdit;$('ceImg').onclick=()=>{const c=ceCard;if(!c
 $('cedit').onclick=e=>{if(e.target.id==='cedit')closeCardEdit()};
 ['ceEn','ceJp','ceMemo'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();saveCardEdit()}}));
 $('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
+$('theme').onchange=()=>{savePrefs();applyTheme()};
 $('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
 for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];ctlSync();refresh(true)};
 // 案2: one compact row — the range is a list, the other three switch each time they are pressed
@@ -4616,11 +4760,13 @@ $('askForm').onsubmit=e=>{e.preventDefault();const v=$('askIn').value;$('askIn')
 $('bagBtn').onclick=()=>toast('<div><strong>ランキングは準備中です</strong><span>使う人が増えたら、ミーモと一緒に順位が出るようになります</span></div>'); $('shopClose').onclick=closeShop;
 $('hangerBtn').onclick=e=>{e.stopPropagation();$('wardrobe').hidden?openWardrobe():closeWardrobe()};
 $('wardrobe').onclick=e=>e.stopPropagation();
-document.addEventListener('click',()=>{if(!$('wardrobe').hidden)closeWardrobe()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('cedit').hidden){closeCardEdit();return}if(bigCard)setBigCard(false);closeOpt();if(deckOpen()){closeDeckEdit();navOn('navHome')}if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
+document.addEventListener('click',()=>{const wd=$('wardrobe');if(!wd.hidden&&!wd.classList.contains('inme'))closeWardrobe()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('mev').classList.contains('open')&&!$('bv').classList.contains('open')&&!$('sv').classList.contains('open')){closeMe();return}if(!$('cedit').hidden){closeCardEdit();return}if(bigCard)setBigCard(false);closeOpt();if(deckOpen()){closeDeckEdit();navOn('navHome')}if($('askv').classList.contains('open'))closeAsk();if($('shopv').classList.contains('open'))closeShop();closeWardrobe()}});
 applyWear(); renderAiStats();
 $('ptsBtn').onclick=openBadges; $('bvClose').onclick=closeBadges;
-$('mascot').onclick=()=>openAsk(ASK_FREE);
+$('mascot').onclick=openMe; $('meClose').onclick=closeMe;
+$('meAsk').onclick=()=>{closeMe();openAsk(ASK_FREE)}; $('meShop').onclick=()=>{closeMe();$('navShop').click()};
+$('meStk').onclick=openStreak; $('deckNameBtn').onclick=()=>$('navLib').click();
 $('goal').value=String(S.goal);
 $('goal').onchange=()=>{S.goal=+$('goal').value;if(checkGoal())celebrateGoal();save();header()};
 $('fireBtn').onclick=openStreak; $('svClose').onclick=closeStreak;
