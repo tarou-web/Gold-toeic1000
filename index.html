@@ -2154,13 +2154,13 @@ header.qh{display:flex;flex-direction:row;align-items:center;gap:12px;padding-to
 .mascot.qav .msparks{inset:-10px}
 .qdeck{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
 .qdeck small{font-family:var(--f-jp);font-size:.72rem;font-weight:700;color:var(--muted)}
-.qdname{align-self:flex-start;max-width:100%;display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:2px 0;font:inherit;font-family:var(--f-jp);font-size:1.2rem;font-weight:800;color:var(--fg);cursor:pointer}
-.qdname span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qdname{align-self:flex-start;max-width:100%;display:inline-flex;align-items:center;gap:5px;border:0;background:none;padding:2px 0;font:inherit;font-family:var(--f-jp);font-size:1.08rem;font-weight:800;color:var(--fg);cursor:pointer}
+.qdname span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .qdname svg{flex:none;color:var(--muted)}
-.qstk{flex:none;display:inline-flex;align-items:center;gap:3px;border:0;background:none;padding:6px 0;font:inherit;color:var(--fg);cursor:pointer}
+.qstk{flex:none;display:grid;grid-template-columns:auto auto;grid-template-rows:auto auto;column-gap:3px;align-items:center;border:0;background:none;padding:6px 0;font:inherit;color:var(--fg);cursor:pointer}
 .qstk svg{color:var(--green)}
-.qstk b{font-family:var(--f);font-weight:900;font-size:1.45rem;line-height:1}
-.qstk small{font-family:var(--f-jp);font-size:.72rem;font-weight:700;color:var(--muted)}
+.qstk svg{grid-row:1}.qstk b{grid-row:1;font-family:var(--f);font-weight:900;font-size:1.45rem;line-height:1}
+.qstk small{grid-column:1/-1;grid-row:2;text-align:center;font-family:var(--f-jp);font-size:.68rem;font-weight:700;color:var(--muted);line-height:1.2}
 #goalbox.qgoal{display:flex;flex-direction:column;align-items:stretch;gap:6px;height:auto;min-height:0;margin:0!important;padding:0!important;border:0;border-radius:0;background:none}
 #goalbox.qgoal::after{display:none}
 .qgl{display:flex;justify-content:space-between;font-family:var(--f-jp);font-size:.78rem;font-weight:700;color:var(--muted)}
@@ -2203,7 +2203,7 @@ html.th-light .tabs button[aria-selected=true]{background:#fff!important;color:v
 html.th-light .bnav button{color:#625f6c!important}
 html.th-light .bnav button.on{background:#ebe9f2!important;color:#24222b!important}
 /* a soft fade under the floating menu so page content never peeks out below it */
-body::before{content:"";position:fixed;left:0;right:0;bottom:0;height:calc(92px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,transparent,var(--bg) 30%);z-index:58;pointer-events:none}
+body::before{content:"";position:fixed;left:0;right:0;bottom:0;height:calc(max(8px,env(safe-area-inset-bottom,0px) - 14px) + 40px);background:linear-gradient(to bottom,transparent,var(--bg) 6px);z-index:58;pointer-events:none}
 body.sv-lock::before{display:none}
 /* library: one card style, the deck being studied is marked by its yellow icon + 勉強中, no outline; solid "new deck" button */
 .lib-item,.lib-item.cur{border:0!important}
