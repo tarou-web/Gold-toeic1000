@@ -1157,6 +1157,11 @@ body.qmode.qactive.sheet-open .wrap{padding-bottom:200px!important}
 
 /* settings 案A */
 .setbody{gap:6px}
+.sgroup.thseg{flex-direction:row;gap:6px;padding:6px}
+.thseg button{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px 10px;border:0;border-radius:15px;background:none;color:var(--muted);font:inherit;font-family:var(--f-jp);font-size:.78rem;font-weight:800;cursor:pointer}
+.thseg button[aria-checked=true]{background:var(--green);color:#1a1600}
+html.th-light .thseg button[aria-checked=true]{box-shadow:0 3px 0 #cfa400}
+.thseg button:active{transform:translateY(2px)}
 .sgl{margin:12px 4px 0;font-family:var(--f-jp);font-size:.75rem;font-weight:800;color:var(--muted)}
 .sgroup{background:var(--surface);border-radius:20px;display:flex;flex-direction:column;overflow:hidden}
 .ph-wait.multi{flex-wrap:wrap}
@@ -2560,6 +2565,8 @@ header.qh{padding-bottom:6px}
 <section class="bv navv setv" id="setv" role="dialog" aria-labelledby="setTitle" aria-hidden="true">
   <div class="bv-hero"><div class="sv-in"><div class="sv-bar"><span></span><h2 id="setTitle">設定</h2><span></span></div></div></div>
   <div class="sv-in bv-body setbody">
+  <h2 class="sgl" id="thTitle">画面の明るさ</h2>
+  <div class="sgroup thseg" role="radiogroup" aria-labelledby="thTitle"><button type="button" role="radio" data-th="auto"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M12 6.5a5.5 5.5 0 0 1 0 11z" fill="currentColor" stroke="none"/></svg><span>端末に合わせる</span></button><button type="button" role="radio" data-th="dark"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a8.6 8.6 0 1 0 11.1 11.1z"/></svg><span>暗い</span></button><button type="button" role="radio" data-th="light"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg><span>明るい</span></button><select id="theme" hidden><option value="auto">端末に合わせる</option><option value="dark">暗い</option><option value="light">明るい</option></select></div>
   <section class="acct" id="acct" aria-labelledby="acctTitle" hidden>
     <h2 id="acctTitle" class="vh">アカウント</h2>
     <div id="acctIn" class="acard" hidden>
@@ -2591,7 +2598,6 @@ header.qh{padding-bottom:6px}
     <label class="srow"><span>1日の目標</span><span class="sval"><select id="goal"><option value="5">5問</option><option value="10">10問</option><option value="15">15問</option><option value="20">20問</option><option value="30">30問</option></select><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></label>
     <label class="srow"><span>効果音</span><span class="sval"><select id="sound"><option value="on">オン</option><option value="off">オフ</option></select><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></label>
     <label class="srow"><span>振動</span><span class="sval"><select id="vib"><option value="on">オン</option><option value="off">オフ</option></select><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></label>
-    <label class="srow"><span>画面の明るさ</span><span class="sval"><select id="theme"><option value="auto">端末に合わせる</option><option value="dark">暗い</option><option value="light">明るい</option></select><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></span></label>
   </div>
   <h2 class="sgl" id="aiTitle">ミーモ（AI）に質問した回数</h2>
   <div class="sgroup aistats" id="aiStats"></div>
@@ -4605,6 +4611,9 @@ $('cedit').onclick=e=>{if(e.target.id==='cedit')closeCardEdit()};
 ['ceEn','ceJp','ceMemo'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();saveCardEdit()}}));
 $('vib').onchange=()=>{savePrefs();if($('vib').value==='on')buzz(true)};
 $('theme').onchange=()=>{savePrefs();applyTheme()};
+function thSync(){const v=$('theme').value;document.querySelectorAll('.thseg button').forEach(b=>b.setAttribute('aria-checked',b.dataset.th===v))}
+document.querySelectorAll('.thseg button').forEach(b=>b.onclick=()=>{$('theme').value=b.dataset.th;savePrefs();applyTheme();thSync()});
+thSync();
 $('sound').onchange=()=>{savePrefs();if($('sound').value==='on')sfx(true)};
 for(const k of ['range','filter','dir','order']) $(k).onchange=()=>{hideSheet();savePrefs();QP=[];ctlSync();refresh(true)};
 // 案2: one compact row — the range is a list, the other three switch each time they are pressed
